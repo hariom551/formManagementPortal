@@ -1,28 +1,46 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Button, Form, Row } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import Form from 'react-bootstrap/Form';
+import Row from 'react-bootstrap/Row';
 import { Box } from '@mui/material';
+import Button from 'react-bootstrap/Button';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import { MdOutlinePlaylistAddCheck } from 'react-icons/md';
-import { FaUserPlus } from 'react-icons/fa';
-import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { mkConfig, generateCsv, download } from 'export-to-csv';
+import { MdOutlinePlaylistAddCheck } from "react-icons/md";
+import { FaUserPlus } from "react-icons/fa";
+import {
+    MaterialReactTable,
+    useMaterialReactTable,
+} from 'material-react-table';
 
 function IncomingForms() {
     const [PSListDetails, setPSListDetails] = useState([]);
+    // const [data, setData] = useState([{
+    //     RoomNo: '',
+    //     RoomNoE: '',
+    //     RoomNoH: ''
+    // }])
+
     const [formData, setFormData] = useState({
-        VMob1: '',
-        VMob2: '',
-        VEName: '',
-        VHName: '',
-        VEAddress: '',
-        VHAddress: '',
+        Id: '',
+        RefId: '',
         NoOfFormsKN: '',
         NoOfFormsKD: '',
         NoOfFormsU: '',
+        FeedFormKN: '',
+        FeedFormKD: '',
+        FeedFormU: '',
         PacketNo: '',
-        ReceivedDate: '',
-        ERemarks: '',
-        COList: [], // Assuming this is an array for care of details
+        COId1: '',
+        COId2: '',
+        COId3: '',
+        COId4: '',
+        COId5: '',
+        ERemark: '',
+        HRemark: '',
+        
+
+
     });
 
     useEffect(() => {
@@ -42,13 +60,15 @@ function IncomingForms() {
                     throw new Error('Empty or invalid IncomingForms details data');
                 }
                 setPSListDetails(data);
+               
             } catch (error) {
                 console.error('Error fetching IncomingForms data:', error);
             }
         };
 
         fetchData();
-    }, []);
+    }, );
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -72,17 +92,35 @@ function IncomingForms() {
         }
     };
 
+ 
+
+    // const handleAdd = () => {
+    //     setData([...data, {
+    //         RoomNo: '',
+    //         RoomNoE: '',
+    //         RoomNoH: ''
+    //     }])
+    // };
+
+    // const handleChange = (e, index) => {
+    //     const { name, value } = e.target;
+    //     const list = [...data]
+    //     list[index][name] = value
+    //     setData(list)
+    // }
+
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+      setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+ 
+    const csvConfig = mkConfig({
+        fieldSeparator: ',',
+        decimalSeparator: '.',
+        useKeysAsHeaders: true,
+    });
+
     const handleExportData = () => {
-        const csvConfig = mkConfig({
-            fieldSeparator: ',',
-            decimalSeparator: '.',
-            useKeysAsHeaders: true,
-        });
         const csv = generateCsv(csvConfig)(PSListDetails);
         download(csvConfig)(csv);
     };
@@ -130,19 +168,8 @@ function IncomingForms() {
         data: PSListDetails,
     });
 
-    const handleAddCareOf = () => {
-        setFormData({
-            ...formData,
-            COList: [...formData.COList, { VMob1: '', VEName: '', VHName: '' }]
-        });
-    };
+  
 
-    const handleCareOfChange = (e, index) => {
-        const { name, value } = e.target;
-        const updatedCOList = [...formData.COList];
-        updatedCOList[index][name] = value;
-        setFormData({ ...formData, COList: updatedCOList });
-    };
 
     return (
         <main className="bg-gray-100">
@@ -201,7 +228,7 @@ function IncomingForms() {
 
 
                 <h1 className="text-3xl font-bold my-4">Incoming Form Info</h1>
-                <Form onSubmit={handleSubmit} className="IncomingForms-form">
+                <Form onSubmit={ handleSubmit} className="IncomingForms-form">
                     <Row className="mb-3">
                         <div className="col-md-3 mb-3">
                             <Form.Group >
@@ -212,7 +239,7 @@ function IncomingForms() {
                         <div className="col-md-3 mb-3">
                             <Form.Group >
                                 <Form.Label>Mobile No. 2</Form.Label>
-                                <Form.Control type="tel" placeholder="Mobile No. 2" id="VMob2" name="VMob2" value={formData.VMob2} onChange={handleChange} />
+                                <Form.Control type="tel" placeholder="Mobile No. 2" id="VMob2" name="VMob2" value={formData.VMob2} onChange={handleChange}  />
                             </Form.Group>
                         </div>
 
@@ -285,46 +312,38 @@ function IncomingForms() {
                             </Form.Group>
                         </div>
                     </div>
-
-
+                   
                     {
-                        formData.COList.map((e, i) => {
+                        data.map((e, i) => {
                             return (
                                 <div className="row  mb-3" key={i}>
                                     <div className="col-md-3 mb-3">
                                         <Form.Group >
-                                            <Form.Label>Care of Mobile No.1</Form.Label>
-                                            <Form.Control type="text" placeholder={`Care of Mobile No.1`} id={`VMob1_${i}`} name={`VMob1_${i}`} value={e.VMob1} onChange={(event) => handleCareOfChange(event, i)} required />
+                                            <Form.Label>Care of Mobile No.{i}</Form.Label>
+                                            <Form.Control type="text" placeholder="Care of Mobile No.${i}" id="VMob1" name="VMob1" value={data.VMob1} onChange={handleChange} required />
                                         </Form.Group>
                                     </div>
                                     <div className="col-md-3 mb-3">
                                         <Form.Group >
-                                            <Form.Label>Care of Name1 (English)</Form.Label>
-                                            <Form.Control type="text" placeholder={`Care of (English)1`} id={`VEName_${i}`} name={`VEName_${i}`} value={e.VEName} onChange={(event) => handleCareOfChange(event, i)} required />
+                                            <Form.Label>Care of Name{i} (English)</Form.Label>
+                                            <Form.Control type="text" placeholder="Care of (English){i}" id="VEName" name="VEName" value={data.VEName} onChange={handleChange} required />
                                         </Form.Group>
                                     </div>
                                     <div className="col-md-3 mb-3">
                                         <Form.Group >
-                                            <Form.Label>Care of Name1 (Hindi)</Form.Label>
-                                            <Form.Control type="text" placeholder={`Care of (Hindi)1`} id={`VHName_${i}`} name={`VHName_${i}`} value={e.VHName} onChange={(event) => handleCareOfChange(event, i)} required />
+                                            <Form.Label>Care of Name{i} (Hindi)</Form.Label>
+                                            <Form.Control type="text" placeholder="Care of (Hindi){i}" id="VHName" name="VHName" value={data.VHName} onChange={handleChange} required />
                                         </Form.Group>
                                     </div>
-                                    {i === 0 && (
-                                        <div className='col-md-3 flex items-center justify-center'>
-                                            <div className='flex items-center justify-center gap-3 checkboxColor'>
-                                                <input type="checkbox" className='w-6 h-6' onClick={handleAddCareOf} />
-                                                <p>Add CareOff</p>
-                                            </div>
+                                    <div className='col-md-3  flex items-center justify-center '>
+                                        <div className='flex items-center justify-center gap-3 checkboxColor'>
+                                            <input type="checkbox" className='w-6 h-6' onClick={handleAdd} />
+                                            <p>Add CareOff</p>
                                         </div>
-                                    )}
-                                </div>
-                            );
+                                    </div>
+                                </div>)
                         })
                     }
-
-
-
-
                     <Button variant="primary" type="submit">
                         Submit
                     </Button>
@@ -356,5 +375,4 @@ function IncomingForms() {
         </main>
     );
 }
-
 export default IncomingForms;
