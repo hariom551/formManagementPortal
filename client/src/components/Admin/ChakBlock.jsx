@@ -24,10 +24,10 @@ function ChakBlock() {
 
   });
 
-  const [CBOptions, setCBOptions] = useState([]);
+  const [WBOptions, setWBOptions] = useState([]);
   useEffect(() => {
 
-    const fetchCBOptions = async () => {
+    const fetchWBOptions = async () => {
       try {
         const response = await fetch('/api/v1/admin/wardBlockDetails', {
           method: 'GET',
@@ -45,14 +45,14 @@ function ChakBlock() {
         }
         // Map data to an array of { value, label } objects
         const options = data.map(wb => ({ value: wb.Id, label: wb.EWardBlock }));
-        setCBOptions(options);
+        setWBOptions(options);
         
       } catch (error) {
         console.error('Error fetching wardblock options:', error);
       }
     };
 
-    fetchCBOptions();
+    fetchWBOptions();
   }, []);
 
   useEffect(() => {
@@ -148,7 +148,6 @@ function ChakBlock() {
     }));
 
   };
-  
 
 
   const handleDelete = async (Id) => {
@@ -250,7 +249,7 @@ function ChakBlock() {
                   required
                 >
                   <option value="">Select WardBlock</option>
-                  {CBOptions.map(option => (
+                  {WBOptions.map(option => (
                     <option
                       key={option.value}
                       value={option.value} 

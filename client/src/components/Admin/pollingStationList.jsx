@@ -2,10 +2,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
-import { Box } from '@mui/material';
+import { Box, Button as MUIButton } from '@mui/material';
 import Button from 'react-bootstrap/Button';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { mkConfig, generateCsv, download } from 'export-to-csv'; 
+import { jsPDF } from 'jspdf'; 
+import autoTable from 'jspdf-autotable';
 
 import {
   MaterialReactTable,
@@ -22,7 +24,7 @@ function PollingStationList() {
     Id: content || '', 
     DId: '',
     ESPArea: '',
-    HSPArea:'',
+    HSPArea: '',
     PSNo: '',
     ESPName: '',
     HSPName: '',
@@ -47,11 +49,10 @@ function PollingStationList() {
         }
         setPSListDetails(data);
         if (content) {
-          const PollingStationList = data.find(item =>{  return item.Id == content});
+          const PollingStationList = data.find(item => item.Id == content);
      
           if (PollingStationList) {
             setFormData(PollingStationList);
-           
           } else {
             console.error(`PollingStationList with ID ${content} not found`);
           }
@@ -63,7 +64,6 @@ function PollingStationList() {
   
     fetchData();
   }, [content]);
-  
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -89,19 +89,6 @@ function PollingStationList() {
 
   const handleEdit = async (e) => {
     e.preventDefault();
-
-    // const Id = content;
-    // const EName = document.getElementById("EName").value;
-    // const HName = document.getElementById("HName").value;
-
-
-    // const requestBody = {
-    //   Id,
-    //   EName,
-    //   HName,
-    // };
-    // console.log(requestBody);
-
     try {
       const result = await fetch("/api/v1/admin/updatePSListDetail", {
         method: 'POST',
@@ -112,9 +99,7 @@ function PollingStationList() {
       });
 
       if (result.ok) {
-
         window.location.href = '/PollingStationList';
-
         console.log("PollingStationList Updated successfully.");
       } else {
         console.error("Error in Updating PollingStationList:", result.statusText);
@@ -124,18 +109,15 @@ function PollingStationList() {
     }
   };
 
-
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData(prevFormData => ({
       ...prevFormData,
       [name]: value
     }));
-  }
+  };
   
-  const handleDelete = async (Id) =>{
-  
-
+  const handleDelete = async (Id) => {
     try {
       let result = await fetch("/api/v1/Admin/deletePSListDetail", {
         method: 'POST',
@@ -147,12 +129,12 @@ function PollingStationList() {
 
       if (result.ok) {
         window.location.reload();
-        console.log("PollingStationList Added Successfully successfully.");
+        console.log("PollingStationList deleted successfully.");
       } else {
-        console.error("Error in Adding PollingStationList:", result.statusText);
+        console.error("Error in deleting PollingStationList:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in Adding PollingStationList:", error.message);
+      console.error("Error in deleting PollingStationList:", error.message);
     }
   };
 
@@ -162,11 +144,22 @@ function PollingStationList() {
     useKeysAsHeaders: true,
   });
   
-  const handleExportData = () => {
-    const csv = generateCsv(csvConfig)(PSListDetails);
-    download(csvConfig)(csv);
+  const handleExport = (rows, format) => {
+    if (format === 'csv') {
+      const csv = generateCsv(csvConfig)(rows.map(row => row.original));
+      download(csvConfig)(csv);
+    } else if (format === 'pdf') {
+      const doc = new jsPDF();
+      const tableData = rows.map(row => Object.values(row.original));
+      const tableHeaders = columns.map(c => c.header);
+      autoTable(doc, {
+        head: [tableHeaders],
+        body: tableData,
+      });
+      doc.save('PollingStationList-export.pdf');
+    }
   };
-  
+
   const columns = useMemo(() => [
     {
       accessorKey: 'Id',
@@ -179,22 +172,15 @@ function PollingStationList() {
       size: 10,
       Cell: ({ row }) => (
         <>
-        
-
-            <Button variant="primary" className="changepassword">
-            <Link
-              to={{ pathname: "/PollingStationList", search: `?content=${row.original.Id}` }}
-            >
+          <Button variant="primary" className="changepassword">
+            <Link to={{ pathname: "/PollingStationList", search: `?content=${row.original.Id}` }}>
               Edit
             </Link>
           </Button>
           <Button variant="danger" onClick={() => handleDelete(row.original.Id)} className="delete" type='button'>
-
             Delete
-
           </Button>
-
-      </>
+        </>
       ),
     },
     {
@@ -203,35 +189,64 @@ function PollingStationList() {
       size: 20,
     },
     {
-        accessorKey: 'HSPArea',
-        header: 'PS Area (Hindi)',
-        size: 20,
+      accessorKey: 'HSPArea',
+      header: 'PS Area (Hindi)',
+      size: 20,
     },
     {
-        accessorKey: 'PSNo',
-        header: 'PS No.',
-        size: 20,
+      accessorKey: 'PSNo',
+      header: 'PS No.',
+      size: 20,
     },
     {
-        accessorKey: 'ESPName',
-        header: 'PS Name(English)',
-        size: 20,
+      accessorKey: 'ESPName',
+      header: 'PS Name(English)',
+      size: 20,
     },
     {
-        accessorKey: 'HSPName',
-        header: 'PS Name (Hindi)',
-        size: 20,
+      accessorKey: 'HSPName',
+      header: 'PS Name (Hindi)',
+      size: 20,
     },
     {
-        accessorKey: 'RoomNo',
-        header: 'Room No.',
-        size: 20,
+      accessorKey: 'RoomNo',
+      header: 'Room No.',
+      size: 20,
     },
   ], []);
 
   const table = useMaterialReactTable({
     columns,
     data: PSListDetails,
+    enableRowSelection: true,
+    columnFilterDisplayMode: 'popover',
+    paginationDisplayMode: 'pages',
+    positionToolbarAlertBanner: 'bottom',
+    renderTopToolbarCustomActions: ({ table }) => (
+      <Box
+        sx={{
+          display: 'flex',
+          gap: '16px',
+          padding: '8px',
+          flexWrap: 'wrap',
+        }}
+      >
+        <MUIButton
+          disabled={table.getPrePaginationRowModel().rows.length === 0}
+          onClick={() => handleExport(table.getPrePaginationRowModel().rows, 'csv')}
+          startIcon={<FileDownloadIcon />}
+        >
+          Export All Data (CSV)
+        </MUIButton>
+        <MUIButton
+          disabled={table.getPrePaginationRowModel().rows.length === 0}
+          onClick={() => handleExport(table.getPrePaginationRowModel().rows, 'pdf')}
+          startIcon={<FileDownloadIcon />}
+        >
+          Export All Data (PDF)
+        </MUIButton>
+      </Box>
+    ),
   });
 
   return (
@@ -241,79 +256,56 @@ function PollingStationList() {
         <Form onSubmit={content ? handleEdit : handleSubmit} className="PollingStationList-form">
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
-              <Form.Group >
+              <Form.Group>
                 <Form.Label>PS Area (English)</Form.Label>
                 <Form.Control type="text" placeholder="PS Area (English)" id="ESPArea" name="ESPArea" value={formData.ESPArea} onChange={handleChange} required />
               </Form.Group>
             </div>
             <div className="col-md-3 mb-3">
-              <Form.Group >
+              <Form.Group>
                 <Form.Label>PS Area (Hindi)</Form.Label>
                 <Form.Control type="text" placeholder="PS Area (Hindi)" id="HSPArea" name="HSPArea" value={formData.HSPArea} onChange={handleChange} required />
               </Form.Group>
             </div>
-
             <div className="col-md-3 mb-3">
-              <Form.Group >
+              <Form.Group>
                 <Form.Label>PS No.</Form.Label>
                 <Form.Control type="text" placeholder="PS No." id="PSNo" name="PSNo" value={formData.PSNo} onChange={handleChange} required />
               </Form.Group>
             </div>
-            </Row>
-
-            <Row className="mb-3">
-           
-
+          </Row>
+          <Row className="mb-3">
             <div className="col-md-3 mb-3">
-              <Form.Group >
+              <Form.Group>
                 <Form.Label>PS Name (English)</Form.Label>
                 <Form.Control type="text" placeholder="PS Name (English)" id="ESPName" name="ESPName" value={formData.ESPName} onChange={handleChange} required />
               </Form.Group>
             </div>
-
             <div className="col-md-3 mb-3">
-              <Form.Group >
+              <Form.Group>
                 <Form.Label>PS Name (Hindi)</Form.Label>
                 <Form.Control type="text" placeholder="PS Name (Hindi)" id="HSPName" name="HSPName" value={formData.HSPName} onChange={handleChange} required />
               </Form.Group>
             </div>
-
             <div className="col-md-3 mb-3">
-              <Form.Group >
+              <Form.Group>
                 <Form.Label>Room No.</Form.Label>
                 <Form.Control type="text" placeholder="Room No." id="RoomNo" name="RoomNo" value={formData.RoomNo} onChange={handleChange} required />
               </Form.Group>
             </div>
-            </Row>
-          
-            <Button variant="primary" type="submit">
+          </Row>
+          <Button variant="primary" type="submit">
             {content ? 'Update' : 'Submit'}
           </Button>
-
         </Form>
         <hr className="my-4" />
         <h4 className="container mt-3 text-xl font-bold mb-3">PollingStationList List</h4>
         <div className="overflow-x-auto">
-        <Box
-            sx={{
-                display: 'flex',
-                gap: '16px',
-                padding: '8px',
-                flexWrap: 'wrap',
-            }}
-            >
-            <Button
-                onClick={handleExportData}
-                startIcon={<FileDownloadIcon />}
-            >
-                Export Data
-            </Button>
-        </Box>
-
           <MaterialReactTable table={table} />
         </div>
       </div>
     </main>
   );
 }
+
 export default PollingStationList;
