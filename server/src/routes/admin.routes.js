@@ -1,13 +1,16 @@
 import { Router } from "express"
 import { verifyJWT } from "../middleware/auth.middleware.js"
-import {AddCaste, casteDetails, UpdateCasteDetail,
-        AddTehsil, TehsilDetails, UpdateTehsilDetail, DeleteTehsilDetail, 
+import {
+        AddCaste, casteDetails, UpdateCasteDetail,
+        AddTehsil, TehsilDetails, UpdateTehsilDetail, DeleteTehsilDetail,
         AddCouncil, CouncilDetails, UpdateCouncilDetail, DeleteCouncilDetail,
-        AddVidhanSabha,VidhanSabhaDetails,UpdateVidhanSabhaDetail,DeleteVidhanSabhaDetail,
-        AddWardBlock,WardBlockDetails,UpdateWardBlockDetail,DeleteWardBlockDetail,
-        AddChakBlock,ChakBlockDetails,UpdateChakBlockDetail,DeleteChakBlockDetail,
-        AddAreaVill,AreaVillDetails,UpdateAreaVillDetail,DeleteAreaVillDetail,
-        AddPSList, PSListDetails, UpdatePSListDetail, DeletePSListDetail        
+        AddVidhanSabha, VidhanSabhaDetails, UpdateVidhanSabhaDetail, DeleteVidhanSabhaDetail,
+        AddWardBlock, WardBlockDetails, UpdateWardBlockDetail, DeleteWardBlockDetail,
+        AddChakBlock, ChakBlockDetails, UpdateChakBlockDetail, DeleteChakBlockDetail,
+        AddAreaVill, AreaVillDetails, UpdateAreaVillDetail, DeleteAreaVillDetail,
+        AddPSList, PSListDetails, UpdatePSListDetail, DeletePSListDetail,
+        SearchPSNo,
+
 }
         from "../controllers/admin.controllers.js";
 
@@ -55,6 +58,7 @@ AdminRouter.route("/addPSList").post(AddPSList)
 AdminRouter.route("/pSListDetails").get(PSListDetails)
 AdminRouter.route("/updatePSListDetail").post(UpdatePSListDetail)
 AdminRouter.route("/deletePSListDetail").post(DeletePSListDetail)
+AdminRouter.route("/searchPSNo").post(SearchPSNo)
 
 
 

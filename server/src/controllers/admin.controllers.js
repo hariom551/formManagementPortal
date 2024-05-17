@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import {pool} from '../db/database.js';
+import { pool } from '../db/database.js';
 
 
 function queryDatabase(sql, params) {
@@ -11,7 +11,7 @@ function queryDatabase(sql, params) {
             if (error) {
                 reject(error);
             } else {
-                resolve(results);   
+                resolve(results);
             }
         });
     });
@@ -20,7 +20,7 @@ function queryDatabase(sql, params) {
 const AddCaste = asyncHandler(async (req, res) => {
     const { ESurname, HSurname, ECaste, HCaste } = req.body;
 
-    if (!ESurname || !HSurname || !ECaste || !HCaste ) {
+    if (!ESurname || !HSurname || !ECaste || !HCaste) {
         throw new ApiError(400, "Please enter all details!")
     }
 
@@ -44,18 +44,18 @@ const AddCaste = asyncHandler(async (req, res) => {
 });
 
 const casteDetails = asyncHandler(async (req, res) => {
-    
-        try {
-            const results = await queryDatabase('SELECT * FROM caste');  
-            return res.json(results); // Should correctly return the results array
-        } catch (error) {
-            console.error('Database query error', error);
-            return res.status(500).send('A database error occurred.');
-        }
+
+    try {
+        const results = await queryDatabase('SELECT * FROM caste');
+        return res.json(results); // Should correctly return the results array
+    } catch (error) {
+        console.error('Database query error', error);
+        return res.status(500).send('A database error occurred.');
+    }
 });
 
-const UpdateCasteDetail = asyncHandler(async(req, res)=> {
-    const { ID, ESurname, HSurname, ECaste, HCaste} = req.body;
+const UpdateCasteDetail = asyncHandler(async (req, res) => {
+    const { ID, ESurname, HSurname, ECaste, HCaste } = req.body;
     if (!ID || !ESurname || !HSurname || !ECaste || !HCaste) {
         throw new ApiError(400, "Please enter all details!")
     }
@@ -66,7 +66,7 @@ const UpdateCasteDetail = asyncHandler(async(req, res)=> {
             [ESurname, HSurname, ECaste, HCaste, ID]
         );
 
-        const updatedCaste= {
+        const updatedCaste = {
             ID, ESurname, HSurname, ECaste, HCaste
         };
 
@@ -80,9 +80,9 @@ const UpdateCasteDetail = asyncHandler(async(req, res)=> {
 });
 
 const AddTehsil = asyncHandler(async (req, res) => {
-    const { EName, HName} = req.body;
+    const { EName, HName } = req.body;
 
-    if (!EName || !HName ) {
+    if (!EName || !HName) {
         throw new ApiError(400, "Please enter all details!")
     }
 
@@ -106,9 +106,9 @@ const AddTehsil = asyncHandler(async (req, res) => {
 });
 
 const TehsilDetails = asyncHandler(async (req, res) => {
-    
+
     try {
-        const results = await queryDatabase('SELECT * FROM tehsillist');  
+        const results = await queryDatabase('SELECT * FROM tehsillist');
         return res.json(results); // Should correctly return the results array
     } catch (error) {
         console.error('Database query error', error);
@@ -116,8 +116,8 @@ const TehsilDetails = asyncHandler(async (req, res) => {
     }
 });
 
-const UpdateTehsilDetail = asyncHandler(async(req, res)=> {
-    const { Id, EName, HName} = req.body;
+const UpdateTehsilDetail = asyncHandler(async (req, res) => {
+    const { Id, EName, HName } = req.body;
     if (!Id || !EName || !HName) {
         throw new ApiError(400, "Please enter all details!")
     }
@@ -128,7 +128,7 @@ const UpdateTehsilDetail = asyncHandler(async(req, res)=> {
             [EName, HName, Id]
         );
 
-        const updatedCaste= {
+        const updatedCaste = {
             EName, HName, Id
         };
 
@@ -142,9 +142,9 @@ const UpdateTehsilDetail = asyncHandler(async(req, res)=> {
 });
 
 
-const DeleteTehsilDetail = asyncHandler(async(req, res)=> {
-    const { Id} = req.body;
-  
+const DeleteTehsilDetail = asyncHandler(async (req, res) => {
+    const { Id } = req.body;
+
 
     try {
         await queryDatabase(
@@ -162,10 +162,10 @@ const DeleteTehsilDetail = asyncHandler(async(req, res)=> {
     }
 });
 
-const AddCouncil = asyncHandler(async(req, res) =>{
-    const { ECouncil, HCouncil, TehId} = req.body;
+const AddCouncil = asyncHandler(async (req, res) => {
+    const { ECouncil, HCouncil, TehId } = req.body;
 
-    if( !ECouncil || !HCouncil || !TehId)
+    if (!ECouncil || !HCouncil || !TehId)
         throw new ApiError(400, 'Plaese Enter All the Details')
 
 
@@ -175,7 +175,7 @@ const AddCouncil = asyncHandler(async(req, res) =>{
             [TehId, ECouncil, HCouncil]
         );
 
-        const AddedCouncil ={
+        const AddedCouncil = {
             TehId, ECouncil, HCouncil
         }
         return res.status(201).json(
@@ -189,10 +189,10 @@ const AddCouncil = asyncHandler(async(req, res) =>{
 });
 
 const CouncilDetails = asyncHandler(async (req, res) => {
-    
+
     try {
-        const results = await queryDatabase('SELECT council.*, tehsillist.EName FROM tehsillist RIGHT JOIN council ON council.TehId = tehsillist.Id');  
-       
+        const results = await queryDatabase('SELECT council.*, tehsillist.EName FROM tehsillist RIGHT JOIN council ON council.TehId = tehsillist.Id');
+
         return res.json(results); // Should correctly return the results array
     } catch (error) {
         console.error('Database query error', error);
@@ -200,8 +200,8 @@ const CouncilDetails = asyncHandler(async (req, res) => {
     }
 });
 
-const UpdateCouncilDetail = asyncHandler(async(req, res)=> {
-    const { Id, TehId, ECouncil, HCouncil} = req.body;
+const UpdateCouncilDetail = asyncHandler(async (req, res) => {
+    const { Id, TehId, ECouncil, HCouncil } = req.body;
     if (!Id, !TehId || !ECouncil || !HCouncil) {
         throw new ApiError(400, "Please enter all details!")
     }
@@ -211,7 +211,7 @@ const UpdateCouncilDetail = asyncHandler(async(req, res)=> {
             [ECouncil, HCouncil, TehId, Id]
         );
 
-        const updatedCouncil= {
+        const updatedCouncil = {
             ECouncil, HCouncil, TehId
         };
 
@@ -225,9 +225,9 @@ const UpdateCouncilDetail = asyncHandler(async(req, res)=> {
 });
 
 
-const DeleteCouncilDetail = asyncHandler(async(req, res)=> {
-    const { Id} = req.body;
-  
+const DeleteCouncilDetail = asyncHandler(async (req, res) => {
+    const { Id } = req.body;
+
 
     try {
         await queryDatabase(
@@ -245,12 +245,12 @@ const DeleteCouncilDetail = asyncHandler(async(req, res)=> {
     }
 });
 
-const AddVidhanSabha = asyncHandler(async(req, res) =>{
-    const { EVidhanSabha, HVidhanSabha, VSNo, counId} = req.body;
-    
+const AddVidhanSabha = asyncHandler(async (req, res) => {
+    const { EVidhanSabha, HVidhanSabha, VSNo, counId } = req.body;
 
 
-    if( !EVidhanSabha || !HVidhanSabha || !counId || !VSNo)
+
+    if (!EVidhanSabha || !HVidhanSabha || !counId || !VSNo)
         throw new ApiError(400, 'Plaese Enter All the Details')
 
 
@@ -259,7 +259,7 @@ const AddVidhanSabha = asyncHandler(async(req, res) =>{
             'INSERT INTO vidhansabha (counId, EVidhanSabha, HVidhanSabha, VSNo) VALUES (?, ?, ?,?)',
             [counId, EVidhanSabha, HVidhanSabha, VSNo]
         );
-        const AddedCouncil ={
+        const AddedCouncil = {
             counId, EVidhanSabha, HVidhanSabha, VSNo
         }
         return res.status(201).json(
@@ -273,10 +273,10 @@ const AddVidhanSabha = asyncHandler(async(req, res) =>{
 });
 
 const VidhanSabhaDetails = asyncHandler(async (req, res) => {
-    
+
     try {
-        const results = await queryDatabase('SELECT vidhansabha.*, council.ECouncil, tehsillist.EName, tehsillist.Id as TehId FROM vidhansabha INNER JOIN council ON vidhansabha.counId = council.id INNER JOIN tehsillist ON tehsillist.id = council.TehId;');  
-       
+        const results = await queryDatabase('SELECT vidhansabha.*, council.ECouncil, tehsillist.EName, tehsillist.Id as TehId FROM vidhansabha INNER JOIN council ON vidhansabha.counId = council.id INNER JOIN tehsillist ON tehsillist.id = council.TehId;');
+
         return res.json(results); // Should correctly return the results array
     } catch (error) {
         console.error('Database query error', error);
@@ -284,20 +284,20 @@ const VidhanSabhaDetails = asyncHandler(async (req, res) => {
     }
 });
 
-const UpdateVidhanSabhaDetail = asyncHandler(async(req, res)=> {
+const UpdateVidhanSabhaDetail = asyncHandler(async (req, res) => {
     // counId, EVidhanSabha, HVidhanSabha, VSNo
-    const {Id, counId, EVidhanSabha, HVidhanSabha, VSNo} = req.body;
-    
+    const { Id, counId, EVidhanSabha, HVidhanSabha, VSNo } = req.body;
+
     if (!Id, !counId || !EVidhanSabha || !HVidhanSabha || !VSNo) {
         throw new ApiError(400, "Please enter all details!")
     }
     try {
         await queryDatabase(
             'UPDATE vidhansabha SET EVidhanSabha= ?, HVidhanSabha= ?, VSNo =?, counId =? WHERE Id= ?',
-            [EVidhanSabha, HVidhanSabha, VSNo, counId,Id ]
+            [EVidhanSabha, HVidhanSabha, VSNo, counId, Id]
         );
 
-        const updatedVS= {
+        const updatedVS = {
             EVidhanSabha, HVidhanSabha, VSNo, counId, Id
         };
 
@@ -310,9 +310,9 @@ const UpdateVidhanSabhaDetail = asyncHandler(async(req, res)=> {
     }
 });
 
-const DeleteVidhanSabhaDetail = asyncHandler(async(req, res)=> {
-    const { Id} = req.body;
-  
+const DeleteVidhanSabhaDetail = asyncHandler(async (req, res) => {
+    const { Id } = req.body;
+
 
     try {
         await queryDatabase(
@@ -330,10 +330,10 @@ const DeleteVidhanSabhaDetail = asyncHandler(async(req, res)=> {
     }
 });
 
-const AddWardBlock = asyncHandler(async(req, res) =>{
-    const { EWardBlock, HWardBlock,WardNo, VSId} = req.body;
+const AddWardBlock = asyncHandler(async (req, res) => {
+    const { EWardBlock, HWardBlock, WardNo, VSId } = req.body;
 
-    if( !EWardBlock || !HWardBlock || !WardNo || !VSId )
+    if (!EWardBlock || !HWardBlock || !WardNo || !VSId)
         throw new ApiError(400, 'Plaese Enter All the Details')
 
 
@@ -343,7 +343,7 @@ const AddWardBlock = asyncHandler(async(req, res) =>{
             [VSId, EWardBlock, HWardBlock, WardNo]
         );
 
-        const AddedCouncil ={
+        const AddedCouncil = {
             VSId, EWardBlock, HWardBlock, WardNo
         }
         return res.status(201).json(
@@ -357,10 +357,10 @@ const AddWardBlock = asyncHandler(async(req, res) =>{
 });
 
 const WardBlockDetails = asyncHandler(async (req, res) => {
-    
+
     try {
-        const results = await queryDatabase('SELECT wardblock.*, vidhansabha.EVidhanSabha FROM wardblock INNER JOIN vidhansabha ON vidhansabha.Id = wardblock.VSId');  
-       
+        const results = await queryDatabase('SELECT wardblock.*, vidhansabha.EVidhanSabha FROM wardblock INNER JOIN vidhansabha ON vidhansabha.Id = wardblock.VSId');
+
         return res.json(results); // Should correctly return the results array
     } catch (error) {
         console.error('Database query error', error);
@@ -368,9 +368,9 @@ const WardBlockDetails = asyncHandler(async (req, res) => {
     }
 });
 
-const UpdateWardBlockDetail = asyncHandler(async(req, res)=> {
-    
-    const { Id, VSId, WardNo, EWardBlock, HWardBlock} = req.body;
+const UpdateWardBlockDetail = asyncHandler(async (req, res) => {
+
+    const { Id, VSId, WardNo, EWardBlock, HWardBlock } = req.body;
     if (!Id, !VSId || !EWardBlock || !WardNo || !HWardBlock) {
         throw new ApiError(400, "Please enter all details!")
     }
@@ -380,7 +380,7 @@ const UpdateWardBlockDetail = asyncHandler(async(req, res)=> {
             [EWardBlock, HWardBlock, VSId, WardNo, Id]
         );
 
-        const updatedCouncil= {
+        const updatedCouncil = {
             EWardBlock, HWardBlock, VSId, WardNo, Id
         };
 
@@ -393,9 +393,9 @@ const UpdateWardBlockDetail = asyncHandler(async(req, res)=> {
     }
 });
 
-const DeleteWardBlockDetail = asyncHandler(async(req, res)=> {
-    const { Id} = req.body;
-  
+const DeleteWardBlockDetail = asyncHandler(async (req, res) => {
+    const { Id } = req.body;
+
 
     try {
         await queryDatabase(
@@ -413,10 +413,10 @@ const DeleteWardBlockDetail = asyncHandler(async(req, res)=> {
     }
 });
 
-const AddChakBlock = asyncHandler(async(req, res) =>{
-    const { ECBPanch, HCBPanch,ChakNo, WBId} = req.body;
+const AddChakBlock = asyncHandler(async (req, res) => {
+    const { ECBPanch, HCBPanch, ChakNo, WBId } = req.body;
 
-    if( !ECBPanch || !HCBPanch || !ChakNo || !WBId )
+    if (!ECBPanch || !HCBPanch || !ChakNo || !WBId)
         throw new ApiError(400, 'Plaese Enter All the Details')
 
 
@@ -426,7 +426,7 @@ const AddChakBlock = asyncHandler(async(req, res) =>{
             [WBId, ECBPanch, HCBPanch, ChakNo]
         );
 
-        const AddedCouncil ={
+        const AddedCouncil = {
             WBId, ECBPanch, HCBPanch, ChakNo
         }
         return res.status(201).json(
@@ -440,20 +440,20 @@ const AddChakBlock = asyncHandler(async(req, res) =>{
 });
 
 const ChakBlockDetails = asyncHandler(async (req, res) => {
-    
+
     try {
-        const results = await queryDatabase('SELECT chakblockpanch.*, wardblock.EWardBlock FROM chakblockpanch INNER JOIN wardblock ON wardblock.Id = chakblockpanch.WBId');  
-       
-        return res.json(results); 
+        const results = await queryDatabase('SELECT chakblockpanch.*, wardblock.EWardBlock FROM chakblockpanch INNER JOIN wardblock ON wardblock.Id = chakblockpanch.WBId');
+
+        return res.json(results);
     } catch (error) {
         console.error('Database query error', error);
         return res.status(500).send('A database error occurred.');
     }
 });
 
-const UpdateChakBlockDetail = asyncHandler(async(req, res)=> {
-    console.log(" hariom ",req.body);
-    const { Id, WBId, ChakNo, ECBPanch, HCBPanch} = req.body;
+const UpdateChakBlockDetail = asyncHandler(async (req, res) => {
+    console.log(" hariom ", req.body);
+    const { Id, WBId, ChakNo, ECBPanch, HCBPanch } = req.body;
     if (!Id, !WBId || !ChakNo || !ECBPanch || !HCBPanch) {
         throw new ApiError(400, "Please enter all details!")
     }
@@ -463,7 +463,7 @@ const UpdateChakBlockDetail = asyncHandler(async(req, res)=> {
             [ECBPanch, HCBPanch, WBId, ChakNo, Id]
         );
 
-        const updatedCouncil= {
+        const updatedCouncil = {
             ECBPanch, HCBPanch, WBId, ChakNo, Id
         };
 
@@ -476,9 +476,9 @@ const UpdateChakBlockDetail = asyncHandler(async(req, res)=> {
     }
 });
 
-const DeleteChakBlockDetail = asyncHandler(async(req, res)=> {
-    const { Id} = req.body;
-      try {
+const DeleteChakBlockDetail = asyncHandler(async (req, res) => {
+    const { Id } = req.body;
+    try {
         await queryDatabase(
             'DELETE FROM chakblockpanch WHERE Id= ?',
             [Id]
@@ -494,12 +494,12 @@ const DeleteChakBlockDetail = asyncHandler(async(req, res)=> {
     }
 });
 
-const AddAreaVill = asyncHandler(async(req, res) =>{
-    const { EAreaVill, HAreaVill, HnoRange, CBPId} = req.body;
-    
+const AddAreaVill = asyncHandler(async (req, res) => {
+    const { EAreaVill, HAreaVill, HnoRange, CBPId } = req.body;
 
 
-    if( !EAreaVill || !HAreaVill || !CBPId || !HnoRange)
+
+    if (!EAreaVill || !HAreaVill || !CBPId || !HnoRange)
         throw new ApiError(400, 'Plaese Enter All the Details')
 
 
@@ -508,7 +508,7 @@ const AddAreaVill = asyncHandler(async(req, res) =>{
             'INSERT INTO areavill (CBPId, EAreaVill, HAreaVill, HnoRange) VALUES (?, ?, ?,?)',
             [CBPId, EAreaVill, HAreaVill, HnoRange]
         );
-        const AddedCouncil ={
+        const AddedCouncil = {
             CBPId, EAreaVill, HAreaVill, HnoRange
         }
         return res.status(201).json(
@@ -522,10 +522,10 @@ const AddAreaVill = asyncHandler(async(req, res) =>{
 });
 
 const AreaVillDetails = asyncHandler(async (req, res) => {
-    
+
     try {
-        const results = await queryDatabase('SELECT areavill.*, chakblockpanch.ECBPanch, wardblock.EWardBlock, wardblock.Id as WBId FROM areavill INNER JOIN chakblockpanch ON areavill.CBPId = chakblockpanch.id INNER JOIN wardblock ON wardblock.id = chakblockpanch.WBID;');  
-       
+        const results = await queryDatabase('SELECT areavill.*, chakblockpanch.ECBPanch, wardblock.EWardBlock, wardblock.Id as WBId FROM areavill INNER JOIN chakblockpanch ON areavill.CBPId = chakblockpanch.id INNER JOIN wardblock ON wardblock.id = chakblockpanch.WBID;');
+
         return res.json(results); // Should correctly return the results array
     } catch (error) {
         console.error('Database query error', error);
@@ -533,23 +533,23 @@ const AreaVillDetails = asyncHandler(async (req, res) => {
     }
 });
 
-const UpdateAreaVillDetail = asyncHandler(async(req, res)=> {
+const UpdateAreaVillDetail = asyncHandler(async (req, res) => {
     // counId, EVidhanSabha, HVidhanSabha, VSNo
-    const {Id, CBPId, EAreaVill, HAreaVill, HnoRange} = req.body;
-    
+    const { Id, CBPId, EAreaVill, HAreaVill, HnoRange } = req.body;
+
     if (!Id, !CBPId || !EAreaVill || !HAreaVill || !HnoRange) {
         throw new ApiError(400, "Please enter all details!")
     }
     try {
         await queryDatabase(
             'UPDATE areavill SET EAreaVill= ?, HAreaVill= ?, HnoRange =?, CBPId =? WHERE Id= ?',
-            [EAreaVill, HAreaVill, HnoRange, CBPId,Id ]
+            [EAreaVill, HAreaVill, HnoRange, CBPId, Id]
         );
 
-        const updatedVS= {
+        const updatedVS = {
             EAreaVill, HAreaVill, HnoRange, CBPId, Id
         };
-        
+
         return res.status(201).json(
             new ApiResponse(200, updatedVS, "VidhanSabha details Updated successfully")
         );
@@ -559,9 +559,9 @@ const UpdateAreaVillDetail = asyncHandler(async(req, res)=> {
     }
 });
 
-const DeleteAreaVillDetail = asyncHandler(async(req, res)=> {
-    const { Id} = req.body;
-  console.log(req.body)
+const DeleteAreaVillDetail = asyncHandler(async (req, res) => {
+    const { Id } = req.body;
+    console.log(req.body)
     try {
         await queryDatabase(
             'DELETE FROM areavill WHERE Id= ?',
@@ -578,21 +578,21 @@ const DeleteAreaVillDetail = asyncHandler(async(req, res)=> {
     }
 });
 
-const AddPSList = asyncHandler(async(req, res) =>{
+const AddPSList = asyncHandler(async (req, res) => {
     const { ESPArea, HSPArea, PSNo, ESPName, HSPName, RoomNo } = req.body;
     console.log(req.body);
 
 
-    if( !ESPArea  || !HSPArea || !PSNo || !ESPName || !HSPName || !RoomNo)
+    if (!ESPArea || !HSPArea || !PSNo || !ESPName || !HSPName || !RoomNo)
         throw new ApiError(400, 'Plaese Enter All the Details')
 
 
     try {
         await queryDatabase(
             'INSERT INTO pollingstation (ESPArea, HSPArea, PSNo, ESPName, HSPName, RoomNo) VALUES (?, ?, ?,?, ?,?)',
-            [ESPArea, HSPArea, PSNo, ESPName, HSPName, RoomNo ]
+            [ESPArea, HSPArea, PSNo, ESPName, HSPName, RoomNo]
         );
-        const AddedPSList ={
+        const AddedPSList = {
             HSPArea, HSPArea, PSNo, ESPName, HSPName, RoomNo
         }
         return res.status(201).json(
@@ -605,36 +605,34 @@ const AddPSList = asyncHandler(async(req, res) =>{
     }
 });
 
-
-
 const PSListDetails = asyncHandler(async (req, res) => {
-    
+
     try {
         const results = await queryDatabase('SELECT * FROM pollingstation')
-        return res.json(results); 
+        return res.json(results);
     } catch (error) {
         console.error('Database query error', error);
         return res.status(500).send('A database error occurred.');
     }
 });
 
-const UpdatePSListDetail = asyncHandler(async(req, res)=> {
-  
-    const { Id, ESPArea, HSPArea, PSNo, ESPName, HSPName, RoomNo} = req.body;
-    
-    if (!Id,  !ESPArea  || !HSPArea || !PSNo || !ESPName || !HSPName || !RoomNo) {
+const UpdatePSListDetail = asyncHandler(async (req, res) => {
+
+    const { Id, ESPArea, HSPArea, PSNo, ESPName, HSPName, RoomNo } = req.body;
+
+    if (!Id, !ESPArea || !HSPArea || !PSNo || !ESPName || !HSPName || !RoomNo) {
         throw new ApiError(400, "Please enter all details!")
     }
     try {
         await queryDatabase(
             'UPDATE pollingstation SET ESPArea= ?, HSPArea= ?, PSNo =?, ESPName =?, HSPName=?, RoomNo=? WHERE Id= ?',
-            [ ESPArea, HSPArea, PSNo, ESPName, HSPName, RoomNo, Id ]
+            [ESPArea, HSPArea, PSNo, ESPName, HSPName, RoomNo, Id]
         );
 
-        const updatedPSList= {
+        const updatedPSList = {
             Id, ESPArea, HSPArea, PSNo, ESPName, HSPName, RoomNo
         };
-        
+
         return res.status(201).json(
             new ApiResponse(200, updatedPSList, "PSList details Updated successfully")
         );
@@ -644,9 +642,8 @@ const UpdatePSListDetail = asyncHandler(async(req, res)=> {
     }
 });
 
-const DeletePSListDetail = asyncHandler(async(req, res)=> {
-    const {Id} = req.body;
-  console.log(req.body)
+const DeletePSListDetail = asyncHandler(async (req, res) => {
+    const { Id } = req.body;
     try {
         await queryDatabase(
             'DELETE FROM pollingstation WHERE Id= ?',
@@ -664,21 +661,42 @@ const DeletePSListDetail = asyncHandler(async(req, res)=> {
 });
 
 
+const SearchPSNo = asyncHandler(async (req, res) => {
+    const { query } = req.body;
+    console.log("Received query:", req.body);
+    // if (!query) {
+    //     return res.status(400).json({ error: 'Query parameter is required', query });
+    // }
+    try {
+        const results = await queryDatabase(
+            'SELECT PSNo, ESPName, RoomNo FROM pollingstation WHERE PSNo LIKE ?',
+            [`%${query}%`]
+        );
+
+        return res.json(results);
+    } catch (error) {
+        console.error('Database query error:', error);
+        return res.status(500).json({ error: 'A database error occurred.' });
+    }
+});
 
 
-export {AddCaste, casteDetails, UpdateCasteDetail,
-        AddTehsil, TehsilDetails, UpdateTehsilDetail, DeleteTehsilDetail,
-        AddCouncil, CouncilDetails, UpdateCouncilDetail, DeleteCouncilDetail,
-        AddVidhanSabha, VidhanSabhaDetails, UpdateVidhanSabhaDetail, DeleteVidhanSabhaDetail,
-        AddWardBlock, WardBlockDetails, UpdateWardBlockDetail, DeleteWardBlockDetail,
-        AddChakBlock, ChakBlockDetails, UpdateChakBlockDetail, DeleteChakBlockDetail,
-        AddAreaVill, AreaVillDetails, UpdateAreaVillDetail, DeleteAreaVillDetail,
-        AddPSList, PSListDetails, UpdatePSListDetail, DeletePSListDetail
-
-        }
 
 
-        //   array sort 
-        // intro
-        // sql - authentication vs authorization
-        // filter - 
+export {
+    AddCaste, casteDetails, UpdateCasteDetail,
+    AddTehsil, TehsilDetails, UpdateTehsilDetail, DeleteTehsilDetail,
+    AddCouncil, CouncilDetails, UpdateCouncilDetail, DeleteCouncilDetail,
+    AddVidhanSabha, VidhanSabhaDetails, UpdateVidhanSabhaDetail, DeleteVidhanSabhaDetail,
+    AddWardBlock, WardBlockDetails, UpdateWardBlockDetail, DeleteWardBlockDetail,
+    AddChakBlock, ChakBlockDetails, UpdateChakBlockDetail, DeleteChakBlockDetail,
+    AddAreaVill, AreaVillDetails, UpdateAreaVillDetail, DeleteAreaVillDetail,
+    AddPSList, PSListDetails, UpdatePSListDetail, DeletePSListDetail, SearchPSNo
+
+}
+
+
+//   array sort 
+// intro
+// sql - authentication vs authorization
+// filter - 

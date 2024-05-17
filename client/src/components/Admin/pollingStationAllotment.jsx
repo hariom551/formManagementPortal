@@ -1,14 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import { Box, Button as MUIButton } from '@mui/material';
 import Button from 'react-bootstrap/Button';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import { mkConfig, generateCsv, download } from 'export-to-csv'; 
-import { jsPDF } from 'jspdf'; 
+import { mkConfig, generateCsv, download } from 'export-to-csv';
+import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Select from 'react-select';
+import AsyncSelect from 'react-select/async';
 
 import {
   MaterialReactTable,
@@ -16,27 +17,23 @@ import {
 } from 'material-react-table';
 
 function PollingStationAllotment() {
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const content = searchParams.get('content');
-
   const [PSListDetails, setPSListDetails] = useState([]);
   const [formData, setFormData] = useState({
-    Id: content || '', 
+    Id: '',
     PSId: '',
     WBId: '',
-    EWardBlock:'',
-    TotalVoters:'0',
-    PSNo:'',
-    EPSName:'',
-    RoomNo:'',
+    EWardBlock: '',
+    TotalVoters: '0',
+    PSNo: '',
+    ESPName: '',
+    RoomNo: '',
     VtsFrom: '',
     VtsTo: '',
   });
 
   const [WBOptions, setWBOptions] = useState([]);
-  useEffect(() => {
 
+  useEffect(() => {
     const fetchWBOptions = async () => {
       try {
         const response = await fetch('/api/v1/admin/wardBlockDetails', {
@@ -45,7 +42,6 @@ function PollingStationAllotment() {
             'Content-Type': 'application/json'
           }
         });
-   
         if (!response.ok) {
           throw new Error('Failed to fetch wardblock options');
         }
@@ -53,10 +49,8 @@ function PollingStationAllotment() {
         if (!data || !Array.isArray(data) || data.length === 0) {
           throw new Error('Empty or invalid wardblock options data');
         }
-        // Map data to an array of { value, label } objects
         const options = data.map(wb => ({ value: wb.Id, label: wb.EWardBlock }));
         setWBOptions(options);
-        
       } catch (error) {
         console.error('Error fetching wardblock options:', error);
       }
@@ -65,46 +59,35 @@ function PollingStationAllotment() {
     fetchWBOptions();
   }, []);
 
-
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/v1/admin/pSListDetails', {
+        const response = await fetch('/api/v1/admin/pSADetails', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'
           }
         });
         if (!response.ok) {
-          throw new Error('Failed to fetch PollingStationAllotment details');
+          throw new Error('Failed to fetch Polling Station Allotment details');
         }
         const data = await response.json();
         if (!data || !Array.isArray(data) || data.length === 0) {
-          throw new Error('Empty or invalid PollingStationAllotment details data');
+          throw new Error('Empty or invalid Polling Station Allotment details data');
         }
         setPSListDetails(data);
-        if (content) {
-          const PollingStationAllotment = data.find(item => item.Id == content);
-     
-          if (PollingStationAllotment) {
-            setFormData(PollingStationAllotment);
-          } else {
-            console.error(`PollingStationAllotment with ID ${content} not found`);
-          }
-        }
       } catch (error) {
         console.error('Error fetching PollingStationAllotment data:', error);
       }
     };
-  
+
     fetchData();
-  }, [content]);
-  
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const result = await fetch("/api/v1/admin/addPSList", {
+      const result = await fetch("/api/v1/admin/addPSA", {
         method: 'POST',
         body: JSON.stringify(formData),
         headers: {
@@ -130,12 +113,12 @@ function PollingStationAllotment() {
       [name]: value
     }));
   };
-  
+
   const handleDelete = async (Id) => {
     try {
-      let result = await fetch("/api/v1/Admin/deletePSListDetail", {
+      let result = await fetch("/api/v1/admin/deletePSListDetail", {
         method: 'POST',
-        body: JSON.stringify({Id}),
+        body: JSON.stringify({ Id }),
         headers: {
           'Content-Type': 'application/json'
         }
@@ -157,7 +140,7 @@ function PollingStationAllotment() {
     decimalSeparator: '.',
     useKeysAsHeaders: true,
   });
-  
+
   const handleExport = (rows, format) => {
     if (format === 'csv') {
       const csv = generateCsv(csvConfig)(rows.map(row => row.original));
@@ -186,26 +169,11 @@ function PollingStationAllotment() {
       size: 10,
       Cell: ({ row }) => (
         <>
-          <Button variant="primary" className="changepassword">
-            <Link to={{ pathname: "/PollingStationAllotment", search: `?content=${row.original.Id}` }}>
-              Edit
-            </Link>
-          </Button>
           <Button variant="danger" onClick={() => handleDelete(row.original.Id)} className="delete" type='button'>
             Delete
           </Button>
         </>
       ),
-    },
-    {
-      accessorKey: 'ESPArea',
-      header: 'PS Area (English)',
-      size: 20,
-    },
-    {
-      accessorKey: 'HSPArea',
-      header: 'PS Area (Hindi)',
-      size: 20,
     },
     {
       accessorKey: 'PSNo',
@@ -214,20 +182,132 @@ function PollingStationAllotment() {
     },
     {
       accessorKey: 'ESPName',
-      header: 'PS Name(English)',
+      header: 'PS Name',
       size: 20,
     },
     {
-      accessorKey: 'HSPName',
-      header: 'PS Name (Hindi)',
+      accessorKey: 'ESPArea',
+      header: 'PS Area (English)',
       size: 20,
     },
     {
-      accessorKey: 'RoomNo',
-      header: 'Room No.',
+      accessorKey: 'WardNo',
+      header: 'Ward No',
+      size: 20,
+    },
+    {
+      accessorKey: 'EWardBlock',
+      header: 'Ward Name',
+      size: 20,
+    },
+    {
+      accessorKey: 'VtsFrom',
+      header: 'From',
+      size: 20,
+    },
+    {
+      accessorKey: 'VtsTo',
+      header: 'To',
       size: 20,
     },
   ], []);
+
+  const loadPSNoOptions = async (inputValue) => {
+    try {
+      const response = await fetch("/api/v1/admin/searchPSNo", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ inputValue })
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch PS No options');
+      }
+  
+      const data = await response.json();
+  
+      if (data && data.length > 0) {
+        return data.map(ps => ({
+          value: ps.PSNo,
+          label: ps.PSNo,
+          ESPName: ps.ESPName,
+          RoomNo: ps.RoomNo
+        }));
+      } else {
+        console.log('No PS No options found.');
+        return [];
+      }
+  
+    } catch (error) {
+      // Log the error and return an empty array if there's an error
+      console.error('Error fetching PS No options:', error);
+      return [];
+    }
+  };
+  
+
+  // const handlePSNoChange = (selectedOption) => {
+  //   setFormData(prevFormData => ({
+  //     ...prevFormData,
+  //     PSNo: selectedOption ? selectedOption.value : '',
+  //     ESPName: selectedOption.ESPName,
+  //     RoomNo: selectedOption.RoomNo,
+  //   }));
+  // };
+
+
+  const handlePSNoChange = async (selectedOption) => {
+    if (!selectedOption) {
+      // Reset related fields if no PS No. is selected
+      setFormData(prevFormData => ({
+        ...prevFormData,
+        PSNo: '',
+        ESPName: '',
+        RoomNo: '',
+      }));
+      return;
+    }
+  
+    const psNo = selectedOption.value;
+    try {
+      const response = await fetch("/api/v1/admin/getPSDetails", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ psNo })
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch PS details');
+      }
+  
+      const data = await response.json();
+  
+      if (data) {
+        setFormData(prevFormData => ({
+          ...prevFormData,
+          PSNo: psNo,
+          ESPName: data.ESPName,
+          RoomNo: data.RoomNo,
+        }));
+      } else {
+        // Reset related fields if no details found for the selected PS No.
+        setFormData(prevFormData => ({
+          ...prevFormData,
+          PSNo: '',
+          ESPName: '',
+          RoomNo: '',
+        }));
+        console.log('No details found for the selected PS No.');
+      }
+    } catch (error) {
+      console.error('Error fetching PS details:', error);
+    }
+  };
+  
+
+
 
   const table = useMaterialReactTable({
     columns,
@@ -269,46 +349,61 @@ function PollingStationAllotment() {
         <h1 className="text-2xl font-bold mb-4">Polling Station Allotment </h1>
         <Form onSubmit={handleSubmit} className="PollingStationAllotment-form">
           <Row className="mb-3">
-          <div className="col-md-3 mb-3">
+            <div className="col-md-3 mb-3">
               <Form.Group>
                 <Form.Label>Select WardBlock</Form.Label>
                 <Select
-              id="WBSelect"
-              name="WBId"
-              value={WBOptions.find(option => option.value === formData.WBId)}
-              onChange={option => setFormData(prevFormData => ({ ...prevFormData, WBId: option.value }))}
-              options={WBOptions}
-              placeholder="Select WardBlock"
-            />
-            </Form.Group>
-            </div>
-
-            <div className="col-md-3 mb-3">
-              <Form.Group>
-                <Form.Label>Total Voters</Form.Label>
-                <Form.Control type="text"  id="TotalVoters" name="TotalVoters" value={formData.TotalVoters} onChange={handleChange} required />
+                  id="WBSelect"
+                  name="WBId"
+                  value={WBOptions.find(option => option.value === formData.WBId)}
+                  onChange={option => setFormData(prevFormData => ({ ...prevFormData, WBId: option.value }))}
+                  options={WBOptions}
+                  placeholder="Select WardBlock"
+                />
               </Form.Group>
             </div>
 
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>PS No.</Form.Label>
-                <Form.Control type="text" placeholder="PS No." id="PSNo" name="PSNo" value={formData.PSNo} onChange={handleChange} required />
+                <Form.Label>Total Voters</Form.Label>
+                <Form.Control type="text" id="TotalVoters" name="TotalVoters" value={formData.TotalVoters} onChange={handleChange} required />
               </Form.Group>
             </div>
           </Row>
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>PS Name (English)</Form.Label>
-                <Form.Control type="text" placeholder="PS Name (English)" id="ESPName" name="ESPName" value={formData.ESPName} onChange={handleChange} required />
+                <Form.Label>PS No.</Form.Label>
+                <AsyncSelect
+                  cacheOptions
+                  loadOptions={loadPSNoOptions}
+                  onChange={handlePSNoChange}
+                  defaultOptions
+                  value={{ value: formData.PSNo, label: formData.PSNo }}
+                  placeholder="Type to search PS No."
+                />
+
+                {/* <AsyncSelect
+                  cacheOptions
+                  loadOptions={loadPSNoOptions}
+                  onChange={handlePSNoChange}
+                  placeholder="Type to search PS No."
+                /> */}
+
               </Form.Group>
             </div>
-          
+
+            <div className="col-md-5 mb-3">
+              <Form.Group>
+                <Form.Label>PS Name</Form.Label>
+                <Form.Control type="text" placeholder="PS Name" id="ESPName" name="ESPName" value={formData.ESPName} onChange={handleChange} readOnly />
+              </Form.Group>
+            </div>
+
             <div className="col-md-3 mb-3">
               <Form.Group>
                 <Form.Label>Room No.</Form.Label>
-                <Form.Control type="text" placeholder="Room No." id="RoomNo" name="RoomNo" value={formData.RoomNo} onChange={handleChange} required />
+                <Form.Control type="text" placeholder="Room No." id="RoomNo" name="RoomNo" value={formData.RoomNo} onChange={handleChange} readOnly />
               </Form.Group>
             </div>
 
@@ -325,7 +420,6 @@ function PollingStationAllotment() {
                 <Form.Control type="text" placeholder="Voter Serial To" id="VtsTo" name="VtsTo" value={formData.VtsTo} onChange={handleChange} required />
               </Form.Group>
             </div>
-
           </Row>
 
           <Button variant="primary" type="submit">
