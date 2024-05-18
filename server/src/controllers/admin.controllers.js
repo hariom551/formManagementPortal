@@ -663,16 +663,17 @@ const DeletePSListDetail = asyncHandler(async (req, res) => {
 
 const SearchPSNo = asyncHandler(async (req, res) => {
     const { query } = req.body;
-    console.log("Received query:", req.body);
-    // if (!query) {
-    //     return res.status(400).json({ error: 'Query parameter is required', query });
-    // }
+    // console.log("Received query:", req.body);
+    if (!query) {
+        return res.status(400).json({ error: 'Query parameter is required', query });
+    }
     try {
         const results = await queryDatabase(
             'SELECT PSNo, ESPName, RoomNo FROM pollingstation WHERE PSNo LIKE ?',
             [`%${query}%`]
         );
-
+        
+       
         return res.json(results);
     } catch (error) {
         console.error('Database query error:', error);

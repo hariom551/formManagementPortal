@@ -212,6 +212,88 @@ function PollingStationAllotment() {
     },
   ], []);
 
+  // const loadPSNoOptions = async (inputValue) => {
+  //   try {
+  //     const response = await fetch("/api/v1/admin/searchPSNo", {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       },
+  //       body: JSON.stringify({ query: inputValue })
+  //     });
+  //     if (!response.ok) {
+  //       throw new Error('Failed to fetch PS No options');
+  //     }
+
+  //     const data = await response.json();
+
+  //     if (data && data.length > 0) {
+  //       return data.map(ps => ({
+  //         value: ps.PSNo,
+  //         label: ps.PSNo,
+  //         ESPName: ps.ESPName,
+  //         RoomNo: ps.RoomNo
+  //       }));
+  //     } else {
+  //       console.log('No PS No options found.');
+  //       return [];
+  //     }
+
+  //   } catch (error) {
+  //     console.error('Error fetching PS No options:', error);
+  //     return [];
+  //   }
+  // };
+
+  // const handlePSNoChange = async (selectedOption) => {
+  //   if (!selectedOption) {
+  //     // Reset related fields if no PS No. is selected
+  //     setFormData(prevFormData => ({
+  //       ...prevFormData,
+  //       PSNo: '',
+  //       ESPName: '',
+  //       RoomNo: '',
+  //     }));
+  //     return;
+  //   }
+
+  //   const psNo = selectedOption.value;
+  //   try {
+  //     const response = await fetch("/api/v1/admin/getPSDetails", {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       },
+  //       body: JSON.stringify({ psNo })
+  //     });
+  //     if (!response.ok) {
+  //       throw new Error('Failed to fetch PS details');
+  //     }
+
+  //     const data = await response.json();
+
+  //     if (data) {
+  //       setFormData(prevFormData => ({
+  //         ...prevFormData,
+  //         PSNo: psNo,
+  //         ESPName: data.ESPName,
+  //         RoomNo: data.RoomNo,
+  //       }));
+  //     } else {
+       
+  //       setFormData(prevFormData => ({
+  //         ...prevFormData,
+  //         PSNo: '',
+  //         ESPName: '',
+  //         RoomNo: '',
+  //       }));
+  //       console.log('No details found for the selected PS No.');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching PS details:', error);
+  //   }
+  // };
+
   const loadPSNoOptions = async (inputValue) => {
     try {
       const response = await fetch("/api/v1/admin/searchPSNo", {
@@ -219,7 +301,7 @@ function PollingStationAllotment() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ inputValue })
+        body: JSON.stringify({ query: inputValue })
       });
       if (!response.ok) {
         throw new Error('Failed to fetch PS No options');
@@ -232,7 +314,12 @@ function PollingStationAllotment() {
           value: ps.PSNo,
           label: ps.PSNo,
           ESPName: ps.ESPName,
-          RoomNo: ps.RoomNo
+          RoomNo: ps.RoomNo,
+          // Include polling station details in the options
+          details: {
+            ESPName: ps.ESPName,
+            RoomNo: ps.RoomNo
+          }
         }));
       } else {
         console.log('No PS No options found.');
@@ -240,23 +327,11 @@ function PollingStationAllotment() {
       }
   
     } catch (error) {
-      // Log the error and return an empty array if there's an error
       console.error('Error fetching PS No options:', error);
       return [];
     }
   };
   
-
-  // const handlePSNoChange = (selectedOption) => {
-  //   setFormData(prevFormData => ({
-  //     ...prevFormData,
-  //     PSNo: selectedOption ? selectedOption.value : '',
-  //     ESPName: selectedOption.ESPName,
-  //     RoomNo: selectedOption.RoomNo,
-  //   }));
-  // };
-
-
   const handlePSNoChange = async (selectedOption) => {
     if (!selectedOption) {
       // Reset related fields if no PS No. is selected
@@ -269,44 +344,18 @@ function PollingStationAllotment() {
       return;
     }
   
-    const psNo = selectedOption.value;
-    try {
-      const response = await fetch("/api/v1/admin/getPSDetails", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ psNo })
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch PS details');
-      }
-  
-      const data = await response.json();
-  
-      if (data) {
-        setFormData(prevFormData => ({
-          ...prevFormData,
-          PSNo: psNo,
-          ESPName: data.ESPName,
-          RoomNo: data.RoomNo,
-        }));
-      } else {
-        // Reset related fields if no details found for the selected PS No.
-        setFormData(prevFormData => ({
-          ...prevFormData,
-          PSNo: '',
-          ESPName: '',
-          RoomNo: '',
-        }));
-        console.log('No details found for the selected PS No.');
-      }
-    } catch (error) {
-      console.error('Error fetching PS details:', error);
-    }
+    // Extract details from the selected option
+    const { value: psNo, details } = selectedOption;
+    // Set form data using the extracted details
+    setFormData(prevFormData => ({
+      ...prevFormData,
+      PSNo: psNo,
+      ESPName: details.ESPName,
+      RoomNo: details.RoomNo,
+    }));
   };
-  
 
+  
 
 
   const table = useMaterialReactTable({
@@ -346,12 +395,12 @@ function PollingStationAllotment() {
   return (
     <main className="bg-gray-100">
       <div className="container py-4 pl-6 text-black">
-        <h1 className="text-2xl font-bold mb-4">Polling Station Allotment </h1>
+        <h1 className="text-2xl font-bold mb-4">Polling Station Allotment</h1>
         <Form onSubmit={handleSubmit} className="PollingStationAllotment-form">
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>Select WardBlock</Form.Label>
+                <Form.Label>Select WardBlock</Form.Label> 
                 <Select
                   id="WBSelect"
                   name="WBId"
@@ -379,17 +428,9 @@ function PollingStationAllotment() {
                   loadOptions={loadPSNoOptions}
                   onChange={handlePSNoChange}
                   defaultOptions
-                  value={{ value: formData.PSNo, label: formData.PSNo }}
+                  value={formData.PSNo ? { value: formData.PSNo, label: formData.PSNo }: null}
                   placeholder="Type to search PS No."
                 />
-
-                {/* <AsyncSelect
-                  cacheOptions
-                  loadOptions={loadPSNoOptions}
-                  onChange={handlePSNoChange}
-                  placeholder="Type to search PS No."
-                /> */}
-
               </Form.Group>
             </div>
 
