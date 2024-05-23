@@ -102,7 +102,7 @@ const submitDetails = asyncHandler(async (req, res) => {
     const { userId, password, confirmPassword, name, mobile1, mobile2, email, address, permission, role } = req.body;
 
     
-    if (!userId || !password || !confirmPassword || !name || !mobile1 || !mobile2 || !email || !address || !permission || !role) {
+    if (!userId || !password || !confirmPassword || !name || !mobile1  || !role) {
         // return res.send('Please enter all details!');
         throw new ApiError(400, "Please enter all details!")
     }

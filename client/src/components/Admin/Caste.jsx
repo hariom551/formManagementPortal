@@ -1,12 +1,15 @@
-import React, { useEffect, useMemo, useState } from 'react';FormData
+import React, { useEffect, useMemo, useState } from 'react'; FormData
 import { Link, useLocation } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {
   MaterialReactTable,
   useMaterialReactTable,
 } from 'material-react-table';
+
 
 function Caste() {
   const location = useLocation();
@@ -40,24 +43,24 @@ function Caste() {
         }
         setCasteDetails(data);
         if (content) {
-          const caste = data.find(item =>{ console.log(content); return item.ID == content});
-     
+          const caste = data.find(item => { console.log(content); return item.ID == content });
+
           if (caste) {
             setFormData(caste);
-           
+
           } else {
-            console.error(`Caste with ID ${content} not found`);
+            toast.error(`Caste with ID ${content} not found`);
           }
         }
       } catch (error) {
-        console.error('Error fetching caste data:', error);
+        toast.error('Error fetching caste data:', error);
       }
     };
-  
+
     fetchData();
   }, [content]);
-  
-  
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -72,13 +75,17 @@ function Caste() {
 
       if (result.ok) {
         // window.location.reload();
-        window.location.href = '/CasteManagement';
-        console.log("Caste Added Successfully.");
+
+        toast.success("Caste Added Successfully.");
+        setTimeout(() => {
+
+          window.location.href = '/CasteManagement';
+        }, 1000)
       } else {
-        console.error("Error in Adding Caste:", result.statusText);
+        toast.error("Error in Adding Caste:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in Adding Caste:", error.message);
+      toast.error("Error in Adding Caste:", error.message);
     }
   };
 
@@ -111,13 +118,13 @@ function Caste() {
 
       if (result.ok) {
         // window.location.reload();
-        window.location.href = '/CasteManagement';
-        console.log("Caste Updated successfully.");
+        setTimeout(() => { window.location.href = '/CasteManagement'; }, 1000)
+        toast.success("Caste Updated successfully.");
       } else {
-        console.error("Error in Updating Caste:", result.statusText);
+        toast.error("Error in Updating Caste:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in updating Caste:", error.message);
+      toast.error("Error in updating Caste:", error.message);
     }
   };
 
@@ -176,6 +183,7 @@ function Caste() {
 
   return (
     <main className="bg-gray-100">
+      <ToastContainer />
       <div className="container py-4 pl-6 text-black">
         <h1 className="text-2xl font-bold mb-4">Add Caste</h1>
         <Form onSubmit={content ? handleEdit : handleSubmit} className="caste-form">
@@ -183,13 +191,13 @@ function Caste() {
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>Surname (English)</Form.Label>
+                <Form.Label>Surname (English) <sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="Surname (English)" id="ESurname" name="ESurname" value={formData.ESurname} onChange={handleChange} required />
               </Form.Group>
             </div>
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>Surname (Hindi)</Form.Label>
+                <Form.Label>Surname (Hindi)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="Surname (Hindi)" id="HSurname" name="HSurname" value={formData.HSurname} onChange={handleChange} required />
               </Form.Group>
             </div>
@@ -197,13 +205,13 @@ function Caste() {
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>Caste (English)</Form.Label>
+                <Form.Label>Caste (English)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="Caste (English)" id="ECaste" name="ECaste" value={formData.ECaste} onChange={handleChange} required />
               </Form.Group>
             </div>
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>Caste (Hindi)</Form.Label>
+                <Form.Label>Caste (Hindi)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="Caste (Hindi)" id="HCaste" name="HCaste" value={formData.HCaste} onChange={handleChange} required />
               </Form.Group>
             </div>

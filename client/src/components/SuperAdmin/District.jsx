@@ -4,7 +4,8 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 function District() {
   const [districtDetails, setDistrictDetails] = useState([]);
 
@@ -36,19 +37,20 @@ function District() {
       });
 
       if (result.ok) {
+      
+       toast.success("District Added Successfully successfully.");
+       setTimeout(() => {
         window.location.reload();
-        console.log("District Added Successfully successfully.");
+       }, 2000);
       } else {
-        console.error("Error in Adding District:", result.statusText);
+        toast.error("Error in Adding District:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in Adding District:", error.message);
+      toast.error("Error in Adding District:", error.message);
     }
   };
 
   const handleDelete = async (DistCode) =>{
-  
-
     try {
       let result = await fetch("http://localhost:3000/api/v1/users/deleteDistrictDetail", {
         method: 'POST',
@@ -59,13 +61,15 @@ function District() {
       });
 
       if (result.ok) {
+      toast.success("District Added Successfully successfully.");
+      setTimeout(() => {
         window.location.reload();
-        console.log("District Added Successfully successfully.");
+      }, 2000);
       } else {
-        console.error("Error in Adding District:", result.statusText);
+        toast.error("Error in Adding District:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in Adding District:", error.message);
+      toast.error("Error in Adding District:", error.message);
     }
   };
 
@@ -79,12 +83,12 @@ function District() {
           }
         });
         if (!response.ok) {
-          throw new Error('Failed to fetch user data');
+          toast.error('Failed to fetch user data');
         }
         const data = await response.json();
         setDistrictDetails(data);
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        toast.error('Error fetching user data:', error);
       }
     };
     const user = JSON.parse(localStorage.getItem("user"));
@@ -162,41 +166,42 @@ function District() {
 
   return (
     <main className="bg-gray-100">
+      <ToastContainer/>
       <div className="container py-4 pl-6 text-black">
         <h1 className="text-2xl font-bold mb-4">Add District</h1>
         <Form onSubmit={handleSubmit} className="District-form">
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>District Code</Form.Label>
+                <Form.Label>District Code<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="District Code" id="DistCode" name="DistCode" required />
               </Form.Group>
             </div>
 
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>District Name(English)</Form.Label>
+                <Form.Label>District Name(English)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="District Name(English)" id="EDistrict" name="EDistrict" required />
               </Form.Group>
             </div>
 
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>District Name(Hindi)</Form.Label>
+                <Form.Label>District Name(Hindi)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="District Name(Hindi)" id="HDistrict" name="HDistrict" required />
               </Form.Group>
             </div>
 
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>Constituencies (English) </Form.Label>
+                <Form.Label>Constituencies (English)<sup className='text-red-600'>*</sup> </Form.Label>
                 <Form.Control type="text" placeholder="Constituencies (English)" id="ESGraduate" name="ESGraduate" required />
               </Form.Group>
             </div>
 
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>Constituencies (Hindi) </Form.Label>
+                <Form.Label>Constituencies (Hindi)<sup className='text-red-600'>*</sup> </Form.Label>
                 <Form.Control type="text" placeholder="Constituencies (Hindi)" id="HSGraduate" name="HSGraduate" required />
               </Form.Group>
             </div>

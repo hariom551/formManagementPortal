@@ -7,7 +7,8 @@ import {
   MaterialReactTable,
   useMaterialReactTable,
 } from 'material-react-table';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 function VidhanSabha() {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -48,7 +49,7 @@ function VidhanSabha() {
         const options = data.map(tehsil => ({ value: tehsil.Id, label: tehsil.EName }));
         setTehsilOptions(options);
       } catch (error) {
-        console.error('Error fetching Tehsil options:', error);
+        toast.error('Error fetching Tehsil options:', error);
       }
     };
 
@@ -82,7 +83,7 @@ function VidhanSabha() {
 
       setCouncilOptions(options);
     } catch (error) {
-      console.error('Error fetching Council options:', error);
+      toast.error('Error fetching Council options:', error);
     }
   };
 
@@ -111,11 +112,11 @@ function VidhanSabha() {
             console.log("set ",formData.counId);
             fetchCouncilOptions(VidhanSabha.counId);
           } else {
-            console.error(`VidhanSabha with ID ${content} not found`);
+            toast.error(`VidhanSabha with ID ${content} not found`);
           }
         }
       } catch (error) {
-        console.error('Error fetching VidhanSabha data:', error);
+        toast.error('Error fetching VidhanSabha data:', error);
       }
     };
 
@@ -134,13 +135,16 @@ function VidhanSabha() {
       });
 
       if (result.ok) {
-        window.location.reload();
-        console.log("VidhanSabha Added Successfully.");
+      
+        toast.success("VidhanSabha Added Successfully.");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
-        console.error("Error in Adding VidhanSabha:", result.statusText);
+        toast.error("Error in Adding VidhanSabha:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in Adding VidhanSabha:", error.message);
+      toast.error("Error in Adding VidhanSabha:", error.message);
     }
   };
 
@@ -170,13 +174,16 @@ function VidhanSabha() {
       });
 
       if (result.ok) {
-        window.location.reload();
-        console.log("VidhanSabha Added Successfully successfully.");
+      
+        toast.success("VidhanSabha Added Successfully successfully.");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
-        console.error("Error in Adding VidhanSabha:", result.statusText);
+        toast.error("Error in Adding VidhanSabha:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in Adding VidhanSabha:", error.message);
+      toast.error("Error in Adding VidhanSabha:", error.message);
     }
   };
 
@@ -208,15 +215,15 @@ function VidhanSabha() {
 
   
       if (result.ok) {
-
-        window.location.href = '/VidhanSabha';
-
-        console.log("VidhanSabha Updated successfully.");
+        toast.success("VidhanSabha Updated successfully.");
+        setTimeout(() => {
+          window.location.href = '/VidhanSabha';
+        }, 1000);
       } else {
-        console.error("Error in Updating VidhanSabha:", result.statusText);
+        toast.error("Error in Updating VidhanSabha:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in updating :", error.message);
+      toast.error("Error in updating :", error.message);
     }
   };
   
@@ -282,13 +289,14 @@ function VidhanSabha() {
 
   return (
     <main className="bg-gray-100">
+      <ToastContainer/>
       <div className="container py-4 pl-6 text-black">
         <h1 className="text-2xl font-bold mb-4">Add VidhanSabha</h1>
         <Form onSubmit={content ? handleEdit :handleSubmit} className="VidhanSabha-form">
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>Select Tehsil</Form.Label>
+                <Form.Label>Select Tehsil<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Select
                   id="tehsilSelect"
                   name="TehId"
@@ -311,7 +319,7 @@ function VidhanSabha() {
 
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>Select Nikaya</Form.Label>
+                <Form.Label>Select Nikaya<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Select
                   id="CouncilSelect"
                   name="counId"
@@ -334,7 +342,7 @@ function VidhanSabha() {
 
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>VidhanSabha No</Form.Label>
+                <Form.Label>VidhanSabha No<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="VidhanSabha No" id="VSNo" name="VSNo" value={formData.VSNo} onChange={handleChange} required />
               </Form.Group>
             </div>
@@ -343,13 +351,13 @@ function VidhanSabha() {
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>VidhanSabha Name (English)</Form.Label>
+                <Form.Label>VidhanSabha Name (English)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="VidhanSabha Name (English)" id="EVidhanSabha" name="EVidhanSabha" value={formData.EVidhanSabha} onChange={handleChange} required />
               </Form.Group>
             </div>
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>VidhanSabha Name (Hindi)</Form.Label>
+                <Form.Label>VidhanSabha Name (Hindi)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="VidhanSabha Name (Hindi)" id="HVidhanSabha" name="HVidhanSabha" value={formData.HVidhanSabha} onChange={handleChange} required />
               </Form.Group>
             </div>

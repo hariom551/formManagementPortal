@@ -5,14 +5,16 @@ import Row from 'react-bootstrap/Row';
 import { Box, Button as MUIButton } from '@mui/material';
 import Button from 'react-bootstrap/Button';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import { mkConfig, generateCsv, download } from 'export-to-csv'; 
-import { jsPDF } from 'jspdf'; 
+import { mkConfig, generateCsv, download } from 'export-to-csv';
+import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 import {
   MaterialReactTable,
   useMaterialReactTable,
 } from 'material-react-table';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function PollingStationList() {
   const location = useLocation();
@@ -21,7 +23,7 @@ function PollingStationList() {
 
   const [PSListDetails, setPSListDetails] = useState([]);
   const [formData, setFormData] = useState({
-    Id: content || '', 
+    Id: content || '',
     DId: '',
     ESPArea: '',
     HSPArea: '',
@@ -50,21 +52,21 @@ function PollingStationList() {
         setPSListDetails(data);
         if (content) {
           const PollingStationList = data.find(item => item.Id == content);
-     
+
           if (PollingStationList) {
             setFormData(PollingStationList);
           } else {
-            console.error(`PollingStationList with ID ${content} not found`);
+            toast.error(`PollingStationList with ID ${content} not found`);
           }
         }
       } catch (error) {
-        console.error('Error fetching PollingStationList data:', error);
+        toast.error('Error fetching PollingStationList data:', error);
       }
     };
-  
+
     fetchData();
   }, [content]);
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -77,13 +79,15 @@ function PollingStationList() {
       });
 
       if (result.ok) {
-        window.location.reload();
-        console.log("PollingStationList Added Successfully.");
+        toast.success("PollingStationList Added Successfully.");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
-        console.error("Error in Adding PollingStationList:", result.statusText);
+        toast.error("Error in Adding PollingStationList:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in Adding PollingStationList:", error.message);
+      toast.error("Error in Adding PollingStationList:", error.message);
     }
   };
 
@@ -99,13 +103,15 @@ function PollingStationList() {
       });
 
       if (result.ok) {
-        window.location.href = '/PollingStationList';
-        console.log("PollingStationList Updated successfully.");
+        toast.success("PollingStationList Updated successfully.");
+        setTimeout(() => {
+          window.location.href = '/PollingStationList';
+        }, 1000);
       } else {
-        console.error("Error in Updating PollingStationList:", result.statusText);
+        toast.error("Error in Updating PollingStationList:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in updating :", error.message);
+      toast.error("Error in updating :", error.message);
     }
   };
 
@@ -116,25 +122,27 @@ function PollingStationList() {
       [name]: value
     }));
   };
-  
+
   const handleDelete = async (Id) => {
     try {
       let result = await fetch("/api/v1/Admin/deletePSListDetail", {
         method: 'POST',
-        body: JSON.stringify({Id}),
+        body: JSON.stringify({ Id }),
         headers: {
           'Content-Type': 'application/json'
         }
       });
 
       if (result.ok) {
-        window.location.reload();
-        console.log("PollingStationList deleted successfully.");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+        toast.success("PollingStationList deleted successfully.");
       } else {
-        console.error("Error in deleting PollingStationList:", result.statusText);
+        toast.error("Error in deleting PollingStationList:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in deleting PollingStationList:", error.message);
+      toast.error("Error in deleting PollingStationList:", error.message);
     }
   };
 
@@ -143,7 +151,7 @@ function PollingStationList() {
     decimalSeparator: '.',
     useKeysAsHeaders: true,
   });
-  
+
   const handleExport = (rows, format) => {
     if (format === 'csv') {
       const csv = generateCsv(csvConfig)(rows.map(row => row.original));
@@ -251,25 +259,26 @@ function PollingStationList() {
 
   return (
     <main className="bg-gray-100">
+      <ToastContainer/>
       <div className="container py-4 pl-6 text-black">
         <h1 className="text-2xl font-bold mb-4">Add Polling Station</h1>
         <Form onSubmit={content ? handleEdit : handleSubmit} className="PollingStationList-form">
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>PS Area (English)</Form.Label>
+                <Form.Label>PS Area (English)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="PS Area (English)" id="ESPArea" name="ESPArea" value={formData.ESPArea} onChange={handleChange} required />
               </Form.Group>
             </div>
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>PS Area (Hindi)</Form.Label>
+                <Form.Label>PS Area (Hindi)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="PS Area (Hindi)" id="HSPArea" name="HSPArea" value={formData.HSPArea} onChange={handleChange} required />
               </Form.Group>
             </div>
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>PS No.</Form.Label>
+                <Form.Label>PS No.<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="PS No." id="PSNo" name="PSNo" value={formData.PSNo} onChange={handleChange} required />
               </Form.Group>
             </div>
@@ -277,19 +286,19 @@ function PollingStationList() {
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>PS Name (English)</Form.Label>
+                <Form.Label>PS Name (English)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="PS Name (English)" id="ESPName" name="ESPName" value={formData.ESPName} onChange={handleChange} required />
               </Form.Group>
             </div>
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>PS Name (Hindi)</Form.Label>
+                <Form.Label>PS Name (Hindi)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="PS Name (Hindi)" id="HSPName" name="HSPName" value={formData.HSPName} onChange={handleChange} required />
               </Form.Group>
             </div>
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>Room No.</Form.Label>
+                <Form.Label>Room No.<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="Room No." id="RoomNo" name="RoomNo" value={formData.RoomNo} onChange={handleChange} required />
               </Form.Group>
             </div>

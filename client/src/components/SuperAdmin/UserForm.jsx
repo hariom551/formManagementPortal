@@ -4,12 +4,13 @@ import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {
   MaterialReactTable,
   useMaterialReactTable,
-} from 'material-react-table';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+} from 'material-react-table'
 
 function UserForm() {
   const [userData, setUserData] = useState([]);
@@ -20,23 +21,23 @@ function UserForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    const requiredFields = ['userId', 'password', 'confirmPassword', 'name', 'mobile1', 'mobile2', 'email', 'address', 'permission', 'role'];
+
+    const requiredFields = ['userId', 'password', 'confirmPassword', 'name', 'mobile1', 'role'];
     const isEmpty = requiredFields.some(field => !document.getElementById(field).value.trim());
 
-  if (isEmpty) {
-    // Display toast notification for empty required fields
-    toast.error('Please fill in all required fields.', {
-      position: "top-center",
-      autoClose: 3000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-    return;
-  }
+    if (isEmpty) {
+      // Display toast notification for empty required fields
+      toast.error('Please fill in all required fields.', {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return;
+    }
 
     const userId = document.getElementById("userId").value;
     const password = document.getElementById("password").value;
@@ -49,7 +50,7 @@ function UserForm() {
     const permission = document.getElementById("permission").value;
     const role = document.getElementById("role").value;
 
-   
+
     const requestBody = {
       userId,
       password,
@@ -75,22 +76,17 @@ function UserForm() {
       if (result.ok) {
         // navigate('/userForm');
         // window.location.href = '/userForm';
-        window.location.reload()
-        toast.success('Form submitted successfully.', {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-   
+      
+        toast.success('Form submitted successfully.');
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000);
+
       } else {
-        console.error("Error submitting form:", result.statusText);
+        toast.error("Error submitting form:", result.statusText);
       }
     } catch (error) {
-      console.error("Error submitting form:", error.message);
+      toast.error("Error submitting form:", error.message);
     }
   };
 
@@ -110,14 +106,14 @@ function UserForm() {
         const data = await response.json();
         setUserData(data);
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        toast.error('Error fetching user data:', error);
       }
     };
-   
-    
 
-      fetchData();
-    
+
+
+    fetchData();
+
 
   }, [content]);
 
@@ -186,11 +182,11 @@ function UserForm() {
         size: 150,
         Cell: ({ row }) => (
           <Button variant="primary" className="changepassword">
-          <Link
-            to={{ pathname: "/changePassword", search: `?content=${row.original.userid}` }} // Navigate to changePassword page with user ID
-          >
-            Change Password
-          </Link>
+            <Link
+              to={{ pathname: "/changePassword", search: `?content=${row.original.userid}` }} // Navigate to changePassword page with user ID
+            >
+              Change Password
+            </Link>
           </Button>
         ),
       },
@@ -223,48 +219,53 @@ function UserForm() {
 
   return (
 
-<main className="bg-gray-100 min-h-screen">
+    <main className="bg-gray-100 min-h-screen">
+      <ToastContainer />
       <div className="container mx-auto py-8 text-black">
-        <h1 className="text-2xl font-bold mb-4">Add {content}</h1>
+
+        <div className=' flex justify-between items-center'>
+          <h1 className="text-2xl font-bold mb-4">Add {content}</h1>
+          <p className='text-sm font-serif'><sup>*</sup>fields are required</p>
+        </div>
         <Form onSubmit={handleSubmit} className="user-form">
           <h1 className='text-lg font-bold mb-3'>Login Credentials</h1>
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>userId</Form.Label>
+                <Form.Label>userId <sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="Enter userId" id="userId" name="userId" required />
               </Form.Group>
             </div>
 
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>Password</Form.Label>
+                <Form.Label>Password<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="password" placeholder="Password" id="password" name="password" required />
               </Form.Group>
             </div>
 
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>Confirm Password</Form.Label>
+                <Form.Label>Confirm Password<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="password" placeholder="Confirm Password" id="confirmPassword" name="confirmPassword" required />
               </Form.Group>
             </div>
           </Row>
 
-<hr />
+          <hr />
 
           <h3 className='text-lg font-bold mt-3 mb-3'>User Information</h3>
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>Name</Form.Label>
+                <Form.Label>Name<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="Enter Name" id="name" name="name" required />
               </Form.Group>
             </div>
 
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>Mobile Number 1</Form.Label>
+                <Form.Label>Mobile Number 1<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="tel" placeholder="Mobile Number 1" id="mobile1" name="mobile1" required />
               </Form.Group>
             </div>
@@ -279,21 +280,21 @@ function UserForm() {
             <div className="col-md-3 mb-3">
               <Form.Group >
                 <Form.Label>Email Id</Form.Label>
-                <Form.Control type="email" placeholder="Enter Email Id" id="email" name="email" required />
+                <Form.Control type="email" placeholder="Enter Email Id" id="email" name="email" />
               </Form.Group>
             </div>
 
             <div className="col-md-5 mb-3">
               <Form.Group >
                 <Form.Label>Address</Form.Label>
-                <Form.Control type="text" placeholder="Address" id="address" name="address" required />
+                <Form.Control type="text" placeholder="Address" id="address" name="address" />
               </Form.Group>
             </div>
 
             <div className="col-md-3 mb-3">
               <Form.Group >
                 <Form.Label>Permission:</Form.Label>
-                <Form.Select name="permission" id="permission" required>
+                <Form.Select name="permission" id="permission" >
                   <option value="" disabled>Select Access</option>
                   <option value="read">Read</option>
                   <option value="write">Write</option>
@@ -316,18 +317,18 @@ function UserForm() {
 
 
 
-        <MaterialReactTable table={table} />;
+          <MaterialReactTable table={table} />;
 
 
         </div>
       </div>
     </main>
 
-);
+  );
 };
 
 export default UserForm;
-          {/* <table className="table table-hover w-full ">
+{/* <table className="table table-hover w-full ">
             
             <thead>
               <tr>

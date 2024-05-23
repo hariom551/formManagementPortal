@@ -7,7 +7,8 @@ import {
   MaterialReactTable,
   useMaterialReactTable,
 } from 'material-react-table';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 function WardBlock() {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -35,7 +36,7 @@ function WardBlock() {
             'Content-Type': 'application/json'
           }
         });
-   
+
         if (!response.ok) {
           throw new Error('Failed to fetch vidhanSabha options');
         }
@@ -46,9 +47,9 @@ function WardBlock() {
         // Map data to an array of { value, label } objects
         const options = data.map(vs => ({ value: vs.Id, label: vs.EVidhanSabha }));
         setVSOptions(options);
-        
+
       } catch (error) {
-        console.error('Error fetching vidhanSabha options:', error);
+        toast.error('Error fetching vidhanSabha options:', error);
       }
     };
 
@@ -77,11 +78,11 @@ function WardBlock() {
           if (WardBlock) {
             setFormData(WardBlock);
           } else {
-            console.error(`WardBlock with ID ${content} not found`);
+            toast.error(`WardBlock with ID ${content} not found`);
           }
         }
       } catch (error) {
-        console.error('Error fetching WardBlock data:', error);
+        toast.error('Error fetching WardBlock data:', error);
       }
     };
 
@@ -102,20 +103,23 @@ function WardBlock() {
       });
 
       if (result.ok) {
-        window.location.reload();
-        console.log("WardBlock Added Successfully.");
+
+        toast.success("WardBlock Added Successfully.");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
-        console.error("Error in Adding WardBlock:", result.statusText);
+        toast.error("Error in Adding WardBlock:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in Adding WardBlock:", error.message);
+      toast.error("Error in Adding WardBlock:", error.message);
     }
   };
 
   const handleEdit = async (e) => {
     e.preventDefault();
 
-   
+
 
     try {
       const result = await fetch("/api/v1/admin/updateWardBlockDetails", {
@@ -128,17 +132,20 @@ function WardBlock() {
 
       if (result.ok) {
 
-        window.location.href = '/WardBlock';
 
-        console.log("WardBlock Updated successfully.");
+        toast.success("WardBlock Updated successfully.");
+        setTimeout(() => {
+
+          window.location.href = '/WardBlock';
+        }, 1000);
       } else {
-        console.error("Error in Updating WardBlock:", result.statusText);
+        toast.error("Error in Updating WardBlock:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in updating :", error.message);
+      toast.error("Error in updating :", error.message);
     }
   };
-  
+
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -148,7 +155,7 @@ function WardBlock() {
     }));
 
   };
-  
+
 
 
   const handleDelete = async (Id) => {
@@ -164,13 +171,16 @@ function WardBlock() {
       });
 
       if (result.ok) {
-        window.location.reload();
-        console.log("WardBlock Added Successfully successfully.");
+
+        toast.success("WardBlock Added Successfully successfully.");
+        setTimeout(() => {
+          window.location.reload()
+        }, 1000);
       } else {
-        console.error("Error in Adding WardBlock:", result.statusText);
+        toast.error("Error in Adding WardBlock:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in Adding WardBlock:", error.message);
+      toast.error("Error in Adding WardBlock:", error.message);
     }
   };
 
@@ -203,15 +213,15 @@ function WardBlock() {
       ),
     },
     {
-        accessorKey: 'EVidhanSabha',
-        header: 'VidhanSabha',
-        size: 20,
-      },
+      accessorKey: 'EVidhanSabha',
+      header: 'VidhanSabha',
+      size: 20,
+    },
     {
-        accessorKey: 'WardNo',
-        header: 'Ward No',
-        size: 20,
-      },
+      accessorKey: 'WardNo',
+      header: 'Ward No',
+      size: 20,
+    },
     {
       accessorKey: 'EWardBlock',
       header: 'WardBlock (English)',
@@ -224,7 +234,7 @@ function WardBlock() {
       header: 'WardBlock (Hindi)',
       size: 20,
     },
-    
+
 
   ], []);
 
@@ -235,13 +245,14 @@ function WardBlock() {
 
   return (
     <main className="bg-gray-100">
+      <ToastContainer />
       <div className="container py-4 pl-6 text-black">
         <h1 className="text-2xl font-bold mb-4">Add WardBlock</h1>
         <Form onSubmit={content ? handleEdit : handleSubmit} className="WardBlock-form">
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>Select VidhanSabha</Form.Label>
+                <Form.Label>Select VidhanSabha<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Select
                   id="VSSelect"
                   name="VSId"
@@ -253,7 +264,7 @@ function WardBlock() {
                   {vsOptions.map(option => (
                     <option
                       key={option.value}
-                      value={option.value} 
+                      value={option.value}
 
                     >
                       {option.label}
@@ -262,21 +273,21 @@ function WardBlock() {
                 </Form.Select>
               </Form.Group>
             </div>
-            
+
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>Ward No</Form.Label>
+                <Form.Label>Ward No<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="Ward No" id="WardNo" name="WardNo" value={formData.WardNo} onChange={handleChange} required />
               </Form.Group>
             </div>
 
 
 
-            </Row>
-            <Row className="mb-3">
+          </Row>
+          <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>WardBlock Name (English)</Form.Label>
+                <Form.Label>WardBlock Name (English)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="WardBlock Name (English)" id="EWardBlock" name="EWardBlock" value={formData.EWardBlock} onChange={handleChange} required />
               </Form.Group>
             </div>
@@ -284,7 +295,7 @@ function WardBlock() {
 
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>WardBlock Name (Hindi)</Form.Label>
+                <Form.Label>WardBlock Name (Hindi)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="WardBlock Name (Hindi)" id="HWardBlock" name="HWardBlock" value={formData.HWardBlock} onChange={handleChange} required />
               </Form.Group>
             </div>

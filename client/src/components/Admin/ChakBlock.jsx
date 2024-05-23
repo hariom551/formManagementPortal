@@ -3,10 +3,13 @@ import { Link, useLocation } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {
   MaterialReactTable,
   useMaterialReactTable,
 } from 'material-react-table';
+
 
 function ChakBlock() {
   const location = useLocation();
@@ -48,7 +51,7 @@ function ChakBlock() {
         setWBOptions(options);
         
       } catch (error) {
-        console.error('Error fetching wardblock options:', error);
+        toast.error('Error fetching wardblock options:', error);
       }
     };
 
@@ -77,11 +80,11 @@ function ChakBlock() {
           if (ChakBlock) {
             setFormData(ChakBlock);
           } else {
-            console.error(`ChakBlock with ID ${content} not found`);
+            toast.error(`ChakBlock with ID ${content} not found`);
           }
         }
       } catch (error) {
-        console.error('Error fetching ChakBlock data:', error);
+        toast.error('Error fetching ChakBlock data:', error);
       }
     };
 
@@ -102,13 +105,16 @@ function ChakBlock() {
       });
 
       if (result.ok) {
-        window.location.reload();
-        console.log("ChakBlock Added Successfully.");
+       
+        toast.success("ChakBlock Added Successfully.");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
-        console.error("Error in Adding ChakBlock:", result.statusText);
+        toast.error("Error in Adding ChakBlock:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in Adding ChakBlock:", error.message);
+      toast.error("Error in Adding ChakBlock:", error.message);
     }
   };
 
@@ -127,15 +133,15 @@ function ChakBlock() {
       });
 
       if (result.ok) {
-
-        window.location.href = '/ChakBlock';
-
-        console.log("ChakBlock Updated successfully.");
+        toast.success("ChakBlock Updated successfully.");
+        setTimeout(() => {
+          window.location.href = '/ChakBlock';
+        }, 2000);
       } else {
-        console.error("Error in Updating ChakBlock:", result.statusText);
+        toast.error("Error in Updating ChakBlock:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in updating :", error.message);
+      toast.error("Error in updating :", error.message);
     }
   };
   
@@ -163,13 +169,16 @@ function ChakBlock() {
       });
 
       if (result.ok) {
-        window.location.reload();
-        console.log("ChakBlock Added Successfully successfully.");
+      
+        toast.success("ChakBlock Added Successfully successfully.");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
-        console.error("Error in Adding ChakBlock:", result.statusText);
+        toast.error("Error in Adding ChakBlock:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in Adding ChakBlock:", error.message);
+      toast.error("Error in Adding ChakBlock:", error.message);
     }
   };
 
@@ -234,6 +243,7 @@ function ChakBlock() {
 
   return (
     <main className="bg-gray-100">
+      <ToastContainer/>
       <div className="container py-4 pl-6 text-black">
         <h1 className="text-2xl font-bold mb-4">Add ChakBlock</h1>
         <Form onSubmit={content ? handleEdit : handleSubmit} className="ChakBlock-form">
@@ -264,7 +274,7 @@ function ChakBlock() {
             
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>Chak No</Form.Label>
+                <Form.Label>Chak No <sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="Chak No" id="ChakNo" name="ChakNo" value={formData.ChakNo} onChange={handleChange} required />
               </Form.Group>
             </div>
@@ -275,7 +285,7 @@ function ChakBlock() {
             <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>ChakBlock Name (English)</Form.Label>
+                <Form.Label>ChakBlock Name (English)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="ChakBlock Name (English)" id="ECBPanch" name="ECBPanch" value={formData.ECBPanch} onChange={handleChange} required />
               </Form.Group>
             </div>
@@ -283,7 +293,7 @@ function ChakBlock() {
 
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>ChakBlock Name (Hindi)</Form.Label>
+                <Form.Label>ChakBlock Name (Hindi)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="ChakBlock Name (Hindi)" id="HCBPanch" name="HCBPanch" value={formData.HCBPanch} onChange={handleChange} required />
               </Form.Group>
             </div>

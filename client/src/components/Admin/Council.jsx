@@ -4,11 +4,13 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Select from 'react-select';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {
   MaterialReactTable,
   useMaterialReactTable,
 } from 'material-react-table';
+
 
 function Council() {
   const location = useLocation();
@@ -48,7 +50,7 @@ function Council() {
         setTehsilOptions(options);
         // console.log(options);
       } catch (error) {
-        console.error('Error fetching Tehsil options:', error);
+        toast.error('Error fetching Tehsil options:', error);
       }
     };
 
@@ -80,11 +82,11 @@ function Council() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
           } else {
-            console.error(`Council with ID ${content} not found`);
+            toast.error(`Council with ID ${content} not found`);
           }
         }
       } catch (error) {
-        console.error('Error fetching Council data:', error);
+        toast.error('Error fetching Council data:', error);
       }
     };
 
@@ -105,15 +107,18 @@ function Council() {
       });
 
       if (result.ok) {
-        window.location.reload();
+     
         // window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
        
-        console.log("Council Added Successfully.");
+        toast.success("Council Added Successfully.");
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
       } else {
-        console.error("Error in Adding Council:", result.statusText);
+        toast.error("Error in Adding Council:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in Adding Council:", error.message);
+      toast.error("Error in Adding Council:", error.message);
     }
   };
 
@@ -132,15 +137,15 @@ function Council() {
       });
 
       if (result.ok) {
-
-        window.location.href = '/Council';
-
-        console.log("Council Updated successfully.");
+        toast.success("Council Updated successfully.");
+        setTimeout(() => {
+          window.location.href = '/Council';
+        }, 2000);
       } else {
-        console.error("Error in Updating Council:", result.statusText);
+        toast.error("Error in Updating Council:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in updating :", error.message);
+      toast.error("Error in updating :", error.message);
     }
   };
   
@@ -169,13 +174,16 @@ function Council() {
       });
 
       if (result.ok) {
-        window.location.reload();
-        console.log("Council Added Successfully successfully.");
+        toast.success("Council Added Successfully successfully.");
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+    
       } else {
-        console.error("Error in Adding Council:", result.statusText);
+        toast.error("Error in Adding Council:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in Adding Council:", error.message);
+      toast.error("Error in Adding Council:", error.message);
     }
   };
 
@@ -234,13 +242,14 @@ function Council() {
 
   return (
     <main className="bg-gray-100">
+      <ToastContainer/>
       <div className="container py-4 pl-6 text-black">
         <h1 className="text-2xl font-bold mb-4">Add Council</h1>
         <Form onSubmit={content ? handleEdit : handleSubmit} className="Council-form">
           <Row className="mb-3">
           <div className="col-md-3 mb-3">
           <Form.Group>
-            <Form.Label>Select Tehsil</Form.Label>
+            <Form.Label>Select Tehsil<sup className='text-red-600'>*</sup></Form.Label>
             <Select
               id="tehsilSelect"
               name="TehId"
@@ -255,13 +264,13 @@ function Council() {
 
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>Nikāya Name (English)</Form.Label>
+                <Form.Label>Nikāya Name (English)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="Nikaya Name (English)" id="ECouncil" name="ECouncil" value={formData.ECouncil} onChange={handleChange} required />
               </Form.Group>
             </div>
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>Nikāya Name (Hindi)</Form.Label>
+                <Form.Label>Nikāya Name (Hindi)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="Nikāya Name (Hindi)" id="HCouncil" name="HCouncil" value={formData.HCouncil} onChange={handleChange} required />
               </Form.Group>
             </div>

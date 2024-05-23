@@ -7,7 +7,8 @@ import {
   MaterialReactTable,
   useMaterialReactTable,
 } from 'material-react-table';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 function Tehsil() {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -45,11 +46,11 @@ function Tehsil() {
             setFormData(Tehsil);
            
           } else {
-            console.error(`Tehsil with ID ${content} not found`);
+            toast.error(`Tehsil with ID ${content} not found`);
           }
         }
       } catch (error) {
-        console.error('Error fetching Tehsil data:', error);
+        toast.error('Error fetching Tehsil data:', error);
       }
     };
   
@@ -69,13 +70,16 @@ function Tehsil() {
       });
 
       if (result.ok) {
-        window.location.reload();
-        console.log("Tehsil Added Successfully.");
+      
+        toast.success("Tehsil Added Successfully.");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
-        console.error("Error in Adding Tehsil:", result.statusText);
+        toast.error("Error in Adding Tehsil:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in Adding Tehsil:", error.message);
+      toast.error("Error in Adding Tehsil:", error.message);
     }
   };
 
@@ -105,14 +109,17 @@ function Tehsil() {
 
       if (result.ok) {
 
-        window.location.href = '/Tehsil';
+ 
 
-        console.log("Tehsil Updated successfully.");
+        toast.success("Tehsil Updated successfully.");
+        setTimeout(() => {
+          window.location.href = '/Tehsil';
+        }, 1000);
       } else {
-        console.error("Error in Updating Tehsil:", result.statusText);
+        toast.error("Error in Updating Tehsil:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in updating :", error.message);
+      toast.error("Error in updating :", error.message);
     }
   };
 
@@ -133,13 +140,16 @@ function Tehsil() {
       });
 
       if (result.ok) {
-        window.location.reload();
-        console.log("Tehsil Added Successfully successfully.");
+
+        toast.success("Tehsil Added Successfully successfully.");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
-        console.error("Error in Adding Tehsil:", result.statusText);
+        toast.error("Error in Adding Tehsil:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in Adding Tehsil:", error.message);
+      toast.error("Error in Adding Tehsil:", error.message);
     }
   };
 
@@ -191,19 +201,20 @@ function Tehsil() {
 
   return (
     <main className="bg-gray-100">
+      <ToastContainer/>
       <div className="container py-4 pl-6 text-black">
         <h1 className="text-2xl font-bold mb-4">Add Tehsil</h1>
         <Form onSubmit={content ? handleEdit : handleSubmit} className="Tehsil-form">
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>Tehsil Name (English)</Form.Label>
+                <Form.Label>Tehsil Name (English)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="Tehsil Name (English)" id="EName" name="EName" value={formData.EName} onChange={handleChange} required />
               </Form.Group>
             </div>
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>Tehsil Name (Hindi)</Form.Label>
+                <Form.Label>Tehsil Name (Hindi)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="Tehsil Name (Hindi)" id="HName" name="HName" value={formData.HName} onChange={handleChange} required />
               </Form.Group>
             </div>

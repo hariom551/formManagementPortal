@@ -233,7 +233,7 @@ function SideNavBar({ show }) {
                                 Form<span className="dropdown-symbol">{dropdownStates.Form ? '-' : '+'}</span>
                             </button>
                             <div className={`dropdown-content ${dropdownStates.Form ? 'show' : ''}`} id="form-dropdown-content">
-                                <ul><li><Link to="/addVotersForm">Add Voter's Form</Link></li></ul>
+                                <ul><li><Link to="/AddVoterForm">Add Voter's Form</Link></li></ul>
                                 <ul><li><Link to="/SearchChakBlock">Search Chak Block</Link></li></ul>
                             </div>
                         </div>

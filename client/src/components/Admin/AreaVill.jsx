@@ -7,6 +7,8 @@ import {
   MaterialReactTable,
   useMaterialReactTable,
 } from 'material-react-table';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function AreaVill() {
   const location = useLocation();
@@ -176,11 +178,13 @@ function AreaVill() {
         throw new Error('Failed to delete AreaVill');
       }
   
-      // Assuming the deletion was successful, reload the page
-      window.location.reload();
-      console.log("AreaVill deleted successfully.");
+      // Assuming the deletion was successful, reload the 
+      toast.success("AreaVill deleted successfully.");
+      setTimeout(() => {
+        window.location.reload()
+      }, 1000);
     } catch (error) {
-      console.error("Error deleting AreaVill:", error.message);
+      toast.error("Error deleting AreaVill:", error.message);
       // Handle error (e.g., show a notification to the user)
     }
   };
@@ -272,8 +276,9 @@ function AreaVill() {
 
   return (
     <main className="bg-gray-100">
+      <ToastContainer/>
       <div className="container py-4 pl-6 text-black">
-        <h1 className="text-2xl font-bold mb-4">Add AreaVill</h1>
+        <h1 className="text-2xl font-bold mb-4">Add AreaVill<sup className='text-red-600'>*</sup></h1>
         <Form onSubmit={content ? handleEdit :handleSubmit} className="AreaVill-form">
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
@@ -301,7 +306,7 @@ function AreaVill() {
 
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>Select Chak Block</Form.Label>
+                <Form.Label>Select Chak Block<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Select
                   id="CBSelect"
                   name="CBPId"
@@ -324,7 +329,7 @@ function AreaVill() {
 
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>Hno Range</Form.Label>
+                <Form.Label>Hno Range<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="Hno Range" id="HnoRange" name="HnoRange" value={formData.HnoRange} onChange={handleChange} required />
               </Form.Group>
             </div>
@@ -333,13 +338,13 @@ function AreaVill() {
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>AreaVill Name (English)</Form.Label>
+                <Form.Label>AreaVill Name (English)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="AreaVill Name (English)" id="EAreaVill" name="EAreaVill" value={formData.EAreaVill} onChange={handleChange} required />
               </Form.Group>
             </div>
             <div className="col-md-3 mb-3">
               <Form.Group >
-                <Form.Label>AreaVill Name (Hindi)</Form.Label>
+                <Form.Label>AreaVill Name (Hindi)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="AreaVill Name (Hindi)" id="HAreaVill" name="HAreaVill" value={formData.HAreaVill} onChange={handleChange} required />
               </Form.Group>
             </div>

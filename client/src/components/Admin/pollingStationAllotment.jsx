@@ -10,11 +10,13 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Select from 'react-select';
 import AsyncSelect from 'react-select/async';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {
   MaterialReactTable,
   useMaterialReactTable,
 } from 'material-react-table';
+
 
 function PollingStationAllotment() {
   const [PSListDetails, setPSListDetails] = useState([]);
@@ -52,7 +54,7 @@ function PollingStationAllotment() {
         const options = data.map(wb => ({ value: wb.Id, label: wb.EWardBlock }));
         setWBOptions(options);
       } catch (error) {
-        console.error('Error fetching wardblock options:', error);
+        toast.error('Error fetching wardblock options:', error);
       }
     };
 
@@ -77,7 +79,7 @@ function PollingStationAllotment() {
         }
         setPSListDetails(data);
       } catch (error) {
-        console.error('Error fetching PollingStationAllotment data:', error);
+        toast.error('Error fetching PollingStationAllotment data:', error);
       }
     };
 
@@ -96,13 +98,16 @@ function PollingStationAllotment() {
       });
 
       if (result.ok) {
-        window.location.reload();
-        console.log("PollingStationAllotment Added Successfully.");
+   
+        toast.success("PollingStationAllotment Added Successfully.");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
-        console.error("Error in Adding PollingStationAllotment:", result.statusText);
+        toast.error("Error in Adding PollingStationAllotment:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in Adding PollingStationAllotment:", error.message);
+      toast.error("Error in Adding PollingStationAllotment:", error.message);
     }
   };
 
@@ -125,13 +130,15 @@ function PollingStationAllotment() {
       });
 
       if (result.ok) {
-        window.location.reload();
-        console.log("PollingStationAllotment deleted successfully.");
+        toast.success("PollingStationAllotment deleted successfully.");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
-        console.error("Error in deleting PollingStationAllotment:", result.statusText);
+        toast.error("Error in deleting PollingStationAllotment:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in deleting PollingStationAllotment:", error.message);
+      toast.error("Error in deleting PollingStationAllotment:", error.message);
     }
   };
 
@@ -322,12 +329,12 @@ function PollingStationAllotment() {
           }
         }));
       } else {
-        console.log('No PS No options found.');
+        toast.log('No PS No options found.');
         return [];
       }
   
     } catch (error) {
-      console.error('Error fetching PS No options:', error);
+      toast.error('Error fetching PS No options:', error);
       return [];
     }
   };
@@ -394,13 +401,14 @@ function PollingStationAllotment() {
 
   return (
     <main className="bg-gray-100">
+      <ToastContainer/>
       <div className="container py-4 pl-6 text-black">
         <h1 className="text-2xl font-bold mb-4">Polling Station Allotment</h1>
         <Form onSubmit={handleSubmit} className="PollingStationAllotment-form">
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>Select WardBlock</Form.Label> 
+                <Form.Label>Select WardBlock<sup className='text-red-600'>*</sup></Form.Label> 
                 <Select
                   id="WBSelect"
                   name="WBId"
@@ -414,7 +422,7 @@ function PollingStationAllotment() {
 
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>Total Voters</Form.Label>
+                <Form.Label>Total Voters<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" id="TotalVoters" name="TotalVoters" value={formData.TotalVoters} onChange={handleChange} required />
               </Form.Group>
             </div>
@@ -422,7 +430,7 @@ function PollingStationAllotment() {
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>PS No.</Form.Label>
+                <Form.Label>PS No.<sup className='text-red-600'>*</sup></Form.Label>
                 <AsyncSelect
                   cacheOptions
                   loadOptions={loadPSNoOptions}
@@ -436,28 +444,28 @@ function PollingStationAllotment() {
 
             <div className="col-md-5 mb-3">
               <Form.Group>
-                <Form.Label>PS Name</Form.Label>
+                <Form.Label>PS Name<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="PS Name" id="ESPName" name="ESPName" value={formData.ESPName} onChange={handleChange} readOnly />
               </Form.Group>
             </div>
 
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>Room No.</Form.Label>
+                <Form.Label>Room No.<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="Room No." id="RoomNo" name="RoomNo" value={formData.RoomNo} onChange={handleChange} readOnly />
               </Form.Group>
             </div>
 
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>Voter Serial From</Form.Label>
+                <Form.Label>Voter Serial From<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="Voter Serial From" id="VtsFrom" name="VtsFrom" value={formData.VtsFrom} onChange={handleChange} required />
               </Form.Group>
             </div>
 
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>Voter Serial To</Form.Label>
+                <Form.Label>Voter Serial To<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="Voter Serial To" id="VtsTo" name="VtsTo" value={formData.VtsTo} onChange={handleChange} required />
               </Form.Group>
             </div>

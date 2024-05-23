@@ -3,7 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function EditDistrictDetails() {
     const location = useLocation();
@@ -49,13 +50,16 @@ function EditDistrictDetails() {
       });
 
       if (result.ok) {
-        window.location.reload();
-        console.log("District Updated successfully.");
+     
+        toast.success("District Updated successfully.");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
-        console.error("Error in Updating District:", result.statusText);
+        toast.error("Error in Updating District:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in updating District:", error.message);
+      toast.error("Error in updating District:", error.message);
     }
   };
   useEffect(() => {
@@ -90,7 +94,7 @@ function EditDistrictDetails() {
             }
 
         } catch (error) {
-            console.error('Error fetching district details:', error);
+            toast.error('Error fetching district details:', error);
         }
     };
 
@@ -101,41 +105,42 @@ function EditDistrictDetails() {
 
   return (
     <main className="bg-gray-100">
+      <ToastContainer/>
       <div className="container py-4 pl-6 text-black">
         <h1 className="text-2xl font-bold mb-4">Add District</h1>
         <Form onSubmit={handleEdit} className="District-form">
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>District Code</Form.Label>
+                <Form.Label>District Code<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="District Code" id="DistCode" name="DistCode" value={content} readOnly />
               </Form.Group>
             </div>
 
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>District Name(English)</Form.Label>
+                <Form.Label>District Name(English)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="District Name(English)" id="EDistrict" name="EDistrict" value={formData.EDistrict || ''}   onChange={(e) => setFormData({ ...formData, EDistrict: e.target.value })} required />
               </Form.Group>
             </div>
 
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>District Name(Hindi)</Form.Label>
+                <Form.Label>District Name(Hindi)<sup className='text-red-600'>*</sup></Form.Label>
                 <Form.Control type="text" placeholder="District Name(Hindi)" id="HDistrict" name="HDistrict" value={formData.HDistrict || ''}  onChange={(e) => setFormData({ ...formData, HDistrict: e.target.value })} required />
               </Form.Group>
             </div>
 
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>Constituencies (English) </Form.Label>
+                <Form.Label>Constituencies (English)<sup className='text-red-600'>*</sup> </Form.Label>
                 <Form.Control type="text" placeholder="Constituencies (English)" id="ESGraduate" name="ESGraduate" value={formData.ESGraduate || ''}  onChange={(e) => setFormData({ ...formData, ESGraduate: e.target.value })} required />
               </Form.Group>
             </div>
 
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>Constituencies (Hindi) </Form.Label>
+                <Form.Label>Constituencies (Hindi)<sup className='text-red-600'>*</sup> </Form.Label>
                 <Form.Control type="text" placeholder="Constituencies (Hindi)" id="HSGraduate" name="HSGraduate" value={formData.HSGraduate || ''}  onChange={(e) => setFormData({ ...formData, HSGraduate: e.target.value })} required />
               </Form.Group>
             </div>
