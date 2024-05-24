@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import Header from './components/Pages/Header';
+import Header from './components/Pages/Header.jsx';
+import Spinner from './components/Pages/Spinner.jsx';
 
 function Layout() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -18,7 +19,8 @@ function Layout() {
 
   if (isLoading) {
     // Optionally, you can render a loading spinner or message here
-    return <div>Loading...</div>;
+     
+    return <Spinner />
   }
 
   return isLoggedIn ? (
@@ -26,7 +28,7 @@ function Layout() {
       <Header />
       <Outlet />
     </>
-  ) : null;
+  ) :null;
 }
 
 export default Layout;
