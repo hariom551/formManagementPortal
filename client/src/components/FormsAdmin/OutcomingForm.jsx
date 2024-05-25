@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { Button, Form, Row } from 'react-bootstrap';
 import { Box } from '@mui/material';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
@@ -8,7 +8,7 @@ import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 import { mkConfig, generateCsv, download } from 'export-to-csv';
 
 function OutgoingForms() {
-    const [OFDetails, setOFListDetails] = useState([]);
+    const [OFDetails, setPSListDetails] = useState([]);
     const [formData, setFormData] = useState({
         VMob1: '',
         VMob2: '',
@@ -19,13 +19,142 @@ function OutgoingForms() {
         NoOfForms: '',
         SendingDate: '',
         ERemarks: '',
-        COList: [], 
+        CMob1: '',
+        CEName: '',
+        CHName: '',
     });
+
+    const mobileInputRef = useRef(null);
+    const careOfMobileInputRef = useRef(null);
+    const [suggestedMobiles, setSuggestedMobiles] = useState([]);
+    const [suggestedCareOfMobiles, setSuggestedCareOfMobiles] = useState([]);
+    const [selectedIndex, setSelectedIndex] = useState(-1);
+    const [selectedCareOfIndex, setSelectedCareOfIndex] = useState(-1);
+
+
+
+    const fetchSuggestedMobiles = async (input) => {
+        try {
+            const response = await fetch('/api/v1/formsAdmin/searchVMobNo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ query: input })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch suggested mobile numbers');
+            }
+
+            const data = await response.json();
+            setSuggestedMobiles(data);
+            setSelectedIndex(-1);
+
+        } catch (error) {
+            console.error('Error fetching suggested mobile numbers:', error);
+        }
+    };
+
+    const fetchSuggestedCareOfMobiles = async (input) => {
+        try {
+            const response = await fetch('/api/v1/formsAdmin/searchVMobNo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ query: input })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch suggested mobile numbers');
+            }
+
+            const data = await response.json();
+            setSuggestedCareOfMobiles(data);
+            setSelectedCareOfIndex(-1);
+        } catch (error) {
+            console.error('Error fetching suggested mobile numbers:', error);
+        }
+    };
+
+
+
+    const handleMobileNumberChange = (e) => {
+        const { value } = e.target;
+        setFormData({ ...formData, VMob1: value });
+        fetchSuggestedMobiles(value);
+    };
+
+    const handleCareOfMobileNumberChange = (e) => {
+        const { value } = e.target;
+        setFormData({ ...formData, CMob1: value });
+        fetchSuggestedCareOfMobiles(value);
+    };
+
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            setSelectedIndex((prevIndex) => Math.min(prevIndex + 1, suggestedMobiles.length - 1));
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            setSelectedIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+        } else if ((e.key === 'Enter' || e.key === 'Tab') && selectedIndex >= 0) {
+            e.preventDefault();
+            handleMobileNumberSelect(suggestedMobiles[selectedIndex].VMob1);
+        }
+    };
+
+    const handleCareOfKeyDown = (e) => {
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            setSelectedCareOfIndex((prevIndex) => Math.min(prevIndex + 1, suggestedCareOfMobiles.length - 1));
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            setSelectedCareOfIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+        } else if ((e.key === 'Enter' || e.key === 'Tab') && selectedCareOfIndex >= 0) {
+            e.preventDefault();
+            handleCareOfMobileNumberSelect(suggestedCareOfMobiles[selectedCareOfIndex].VMob1);
+        }
+    };
+
+
+    const handleMobileNumberSelect = (mobile) => {
+        const selectedMobile = suggestedMobiles.find((user) => user.VMob1 === mobile);
+        if (selectedMobile) {
+            setFormData({
+                ...formData,
+                VMob1: selectedMobile.VMob1,
+                VMob2: selectedMobile.VMob2,
+                VEName: selectedMobile.VEName,
+                VHName: selectedMobile.VHName,
+                VEAddress: selectedMobile.VEAddress,
+                VHAddress: selectedMobile.VHAddress
+            });
+            setSuggestedMobiles([]);
+            setSelectedIndex(-1);
+        }
+    };
+
+    const handleCareOfMobileNumberSelect = (mobile) => {
+        const selectedCareOfMobile = suggestedCareOfMobiles.find((user) => user.VMob1 === mobile);
+        if (selectedCareOfMobile) {
+            setFormData({
+                ...formData,
+                CMob1: selectedCareOfMobile.VMob1,
+                CEName: selectedCareOfMobile.VEName,
+                CHName: selectedCareOfMobile.VHName
+            });
+            setSuggestedCareOfMobiles([]);
+            setSelectedCareOfIndex(-1);
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('/api/v1/FFormsAdmin/OutgoingFormsDetails', {
+                const response = await fetch('/api/v1/FormsAdmin/outFormDetails', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
@@ -50,13 +179,15 @@ function OutgoingForms() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const result = await fetch("/api/v1/admin/addOutgoingForms", {
+            const result = await fetch("/api/v1/FormsAdmin/addOutForm", {
                 method: 'POST',
-                body: JSON.stringify(formData),
                 headers: {
                     'Content-Type': 'application/json'
-                }
+                },
+                body: JSON.stringify(formData),
             });
+            const data = result.json()
+            console.log(data)
 
             if (result.ok) {
                 window.location.reload();
@@ -84,62 +215,74 @@ function OutgoingForms() {
         download(csvConfig)(csv);
     };
 
+
+
+    const calculateColumnTotals = (key) => {
+        return OFDetails.reduce((sum, row) => sum + (Number(row[key]) || 0), 0);
+    };
+
     const columns = useMemo(() => [
         {
-            accessorKey: 'Id',
-            header: 'S.No',
+            accessor: (index) => index + 1,
+            id: 'serialNumber',
+            Header: 'S.No',
+            size: 5,
+            Cell: ({ cell }) => cell.row.index + 1,
+            Footer: "Total"
+        },
+        {
+            accessorKey: 'RName',
+            header: 'Name ',
+            size: 15,
+        },
+        {
+            accessorKey: 'RMob1',
+            header: 'Mobile',
             size: 10,
         },
         {
-            accessorKey: 'EPSArea',
-            header: 'PS Area (English)',
+            accessorKey: 'RAddress',
+            header: 'Address',
             size: 20,
         },
         {
-            accessorKey: 'HPSArea',
-            header: 'PS Area (Hindi)',
-            size: 20,
+            accessorKey: 'NoOfForms',
+            header: 'No Of Forms',
+            size: 4,
+            Footer: () => calculateColumnTotals('NoOfForms')
+        },
+
+        {
+            accessorKey: 'C1Name',
+            header: 'CO1 Name ',
+            size: 15,
         },
         {
-            accessorKey: 'PSNo',
-            header: 'PS No.',
-            size: 20,
+            accessorKey: 'C1Mob',
+            header: 'CO1 Mobile',
+            size: 10,
+        },
+
+        {
+            accessorKey: 'SendingDate',
+            header: 'Sending Date',
+            size: 8,
         },
         {
-            accessorKey: 'ESPName',
-            header: 'PS Name(English)',
-            size: 20,
+            accessorKey: 'ERemark',
+            header: 'Remarks',
+            size: 25,
         },
-        {
-            accessorKey: 'HSPName',
-            header: 'PS Name (Hindi)',
-            size: 20,
-        },
-        {
-            accessorKey: 'RoomNo.',
-            header: 'Room No.',
-            size: 20,
-        },
-    ], []);
+    ], [OFDetails]);
 
     const table = useMaterialReactTable({
         columns,
         data: OFDetails,
     });
 
-    const handleAddCareOf = () => {
-        setFormData({
-            ...formData,
-            COList: [...formData.COList, { VMob1: '', VEName: '', VHName: '' }]
-        });
-    };
 
-    const handleCareOfChange = (e, index) => {
-        const { name, value } = e.target;
-        const updatedCOList = [...formData.COList];
-        updatedCOList[index][name] = value;
-        setFormData({ ...formData, COList: updatedCOList });
-    };
+
+
 
     return (
         <main className="bg-gray-100">
@@ -201,17 +344,39 @@ function OutgoingForms() {
                 <Form onSubmit={handleSubmit} className="OutgoingForms-form">
                     <Row className="mb-3">
                         <div className="col-md-3 mb-3">
-                            <Form.Group >
-                                <Form.Label>Mobile No. 1 <sup className='text-red-500'>*</sup></Form.Label>
-                                <Form.Control type="tel" placeholder="Mobile No. 1" id="VMob1" name="VMob1" value={formData.VMob1} onChange={handleChange} required />
+                            <Form.Group controlId="VMob1">
+                                <Form.Label>Mobile Number</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="VMob1"
+                                    placeholder="Mobile Number"
+                                    value={formData.VMob1}
+                                    onChange={handleMobileNumberChange}
+                                    onKeyDown={handleKeyDown}
+                                    ref={mobileInputRef}
+                                    className="border p-2 rounded-md w-full"
+                                />
+                                {suggestedMobiles.length > 0 && (
+                                    <ul className="suggestions max-h-48 overflow-y-auto border border-gray-300 rounded-md mt-2">
+                                        {suggestedMobiles.map((mobile, index) => (
+                                            <li
+                                                key={mobile.VMob1}
+                                                className={`p-2 cursor-pointer hover:bg-gray-400 ${index === selectedIndex ? 'bg-gray-400' : ''}`}
+                                                onClick={() => handleMobileNumberSelect(mobile.VMob1)}
+                                            >
+                                                {mobile.VMob1} - {mobile.VEName}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
                             </Form.Group>
                         </div>
-                        <div className="col-md-3 mb-3">
+                        {/* <div className="col-md-3 mb-3">
                             <Form.Group >
                                 <Form.Label>Mobile No. 2</Form.Label>
                                 <Form.Control type="tel" placeholder="Mobile No. 2" id="VMob2" name="VMob2" value={formData.VMob2} onChange={handleChange} />
                             </Form.Group>
-                        </div>
+                        </div> */}
 
                         <div className="col-md-3 mb-3">
                             <Form.Group >
@@ -244,35 +409,64 @@ function OutgoingForms() {
                     </Row>
                     <div className="row  mb-3">
                         <div className="col-md-3 mb-3">
+                            <Form.Group controlId="CMob1">
+                                <Form.Label>Careof Mobile No.<sup className='text-red-500'>*</sup></Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Careof Mobile No."
+                                    name="CMob1"
+                                    value={formData.CMob1}
+                                    onChange={handleCareOfMobileNumberChange}
+                                    onKeyDown={handleCareOfKeyDown}
+                                    ref={careOfMobileInputRef}
+                                    className="border p-2 rounded-md w-full"
+                                    required
+                                />
+                                {suggestedCareOfMobiles.length > 0 && (
+                                    <ul className="suggestions max-h-48 overflow-y-auto border border-gray-300 rounded-md mt-2">
+                                        {suggestedCareOfMobiles.map((mobile, index) => (
+                                            <li
+                                                key={mobile.VMob1}
+                                                className={`p-2 cursor-pointer hover:bg-gray-400 ${index === selectedCareOfIndex ? 'bg-gray-400' : ''}`}
+                                                onClick={() => handleCareOfMobileNumberSelect(mobile.VMob1)}
+                                            >
+                                                {mobile.VMob1} - {mobile.VEName}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </Form.Group>
+                        </div>
+
+
+
+                        <div className="col-md-3 mb-3">
                             <Form.Group >
-                                <Form.Label>No. of Forms (Kanpur)<sup className='text-red-500'>*</sup></Form.Label>
-                                <Form.Control type="text" placeholder="No. of Forms" id="NoOfFormsKN" name="NoOfFormsKN" value={formData.NoOfFormsKN} onChange={handleChange} required />
+                                <Form.Label>
+                                    Careof (English)<sup className='text-red-500'>*</sup></Form.Label>
+                                <Form.Control type="text" placeholder="Careof (English)" id="NoOfFormsKD" name="CEName" value={formData.CEName} onChange={handleChange} required />
                             </Form.Group>
                         </div>
                         <div className="col-md-3 mb-3">
                             <Form.Group >
-                                <Form.Label>No. of Forms (Dehat)<sup className='text-red-500'>*</sup></Form.Label>
-                                <Form.Control type="text" placeholder="No. of Forms" id="NoOfFormsKD" name="NoOfFormsKD" value={formData.NoOfFormsKD} onChange={handleChange} required />
+                                <Form.Label>
+                                    Careof (Hindi)<sup className='text-red-500'>*</sup></Form.Label>
+                                <Form.Control type="text" placeholder="Careof (Hindi)" id="NoOfFormsU" name="CHName" value={formData.CHName} onChange={handleChange} required />
                             </Form.Group>
                         </div>
                         <div className="col-md-3 mb-3">
                             <Form.Group >
-                                <Form.Label>No. of Forms (Unnao)<sup className='text-red-500'>*</sup></Form.Label>
-                                <Form.Control type="text" placeholder="No. of Forms" id="NoOfFormsU" name="NoOfFormsU" value={formData.NoOfFormsU} onChange={handleChange} required />
-                            </Form.Group>
-                        </div>
-                        <div className="col-md-3 mb-3">
-                            <Form.Group >
-                                <Form.Label>Packet No.<sup className='text-red-500'>*</sup></Form.Label>
-                                <Form.Control type="text" placeholder="Packet No." id="PacketNo" name="PacketNo" value={formData.RoomNo} onChange={handleChange} required />
+                                <Form.Label>
+                                    No. of Forms<sup className='text-red-500'>*</sup></Form.Label>
+                                <Form.Control type="number" placeholder="No. of Forms" id="PacketNo" name="NoOfForms" value={formData.NoOfForms} onChange={handleChange} required />
                             </Form.Group>
                         </div>
                     </div>
                     <div className="row  mb-3">
                         <div className="col-md-3 mb-3">
                             <Form.Group >
-                                <Form.Label>Recieved Date :<sup className='text-red-500'>*</sup></Form.Label>
-                                <Form.Control type="date" placeholder="Recieved date" id="ReceivedDate" name="ReceivedDate" value={formData.ReceivedDate} onChange={handleChange} required />
+                                <Form.Label>Sending Date :<sup className='text-red-500'>*</sup></Form.Label>
+                                <Form.Control type="date" placeholder="Recieved date" id="ReceivedDate" name="SendingDate" value={formData.SendingDate} onChange={handleChange} required />
                             </Form.Group>
                         </div>
                         <div className="col-md-9 mb-3">
@@ -284,40 +478,7 @@ function OutgoingForms() {
                     </div>
 
 
-                    {
-                        formData.COList.map((e, i) => {
-                            return (
-                                <div className="row  mb-3" key={i}>
-                                    <div className="col-md-3 mb-3">
-                                        <Form.Group >
-                                            <Form.Label>Care of Mobile No.1</Form.Label>
-                                            <Form.Control type="text" placeholder={`Care of Mobile No.1`} id={`VMob1_${i}`} name={`VMob1_${i}`} value={e.VMob1} onChange={(event) => handleCareOfChange(event, i)} required />
-                                        </Form.Group>
-                                    </div>
-                                    <div className="col-md-3 mb-3">
-                                        <Form.Group >
-                                            <Form.Label>Care of Name1 (English)</Form.Label>
-                                            <Form.Control type="text" placeholder={`Care of (English)1`} id={`VEName_${i}`} name={`VEName_${i}`} value={e.VEName} onChange={(event) => handleCareOfChange(event, i)} required />
-                                        </Form.Group>
-                                    </div>
-                                    <div className="col-md-3 mb-3">
-                                        <Form.Group >
-                                            <Form.Label>Care of Name1 (Hindi)</Form.Label>
-                                            <Form.Control type="text" placeholder={`Care of (Hindi)1`} id={`VHName_${i}`} name={`VHName_${i}`} value={e.VHName} onChange={(event) => handleCareOfChange(event, i)} required />
-                                        </Form.Group>
-                                    </div>
-                                    {i === 0 && (
-                                        <div className='col-md-3 flex items-center justify-center'>
-                                            <div className='flex items-center justify-center gap-3 checkboxColor'>
-                                                <input type="checkbox" className='w-6 h-6' onClick={handleAddCareOf} />
-                                                <p>Add CareOff</p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })
-                    }
+
 
 
 

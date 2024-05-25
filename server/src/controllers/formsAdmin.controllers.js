@@ -15,6 +15,78 @@ function queryDatabase(sql, params) {
     });
 }
 
+
+const AddOutForm = asyncHandler(async (req, res) => {
+    const {
+        VMob1,
+        VMob2,
+        VEName,
+        VHName,
+        VEAddress,
+        VHAddress,
+        NoOfForms,
+        SendingDate,
+        ERemarks,
+        CMob1,
+        CEName,
+        CHName
+    } = req.body;
+
+
+    try {
+        // Insert the main volunteer entry
+        const result = await queryDatabase(
+            'INSERT INTO volunteer (VMob1, VMob2, VEName, VHName, VEAddress, VHAddress) VALUES (?, ?, ?, ?, ?, ?)',
+            [VMob1, VMob2, VEName, VHName, VEAddress, VHAddress]
+        );
+
+        const RefId = result.insertId;
+
+        const result2 = await queryDatabase(
+            'INSERT INTO volunteer (VMob1, VEName, VHName) VALUES (?, ?, ?)',
+            [CMob1, CEName, CHName]
+        );
+
+        const COId = result2.insertId;
+
+        await queryDatabase(
+            `INSERT INTO outgoingform (
+                RefId,  ERemark, SendingDate, NoOfForms, COID
+            ) VALUES (?, ?, ?, ?, ?)`,
+            [RefId, ERemarks, SendingDate, NoOfForms, COId]
+        );
+
+        res.status(201).json(
+            new ApiResponse(200, "OF details submitted successfully")
+        );
+    } catch (error) {
+        console.error('Error in adding Ougoing form forms:', error);
+        return res.status(error.statusCode || 500).json(new ApiResponse(error.statusCode || 500, null, error.message || "Internal Server Error"));
+    }
+});
+
+const OutFormDetails = asyncHandler(async (req, res) => {
+
+    try {
+        const OutForms = await queryDatabase(`
+        SELECT v1.VEName AS RName, V1.VMob1 AS RMob1, v1.VEAddress AS RAddress,
+        v2.VEName AS C1Name, V2.VMob1 as C1Mob,
+        O.SendingDate, O.ERemark, O.NoOfForms
+        FROM outgoingform AS O
+        LEFT JOIN volunteer AS v1 ON O.RefId = v1.Id
+        LEFT JOIN volunteer AS v2 ON O.COId = v2.Id
+      
+        `);
+        return res.json(OutForms);
+        // res.status(200).json(new ApiResponse(200, incomingForms, "Fetched all Outgoing forms successfully"));
+    } catch (error) {
+        console.error('Error in fetching incoming forms:', error);
+        return res.status(error.statusCode || 500).json(new ApiResponse(error.statusCode || 500, null, error.message || "Internal Server Error"));
+    }
+});
+
+
+
 const AddIncomForm = asyncHandler(async (req, res) => {
     const {
         VMob1,
@@ -30,7 +102,7 @@ const AddIncomForm = asyncHandler(async (req, res) => {
         COList
     } = req.body;
 
-  
+
 
     try {
         // Insert the main volunteer entry
@@ -137,8 +209,8 @@ const SearchVMobNo = asyncHandler(async (req, res) => {
             WHERE VMob1 LIKE ?`,
             [`%${query}%`]
         );
-        
-       
+
+
         return res.json(results);
     } catch (error) {
         console.error('Database query error:', error);
@@ -151,4 +223,7 @@ const SearchVMobNo = asyncHandler(async (req, res) => {
 
 
 
-export { AddIncomForm, incomFormDetails, SearchVMobNo };
+export {
+    AddOutForm, OutFormDetails,
+    AddIncomForm, incomFormDetails, SearchVMobNo
+};
