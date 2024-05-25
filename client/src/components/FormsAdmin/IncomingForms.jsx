@@ -45,11 +45,9 @@ function IncomingForms() {
             } else if (event.key === 'ArrowDown') {
                 event.preventDefault();
                 setSelectedOptionIndex(prevIndex => Math.min(prevIndex + 1, suggestedMobiles.length - 1));
-            } else if (event.key === 'Enter') {
-                event.preventDefault();
-                if (selectedOptionIndex !== -1) {
-                    handleMobileNumberSelect(suggestedMobiles[selectedOptionIndex].VMob1);
-                }
+            } else if ((e.key === 'Enter' || e.key === 'Tab') && selectedIndex >= 0) {
+                e.preventDefault();
+                handleMobileNumberSelect(suggestedMobiles[selectedIndex].VMob1);
             }
         };
 
@@ -225,7 +223,7 @@ function IncomingForms() {
         download(csvConfig)(csv);
     };
 
-    
+
 
 
 

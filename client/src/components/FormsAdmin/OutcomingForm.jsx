@@ -387,7 +387,7 @@ function OutgoingForms() {
                         <div className="col-md-3 mb-3">
                             <Form.Group >
                                 <Form.Label>Name (Hindi) <sup className='text-red-500'>*</sup></Form.Label>
-                                <Form.Control type="text" placeholder="Name (Hindi)" id="VHName" name="VHName" value={formData.VHName} onChange={handleChange} required />
+                                <Form.Control type="text" placeholder="Name (Hindi)" id="VHName" name="VHName" value={formData.VHName} onChange={handleChange}  />
                             </Form.Group>
                         </div>
                     </Row>
@@ -403,7 +403,7 @@ function OutgoingForms() {
                         <div className="col-md-6 mb-3">
                             <Form.Group >
                                 <Form.Label>Address (Hindi)<sup className='text-red-500'>*</sup></Form.Label>
-                                <Form.Control type="text" placeholder="Address (Hindi)" id="VHAddress" name="VHAddress" value={formData.VHAddress} onChange={handleChange} required />
+                                <Form.Control type="text" placeholder="Address (Hindi)" id="VHAddress" name="VHAddress" value={formData.VHAddress} onChange={handleChange}  />
                             </Form.Group>
                         </div>
                     </Row>
@@ -451,7 +451,7 @@ function OutgoingForms() {
                             <Form.Group >
                                 <Form.Label>
                                     Careof (Hindi)<sup className='text-red-500'>*</sup></Form.Label>
-                                <Form.Control type="text" placeholder="Careof (Hindi)" id="NoOfFormsU" name="CHName" value={formData.CHName} onChange={handleChange} required />
+                                <Form.Control type="text" placeholder="Careof (Hindi)" id="NoOfFormsU" name="CHName" value={formData.CHName} onChange={handleChange}  />
                             </Form.Group>
                         </div>
                         <div className="col-md-3 mb-3">
