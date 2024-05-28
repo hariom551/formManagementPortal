@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 function AddVoter() {
     const [referenceDetails, setReferenceDetails] = useState({
         PacketNo: '',
-        IncRefId:'',
+        IncRefId: '',
         VMob1: '',
         VMob2: '',
         VEName: '',
@@ -24,6 +24,7 @@ function AddVoter() {
     });
 
     const [packetOptions, setPacketOptions] = useState([]);
+
 
     useEffect(() => {
         const fetchPacketOptions = async () => {
@@ -98,24 +99,24 @@ function AddVoter() {
                     'Content-Type': 'application/json',
                 },
             });
-    
+
             if (!response.ok) {
                 throw new Error('Failed to fetch reference details');
             }
-    
+
             const data = await response.json();
-    
+
             if (!data || !Array.isArray(data) || data.length === 0) {
                 throw new Error('Empty or invalid packet options data');
             }
-    
+
             const selectedDetails = data.find(det => det.Id === selectedOption.value);
-            console.log(selectedDetails);
+          
             if (!selectedDetails) {
                 throw new Error('Selected packet details not found');
             }
-    
-            // Map the COList data if it is directly part of the response
+
+     
             const mappedCOList = [
                 {
                     VMob1: selectedDetails.C1Mob,
@@ -132,13 +133,13 @@ function AddVoter() {
                     VEName: selectedDetails.C3Name,
                     VHName: selectedDetails.C3HName,
                 }
-                
+
             ].filter(co => co.VMob1 || co.VEName || co.VHName); // Remove empty CO entries
-    
+
             setReferenceDetails(prevDetails => ({
                 ...prevDetails,
                 PacketNo: selectedOption.value,
-                IncRefId:  selectedDetails.IncRefId,
+                IncRefId: selectedDetails.IncRefId,
                 VMob1: selectedDetails.RMob1,
                 VMob2: selectedDetails.RMob2,
                 VEName: selectedDetails.RName,
@@ -157,8 +158,8 @@ function AddVoter() {
             toast.error(`Error fetching reference details: ${error.message}`);
         }
     };
-    
-    
+
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -237,7 +238,7 @@ function AddVoter() {
                                     <Form.Group>
                                         <Form.Label>Volunteer (Hindi)</Form.Label>
                                         <Form.Control
-                                        className='px-2'
+                                            className='px-2'
                                             type="text"
                                             name="VHName"
                                             value={referenceDetails.VHName}
@@ -250,7 +251,7 @@ function AddVoter() {
                                     <Form.Group>
                                         <Form.Label>Volunteer (English)</Form.Label>
                                         <Form.Control
-                                        className='px-2'
+                                            className='px-2'
                                             type="text"
                                             name="VEName"
                                             value={referenceDetails.VEName}
@@ -263,7 +264,7 @@ function AddVoter() {
                                     <Form.Group>
                                         <Form.Label>Mobile 2</Form.Label>
                                         <Form.Control
-                                        className='px-2'
+                                            className='px-2'
                                             type="text"
                                             name="VMob2"
                                             value={referenceDetails.VMob2}
@@ -361,12 +362,15 @@ function AddVoter() {
                                                 </Form.Group>
                                             </div>
                                         )}
-                                        
+
                                     </Row>
                                 </div>
                             ))}
                         </div>
                     </div>
+
+
+                    
                     <Button type="submit" className="mt-4">Submit</Button>
                 </Form>
             </div>

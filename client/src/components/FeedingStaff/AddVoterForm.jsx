@@ -562,6 +562,8 @@ const AddVoterForm = () => {
           </div>
           {/* document    fields  end*/}
         </div>
+
+        
         <div className='w-[90%]  h-[full] mx-auto my-5 px-8 py-5 bg-gray-100 ' style={{ boxShadow: "0 0 5px 1px #ddd" }}>
           <div className="container-fluid flex-col gap-2 flex">
             <div className='flex items-center justify-between py-3'>
