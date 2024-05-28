@@ -6,7 +6,7 @@ import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 import { mkConfig, generateCsv, download } from 'export-to-csv';
 import FormsAdminInfo from './FormsAdminInfo.jsx';
 
-function IncomingForms() {
+function UpdateIncomingForm() {
 
     const formatDate = (date) => {
         const d = new Date(date);
@@ -163,228 +163,23 @@ function IncomingForms() {
         const newSuggestedMobiles = [...careOfSuggestedMobiles];
         newSuggestedMobiles[index] = [];
         setCareOfSuggestedMobiles(newSuggestedMobiles);
-    };
+    }
 
-
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch('/api/v1/formsAdmin/incomFormDetails', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch IncomingForms details');
-                }
-
-                const data = await response.json();
-                // const data = result.incomingForms;
-
-                if (!data || !Array.isArray(data) || data.length === 0) {
-                    throw new Error('Empty or invalid IncomingForms details data');
-                }
-
-                setIFDetails(data);
-             
-            } catch (error) {
-                console.error('Error fetching IncomingForms data:', error);
-            }
-        };
-
-        fetchData();
-    }, []);
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const result = await fetch("/api/v1/formsAdmin/AddIncomForm", {
-                method: 'POST',
-                body: JSON.stringify(formData),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (result.ok) {
-                window.location.reload();
-                console.log("IncomingForms Added Successfully.");
-            } else {
-                console.error("Error in Adding IncomingForms:", result.statusText);
-            }
-        } catch (error) {
-            console.error("Error in Adding IncomingForms:", error.message);
-        }
-    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleExportData = () => {
-        const csvConfig = mkConfig({
-            fieldSeparator: ',',
-            decimalSeparator: '.',
-            useKeysAsHeaders: true,
-        });
-        const csv = generateCsv(csvConfig)(IFDetails);
-        download(csvConfig)(csv);
+
+    const handleAddCareOf = () => {
+        if (formData.COList.length < 5) {
+            setFormData({
+                ...formData,
+                COList: [...formData.COList, { VMob1: '', VEName: '', VHName: '', NoOfFormsKN: '', NoOfFormsKD: '', NoOfFormsU: '', }]
+            });
+        }
     };
-
-
-
-
-
-    const columns = useMemo(() => [
-        {
-            accessor: (index) => index + 1,
-            id: 'serialNumber',
-            Header: 'S.No',
-            size: 5,
-            Cell: ({ cell }) => cell.row.index + 1
-        },
-        {
-            accessorKey: 'RName',
-            header: 'Name ',
-            size: 15,
-        },
-        {
-            accessorKey: 'RMob1',
-            header: 'Mobile',
-            size: 10,
-        },
-        {
-            accessorKey: 'RAddress',
-            header: 'Address',
-            size: 20,
-        },
-        {
-            accessorKey: 'TotalForms',
-            header: 'Total Form',
-            size: 4,
-            Footer: () => calculateColumnTotals('TotalForms')
-        },
-        {
-            accessorKey: 'PacketNo',
-            header: 'PacketNo',
-            size: 5,
-        },
-        {
-            accessorKey: 'C1Name',
-            header: 'CO1 Name ',
-            size: 15,
-        },
-        {
-            accessorKey: 'C1Mob',
-            header: 'CO1 Mobile',
-            size: 10,
-        },
-        {
-            accessorKey: 'NFormsKN1',
-            header: 'CO1 InForm Kanpur',
-            size: 5,
-            Footer: () => calculateColumnTotals('NFormsKN1')
-        },
-        {
-            accessorKey: 'NFormsKd1',
-            header: 'CO1 InForm Dehat',
-            size: 5,
-            Footer: () => calculateColumnTotals('NFormsKd1')
-        },
-        {
-            accessorKey: 'NFormsU1',
-            header: 'CO1 InForm Unnao',
-            size: 5,
-            Footer: () => calculateColumnTotals('NFormsU1')
-        },
-        {
-            accessorKey: 'C2Name',
-            header: 'CO2 Name',
-            size: 15,
-        },
-        {
-            accessorKey: 'C2Mob',
-            header: 'CO2 Mobile',
-            size: 10,
-        },
-        {
-            accessorKey: 'NFormsKN2',
-            header: 'CO2 InForm Kanpur',
-            size: 5,
-            Footer: () => calculateColumnTotals('NFormsKN2')
-        },
-        {
-            accessorKey: 'NFormsKd2',
-            header: 'CO2 InForm Dehat',
-            size: 5,
-            Footer: () => calculateColumnTotals('NFormsKd2')
-        },
-        {
-            accessorKey: 'NFormsU2',
-            header: 'CO2 InForm Unnao',
-            size: 5,
-            Footer: () => calculateColumnTotals('NFormsU2')
-        },
-        {
-            accessorKey: 'C3Name',
-            header: 'CO3 Name',
-            size: 15,
-        },
-        {
-            accessorKey: 'C3Mob',
-            header: 'CO3 Mobile',
-            size: 10,
-        },
-        {
-            accessorKey: 'NFormsKN3.',
-            header: 'CO3 InForm Kanpur',
-            size: 5,
-            Footer: () => calculateColumnTotals('NFormsKN3')
-        },
-        {
-            accessorKey: 'NFormsKd3.',
-            header: 'CO3 InForm Dehat',
-            size: 5,
-            Footer: () => calculateColumnTotals('NFormsKd3')
-        },
-        {
-            accessorKey: 'NFormsU3',
-            header: 'CO3 InForm Unnao',
-            size: 5,
-        },
-        {
-            accessorKey: 'ReceivedDate',
-            header: 'Received Date',
-            size: 8,
-        },
-        {
-            accessorKey: 'ERemarks',
-            header: 'Remarks',
-            size: 25,
-        },
-    ], [IFDetails]);
-
-
-    const table = useMaterialReactTable({
-        columns,
-        data: IFDetails,
-        initialState: {
-            showFooter: true,
-        },
-    });
-
-    // const handleAddCareOf = () => {
-    //     if (formData.COList.length < 5) {
-    //         setFormData({
-    //             ...formData,
-    //             COList: [...formData.COList, { VMob1: '', VEName: '', VHName: '', NoOfFormsKN: '', NoOfFormsKD: '', NoOfFormsU: '', }]
-    //         });
-    //     }
-    // };
 
     const handleCareOfChange = (e, index) => {
         const { name, value } = e.target;
@@ -409,11 +204,6 @@ function IncomingForms() {
     };
 
 
-    const calculateColumnTotals = (key) => {
-        return IFDetails.reduce((sum, row) => sum + (Number(row[key]) || 0), 0);
-    };
-
-
     const calculateTotalForms = () => {
         let totalForms = 0;
         formData.COList.forEach(co => {
@@ -424,17 +214,22 @@ function IncomingForms() {
 
 
 
-
     return (
         <main className="bg-gray-100">
             <div className="container py-4 pl-6 text-black">
-                <div className='w-full h-full my-1 container-fluid'>
-                   <FormsAdminInfo/>
-                </div>
+                
 
 
                 <h1 className="text-3xl font-bold my-4">Incoming Form Info</h1>
-                <Form onSubmit={handleSubmit} className="IncomingForms-form">
+                <Form className="IncomingForms-form">
+                <div className="col-md-2 mb-3">
+                            <Form.Group >
+                                <Form.Label>Packet No.<sup className='text-red-500'>*</sup></Form.Label>
+                                <Form.Control type="text" placeholder="Packet No." name="PacketNo" value={formData.PacketNo} onChange={handleChange} required />
+                            </Form.Group>
+                        </div>
+                    
+                    
                     <Row className="mb-3">
 
                         <div className="col-md-3 mb-3">
@@ -487,14 +282,14 @@ function IncomingForms() {
                     </Row>
 
                     <Row className="mb-3">
-                        <div className="col-md-5 mb-3">
+                        <div className="col-md-6 mb-3">
                             <Form.Group >
                                 <Form.Label>Address (English)<sup className='text-red-500'>*</sup></Form.Label>
                                 <Form.Control type="text" placeholder="Address (English)" name="VEAddress" value={formData.VEAddress} onChange={handleChange} required />
                             </Form.Group>
                         </div>
 
-                        <div className="col-md-5 mb-3">
+                        <div className="col-md-6 mb-3">
                             <Form.Group >
                                 <Form.Label>Address (Hindi)<sup className='text-red-500'>*</sup></Form.Label>
                                 <Form.Control type="text" placeholder="Address (Hindi)" name="VHAddress" value={formData.VHAddress} onChange={handleChange} />
@@ -503,18 +298,10 @@ function IncomingForms() {
                     </Row>
 
                     <Row className="mb-3">
-
-                    <div className="col-md-5 mb-3">
+                    <div className="col-md-6 mb-3">
                             <Form.Group >
                                 <Form.Label>Remarks</Form.Label>
                                 <Form.Control type="text" placeholder="Remarks" name="ERemarks" value={formData.ERemarks} onChange={handleChange} />
-                            </Form.Group>
-                        </div>
-
-                        <div className="col-md-2 mb-3">
-                            <Form.Group >
-                                <Form.Label>Packet No.<sup className='text-red-500'>*</sup></Form.Label>
-                                <Form.Control type="text" placeholder="Packet No." name="PacketNo" value={formData.PacketNo} onChange={handleChange} required />
                             </Form.Group>
                         </div>
 
@@ -532,7 +319,7 @@ function IncomingForms() {
                             </Form.Group>
                         </div>
 
-                        
+                       
                     </Row>
 
                     {formData.COList.map((e, index) => (
@@ -661,36 +448,17 @@ function IncomingForms() {
                     ))}
 
                     <Button variant="primary" type="submit">
-                        Submit
+                        Update
                     </Button>
                 </Form>
 
-                <hr className="my-4" />
-                <h4 className="container mt-3 text-xl font-bold mb-3">IncomingForms List</h4>
-                <div className="overflow-x-auto">
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            gap: '16px',
-                            padding: '8px',
-                            flexWrap: 'wrap',
-                        }}
-                    >
-                        <Button
-                            onClick={handleExportData}
-                            startIcon={<FileDownloadIcon />}
-                        >
-                            Export Data
-                        </Button>
-                    </Box>
-
-                    <MaterialReactTable table={table} />
-                </div>
+                
+                
             </div>
         </main>
     );
 }
 
-export default IncomingForms;
+export default UpdateIncomingForm;
 
 

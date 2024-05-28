@@ -100,7 +100,16 @@ header svg{
     border-radius: 6px;
     
 }
-
+input[type="text"] {
+    color: #011627;
+    padding: 2px 0;
+ }
+select, option{
+    color: #011627;
+} 
+select input,label{
+    color: #011627;
+}
 .dropdown-symbol {
     font-size: 18px;
     float: right;

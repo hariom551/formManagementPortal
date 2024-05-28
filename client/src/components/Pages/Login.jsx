@@ -88,7 +88,7 @@ function Login() {
           <div className="flex justify-center items-center  font-serief mt-[10vw]">
             <Form onSubmit={handleSubmit} className="loginbox max-w-3xl mt-2 mx-auto p-4 rounded-lg shadow-md">
               <Form.Group className="mb-3 pt-4" >
-                <Form.Label>User Id:</Form.Label>
+                <Form.Label className='text-white'>User Id:</Form.Label>
                 <Form.Control
                   type="text"
                   id="userid"
@@ -102,7 +102,7 @@ function Login() {
               </Form.Group>
 
               <Form.Group className="mb-3" >
-                <Form.Label>Password</Form.Label>
+                <Form.Label className='text-white'>Password</Form.Label>
                 <Form.Control
                   type="password"
                   id="password"

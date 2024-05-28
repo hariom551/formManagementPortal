@@ -25,6 +25,8 @@ import PollingStationAllotment from './components/Admin/pollingStationAllotment.
 import OutgoingForms from './components/FormsAdmin/OutcomingForm.jsx';
 import AddVoterForm from './components/FeedingStaff/AddVoterForm.jsx';
 import IncomingForms from './components/FormsAdmin/IncomingForms.jsx';
+import UpdateIncomingForm from './components/FormsAdmin/UpdateIncomingForm.jsx';
+import AddVoter from './components/FeedingStaff/AddVoter.jsx';
 
 
 
@@ -53,6 +55,7 @@ const getRoutesForRole = (role) => {
             <Route path="/Home" element={<Home />} />
             <Route path="/incomingForms" element={<IncomingForms />} />
             <Route path="/outgoingForms" element={<OutgoingForms />} />
+            <Route path="/updatedIncomingForms" element={<UpdateIncomingForm />} />
           
           </>
         );
@@ -89,7 +92,8 @@ const getRoutesForRole = (role) => {
           return (
             <>
               <Route path="/Home" element={<Home />} />
-              <Route path="/AddVoterForm" element={<AddVoterForm />} />
+              {/* <Route path="/AddVoterForm" element={<AddVoterForm />} /> */}
+              <Route path="/AddVoterForm" element={<AddVoter />} />
              
             
             </>

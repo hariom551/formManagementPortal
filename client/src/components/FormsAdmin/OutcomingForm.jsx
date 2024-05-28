@@ -2,10 +2,19 @@ import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { Button, Form, Row } from 'react-bootstrap';
 import { Box } from '@mui/material';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import { MdOutlinePlaylistAddCheck } from 'react-icons/md';
-import { FaUserPlus } from 'react-icons/fa';
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { mkConfig, generateCsv, download } from 'export-to-csv';
+import FormsAdminInfo from './FormsAdminInfo';
+
+const formatDate = (date) => {
+    const d = new Date(date);
+    const month = `${d.getMonth() + 1}`.padStart(2, '0');
+    const day = `${d.getDate()}`.padStart(2, '0');
+    const year = d.getFullYear();
+    return [year, month, day].join('-');
+};
+
+const today = formatDate(new Date());
 
 function OutgoingForms() {
     const [OFDetails, setPSListDetails] = useState([]);
@@ -17,7 +26,7 @@ function OutgoingForms() {
         VEAddress: '',
         VHAddress: '',
         NoOfForms: '',
-        SendingDate: '',
+        SendingDate: today,
         ERemarks: '',
         CMob1: '',
         CEName: '',
@@ -288,55 +297,7 @@ function OutgoingForms() {
         <main className="bg-gray-100">
             <div className="container py-4 pl-6 text-black">
                 <div className='w-full h-full my-1 container-fluid'>
-                    <div className="gap-4 lg:flex">
-
-                        <div className='gap-4 sm:flex my-2'>
-                            <div className='h-24 lg:w-[20vw] w-full bg-sky-600 flex my-1 box1 hover:bg-sky-700  hover:transition-transform hover:transform-gpu'>
-                                <div className='h-full w-36 bg-sky-800 flex items-center justify-center'>
-                                    <MdOutlinePlaylistAddCheck className='text-6xl text-white' />
-                                </div>
-                                <div className='h-24 w-full flex items-start justify-center text-white flex-col px-3'>
-                                    <p>TOTAL OUTGOING</p>
-                                    <span className='text-2xl'>15236</span>
-                                </div>
-                            </div>
-
-
-                            {/* First box total Incoming  */}
-                            <div className='h-24  lg:w-[20vw] w-full bg-red-500 flex my-1 box hover:bg-red-600 hover:transition-transform hover:transform-gpu'>
-                                <div className='h-full w-36 bg-red-700 flex items-center justify-center'>
-                                    <MdOutlinePlaylistAddCheck className='text-6xl text-white' />
-                                </div>
-                                <div className='h-24 w-full flex items-start justify-center text-white flex-col px-3'>
-                                    <p>TOTAL INCOMING</p>
-                                    <span className='text-2xl'>984436</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className='gap-4 sm:flex my-2'>
-                            {/* First box ref outGoing  */}
-                            <div className='h-24  lg:w-[20vw] w-full bg-yellow-600 flex my-1 box hover:bg-yellow-500 hover:transition-transform hover:transform-gpu' >
-                                <div className='h-full w-36 bg-yellow-700 flex items-center justify-center'>
-                                    <FaUserPlus className='text-5xl text-white' />
-                                </div>
-                                <div className='h-24 w-full flex items-start justify-center text-white flex-col px-3'>
-                                    <p>TOTAL OUTGOING</p>
-                                    <span className='text-2xl'><pre>    </pre></span>
-                                </div>
-                            </div>
-                            {/* First box ref €incoming  */}
-                            <div className='h-24  lg:w-[20vw] w-full bg-green-500 flex my-1 box hover:bg-green-600 hover:transition-transform hover:transform-gpu'>
-                                <div className='h-full w-36 bg-green-700 flex items-center justify-center'>
-                                    <MdOutlinePlaylistAddCheck className='text-6xl text-white' />
-                                </div>
-                                <div className='h-24 w-full flex items-start justify-center text-white flex-col px-3'>
-                                    <p>REF. INCOMING</p>
-                                    <span className='text-2xl'><pre>    </pre></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <FormsAdminInfo/>
                 </div>
 
 

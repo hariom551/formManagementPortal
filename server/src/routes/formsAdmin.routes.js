@@ -1,7 +1,8 @@
 import { Router } from "express"
 import { AddOutForm,
      AddIncomForm, incomFormDetails, SearchVMobNo, 
-     OutFormDetails} from "../controllers/formsAdmin.controllers.js"
+     OutFormDetails,
+     FormsAdminInfo} from "../controllers/formsAdmin.controllers.js"
 
 
 
@@ -13,6 +14,7 @@ formsAdminRouter.route("/outFormDetails").get(OutFormDetails)
 formsAdminRouter.route("/addIncomForm").post(AddIncomForm)
 formsAdminRouter.route("/incomFormDetails").get(incomFormDetails)
 formsAdminRouter.route("/searchVMobNo").post(SearchVMobNo)
+formsAdminRouter.route("/formsAdminInfo").get(FormsAdminInfo)
 
 
 

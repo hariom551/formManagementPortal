@@ -18,19 +18,8 @@ export const Category = [
     { value: "ST", name: "ST" },
 ]
 
-export const Stream = [
-    { value: "Advance Software Training", name: "Advance Software Training" },
-    { value: "University Cources", name: "University Cources" },
-]
 
-export const University = [
-    { value: 'MUONA', name: "Mangalayatan University Online,Aligah" },
-    { value: 'MUOA', name: "Mangalayatan University ODL,Aligah" },
-    { value: 'SPU', name: "Sikkim Professional University" },
-    { value: 'SUMU', name: "Subharti University ,Meerut ,UP" },
-    { value: 'SSU', name: "Sikkim Skill University" },
 
-]
 
 export const Marital = [
     { value: "Single/unmarried", name: "Single/unmarried" },
@@ -40,20 +29,9 @@ export const Marital = [
     { value: "Separated", name: "Separated" },
 ]
 
-export const Course = [
-    { value: "BA", name: "BA" },
-    { value: "BSc", name: "BSc" },
-    { value: "BCA", name: "BCA" },
-    { value: "BTech", name: "BTech" },
-    { value: "MCA", name: "MCA" },
-    { value: "MSc", name: "MSc" },
-    { value: "MA", name: "MA" },
-    { value: "MTech", name: "MTech" },
-]
 
-export const Board = [{
 
-}]
+
 
 // export const YOP=[
 //     {name:"2005",value:"2005"},
