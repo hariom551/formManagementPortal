@@ -1,5 +1,5 @@
 import React, { useRef, useState, useCallback } from 'react'
-import { Religion, Occupation } from '../Pages/Constaint.jsx';
+import {Relation, Occupation } from '../Pages/Constaint.jsx';
 import { ValidationPage } from './Validation.jsx';
 import Webcam from 'react-webcam-v2'
 const AddVoterForm = () => {
@@ -26,6 +26,7 @@ const AddVoterForm = () => {
     COId3: '',
     COId4: '',
     COId5: '',
+    
     EFName: '',
     HFName: '',
     ELName: '',
@@ -329,7 +330,7 @@ const AddVoterForm = () => {
                 <select className='w-full py-[.1rem]' name="RType" value={data.RType} onChange={handleChange}>
                   <option value="">--select relation--</option>
                   {
-                    Religion.map((c) => (
+                    Relation.map((c) => (
                       <>
                         <option key={c.value} value={c.value}>{c.name}</option>
                       </>

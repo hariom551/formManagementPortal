@@ -330,7 +330,7 @@ function AreaVill() {
             <div className="col-md-3 mb-3">
               <Form.Group >
                 <Form.Label>Hno Range<sup className='text-red-600'>*</sup></Form.Label>
-                <Form.Control type="text" placeholder="Hno Range" id="HnoRange" name="HnoRange" value={formData.HnoRange} onChange={handleChange} required />
+                <Form.Control type="text" placeholder="Hno Range" id="HnoRange" name="HnoRange" value={formData.HnoRange} onChange={handleChange} />
               </Form.Group>
             </div>
           </Row>

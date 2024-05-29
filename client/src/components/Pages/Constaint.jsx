@@ -3,13 +3,16 @@ export const Gender = [
     { value: "Female", name: "Female" },
 ]
 
-export const Religion = [
-    { value: 'Hindu', name: "Hindu" },
-    { value: 'Sikh', name: "Sikh" },
-    { value: 'Jain', name: "Jain" },
-    { value: 'Christian', name: "Christian" },
-    { value: 'Muslim', name: "Muslim" },
+export const Relation = [
+    { value: 'Father', name: "Father" },
+    { value: 'Mother', name: "Mother" },
+    { value: 'Husband', name: "Husband" },
+    { value: 'Other', name: "Other" },
+   
 ]
+
+
+
 
 export const Category = [
     { value: "Gen", name: "Gen" },

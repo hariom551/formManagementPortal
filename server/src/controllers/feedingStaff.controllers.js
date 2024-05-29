@@ -18,6 +18,18 @@ function queryDatabase(sql, params) {
 }
 
 
+const CasteOption = asyncHandler(async (req, res) => {
+        const {lastName}= request.body;
+
+    try {
+        const results = await queryDatabase('SELECT Id AS CasteId, ECaste FROM caste Where ESurname= ?', [lastName]);
+        return res.json(results); // Should correctly return the results array
+    } catch (error) {
+        console.error('Database query error', error);
+        return res.status(500).send('A database error occurred.');
+    }
+});
+
 
 
 export {}

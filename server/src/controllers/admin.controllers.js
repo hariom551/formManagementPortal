@@ -499,7 +499,7 @@ const AddAreaVill = asyncHandler(async (req, res) => {
 
 
 
-    if (!EAreaVill || !HAreaVill || !CBPId || !HnoRange)
+    if (!EAreaVill || !HAreaVill || !CBPId )
         throw new ApiError(400, 'Plaese Enter All the Details')
 
 
