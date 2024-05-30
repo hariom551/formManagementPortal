@@ -1,6 +1,8 @@
-import React, { useEffect, useMemo, useState, useRef } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Form, Row } from 'react-bootstrap';
 import { Box } from '@mui/material';
+import { Typeahead } from 'react-bootstrap-typeahead';
+import 'react-bootstrap-typeahead/css/Typeahead.css';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { mkConfig, generateCsv, download } from 'export-to-csv';
@@ -41,40 +43,12 @@ function IncomingForms() {
     });
 
     const [suggestedMobiles, setSuggestedMobiles] = useState([]);
-    const [selectedOptionIndex, setSelectedOptionIndex] = useState(-1)
-    const [careOfSuggestedMobiles, setCareOfSuggestedMobiles] = useState([]); // Track suggestions for Care Of
-    const [selectedCareOfIndex, setSelectedCareOfIndex] = useState(-1); // Track selected suggestion index for Care Of
-
-    const mobileInputRef = useRef(null);
+    const [suggestedCareOfMobiles, setSuggestedCareOfMobiles] = useState([]);
 
 
 
-    useEffect(() => {
-        const handleKeyDown = (event) => {
-            if (event.key === 'ArrowUp') {
-                event.preventDefault();
-                setSelectedOptionIndex(prevIndex => Math.max(prevIndex - 1, 0));
-            } else if (event.key === 'ArrowDown') {
-                event.preventDefault();
-                setSelectedOptionIndex(prevIndex => Math.min(prevIndex + 1, suggestedMobiles.length - 1));
-            } else if ((e.key === 'Enter' || e.key === 'Tab') && selectedIndex >= 0) {
-                e.preventDefault();
-                handleMobileNumberSelect(suggestedMobiles[selectedIndex].VMob1);
-            }
-        };
 
-        if (mobileInputRef.current) {
-            mobileInputRef.current.addEventListener('keydown', handleKeyDown);
-        }
-
-        return () => {
-            if (mobileInputRef.current) {
-                mobileInputRef.current.removeEventListener('keydown', handleKeyDown);
-            }
-        };
-    }, [suggestedMobiles, selectedOptionIndex]);
-
-    const fetchSuggestedMobiles = async (input) => {
+    const fetchSuggestedMobiles = async (input, setter) => {
         try {
             const response = await fetch('/api/v1/formsAdmin/searchVMobNo', {
                 method: 'POST',
@@ -89,81 +63,17 @@ function IncomingForms() {
             }
 
             const data = await response.json();
-            setSuggestedMobiles(data);
+            setter(data);
+
+          
         } catch (error) {
             console.error('Error fetching suggested mobile numbers:', error);
         }
     };
 
-    const handleMobileNumberChange = (e) => {
-        const { value } = e.target;
-        setFormData({ ...formData, VMob1: value });
-        fetchSuggestedMobiles(value);
-    };
+ 
 
-    const handleMobileNumberSelect = (selectedMobile) => {
-        const selectedUser = suggestedMobiles.find(user => user.VMob1 === selectedMobile);
-        if (selectedUser) {
-            setFormData({
-                ...formData,
-                VMob1: selectedUser.VMob1,
-                VMob2: selectedUser.VMob2,
-                VEName: selectedUser.VEName,
-                VHName: selectedUser.VHName,
-                VEAddress: selectedUser.VEAddress,
-                VHAddress: selectedUser.VHAddress
-            });
-        }
-        setSuggestedMobiles([]);
-    };
 
-    const handleCareOfMobileNumberChange = (e, index) => {
-        const { value } = e.target;
-        const updatedCOList = [...formData.COList];
-        updatedCOList[index].VMob1 = value;
-        setFormData({ ...formData, COList: updatedCOList });
-        fetchCareOfSuggestedMobiles(value, index);
-    };
-
-    const fetchCareOfSuggestedMobiles = async (input, index) => {
-        try {
-            const response = await fetch('/api/v1/formsAdmin/searchVMobNo', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ query: input })
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch suggested mobile numbers');
-            }
-
-            const data = await response.json();
-            const newSuggestedMobiles = [...careOfSuggestedMobiles];
-            newSuggestedMobiles[index] = data;
-            setCareOfSuggestedMobiles(newSuggestedMobiles);
-        } catch (error) {
-            console.error('Error fetching suggested mobile numbers:', error);
-        }
-    };
-
-    const handleCareOfMobileNumberSelect = (selectedMobile, index) => {
-        const selectedUser = careOfSuggestedMobiles[index].find(user => user.VMob1 === selectedMobile);
-        if (selectedUser) {
-            const updatedCOList = [...formData.COList];
-            updatedCOList[index] = {
-                ...updatedCOList[index],
-                VMob1: selectedUser.VMob1,
-                VEName: selectedUser.VEName,
-                VHName: selectedUser.VHName
-            };
-            setFormData({ ...formData, COList: updatedCOList });
-        }
-        const newSuggestedMobiles = [...careOfSuggestedMobiles];
-        newSuggestedMobiles[index] = [];
-        setCareOfSuggestedMobiles(newSuggestedMobiles);
-    };
 
 
 
@@ -438,30 +348,35 @@ function IncomingForms() {
                     <Row className="mb-3">
 
                         <div className="col-md-3 mb-3">
-                            <Form.Group controlId="VMob1">
-                                <Form.Label>Mobile Number 1</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Mobile Number 1"
-                                    value={formData.VMob1}
-                                    onChange={handleMobileNumberChange}
-                                    ref={mobileInputRef}
-                                    className="border p-2 rounded-md w-full"
+                        <Form.Group>
+                                <Form.Label>Mobile Number<sup className='text-red-500'>*</sup></Form.Label>
+                                <Typeahead
+                                    id="VMob1"
+                                    onInputChange={(value) => fetchSuggestedMobiles(value, setSuggestedMobiles)}
+                                    onChange={(selected) => {
+                                        if (selected.length > 0) {
+                                            const [choice] = selected;
+                                            setFormData(prevData => ({
+                                                ...prevData,
+                                                VMob1: choice.VMob1,
+                                                VMob2: choice.VMob2,
+                                                VEName: choice.VEName,
+                                                VHName: choice.VHName,
+                                                VEAddress: choice.VEAddress,
+                                                VHAddress: choice.VHAddress,
+                                            }));
+                                        }
+                                    }}
+                                    options={suggestedMobiles}
+                                    placeholder="Mobile Number"
+                                    labelKey="VMob1"
+                                    renderMenuItemChildren={(option) => (
+                                        <div>
+                                            {option.VMob1} - {option.VEName}
+                                        </div>
+                                    )}
                                 />
-                                {suggestedMobiles.length > 0 && (
-                                    <ul className="suggestions max-h-48 overflow-y-auto border border-gray-300 rounded-md mt-2">
-                                        {suggestedMobiles.map((mobile, index) => (
-                                            <li
-                                                key={mobile.VMob1}
-                                                className={`p-2 cursor-pointer hover:bg-gray-400 ${index === selectedOptionIndex ? 'bg-gray-400' : ''}`}
-                                                onClick={() => handleMobileNumberSelect(mobile.VMob1)}
-                                            >
-                                                {mobile.VMob1} - {mobile.VEName}
-                                            </li>
-                                        ))}
-                                    </ul>
 
-                                )}
                             </Form.Group>
                         </div>
 
@@ -539,30 +454,42 @@ function IncomingForms() {
                         <div className="row mb-3" key={index}>
                             <Row className="mb-3">
                                 <div className="col-md-3 mb-3">
-                                    <Form.Group controlId={`VMob1_${index}`}>
-                                        <Form.Label>Care of Mobile No.{index + 1}</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            placeholder={`Care of Mobile No ${index + 1}`}
-                                            value={formData.COList[index].VMob1}
-                                            onChange={(e) => handleCareOfMobileNumberChange(e, index)}
-                                            className="border p-2 rounded-md w-full"
-                                            required
-                                        />
-                                        {careOfSuggestedMobiles[index]?.length > 0 && (
-                                            <ul className="suggestions max-h-48 overflow-y-auto border border-gray-300 rounded-md mt-2">
-                                                {careOfSuggestedMobiles[index].map((mobile) => (
-                                                    <li
-                                                        key={mobile.VMob1}
-                                                        className={`p-2 cursor-pointer hover:bg-gray-400 ${index === selectedCareOfIndex ? 'bg-gray-400' : ''}`}
-                                                        onClick={() => handleCareOfMobileNumberSelect(mobile.VMob1, index)}
-                                                    >
-                                                        {mobile.VMob1} - {mobile.VEName}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
-                                    </Form.Group>
+                                   
+
+                                    <Form.Group controlId={`COList[${index}].VMob1`}>
+                                <Form.Label>Care Of Mobile {index + 1}</Form.Label>
+                                <Typeahead
+    id={`COList[${index}].VMob1`}
+    onInputChange={(input) => fetchSuggestedMobiles(input, setSuggestedCareOfMobiles)}
+    onChange={(selected) => {
+        if (selected.length > 0) {
+            const [choice] = selected;
+            const updatedCOList = [...formData.COList];
+            updatedCOList[index] = {
+                ...updatedCOList[index],
+                VMob1: choice.VMob1,
+                VEName: choice.VEName,
+                VHName: choice.VHName,
+            };
+            setFormData({ ...formData, COList: updatedCOList });
+        }
+    }}
+    options={suggestedCareOfMobiles}
+    placeholder="Search mobile"
+    labelKey="VMob1"
+    renderMenuItemChildren={(option) => (
+        <div>
+            {option.VMob1} - {option.VEName}
+        </div>
+    )}
+/>
+
+                            </Form.Group>
+
+
+
+
+                             
                                 </div>
                                 <div className="col-md-3 mb-3">
                                     <Form.Group>

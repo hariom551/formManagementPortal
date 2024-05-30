@@ -9,6 +9,7 @@ import {
 } from 'material-react-table';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 function VidhanSabha() {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -96,7 +97,7 @@ function VidhanSabha() {
             'Content-Type': 'application/json'
           }
         });
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch VidhanSabha details');
         }
@@ -109,7 +110,7 @@ function VidhanSabha() {
           const VidhanSabha = data.find(item => item.Id == content);
           if (VidhanSabha) {
             setFormData(VidhanSabha);
-            console.log("set ",formData.counId);
+            console.log("set ", formData.counId);
             fetchCouncilOptions(VidhanSabha.counId);
           } else {
             toast.error(`VidhanSabha with ID ${content} not found`);
@@ -135,7 +136,7 @@ function VidhanSabha() {
       });
 
       if (result.ok) {
-      
+
         toast.success("VidhanSabha Added Successfully.");
         setTimeout(() => {
           window.location.reload();
@@ -160,7 +161,7 @@ function VidhanSabha() {
       fetchCouncilOptions(value);
 
     }
-   
+
   };
 
   const handleDelete = async (Id) => {
@@ -174,7 +175,7 @@ function VidhanSabha() {
       });
 
       if (result.ok) {
-      
+
         toast.success("VidhanSabha Added Successfully successfully.");
         setTimeout(() => {
           window.location.reload();
@@ -213,7 +214,7 @@ function VidhanSabha() {
         }
       });
 
-  
+
       if (result.ok) {
         toast.success("VidhanSabha Updated successfully.");
         setTimeout(() => {
@@ -226,7 +227,7 @@ function VidhanSabha() {
       toast.error("Error in updating :", error.message);
     }
   };
-  
+
 
 
 
@@ -289,10 +290,10 @@ function VidhanSabha() {
 
   return (
     <main className="bg-gray-100">
-      <ToastContainer/>
+      <ToastContainer />
       <div className="container py-4 pl-6 text-black">
         <h1 className="text-2xl font-bold mb-4">Add VidhanSabha</h1>
-        <Form onSubmit={content ? handleEdit :handleSubmit} className="VidhanSabha-form">
+        <Form onSubmit={content ? handleEdit : handleSubmit} className="VidhanSabha-form">
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group>

@@ -271,7 +271,7 @@ function ReferenceDetailsForm({
                                                     name="VMob1"
                                                     value={e.VMob1}
                                                     onChange={(event) => handleCareOfChange(event, index)}
-                                                    required
+                                                   
                                                 />
                                             </Form.Group>
                                         </div>
@@ -285,7 +285,7 @@ function ReferenceDetailsForm({
                                                     name="VEName"
                                                     value={e.VEName}
                                                     onChange={(event) => handleCareOfChange(event, index)}
-                                                    required
+                                                  
                                                 />
                                             </Form.Group>
                                         </div>

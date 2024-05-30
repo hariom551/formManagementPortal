@@ -59,11 +59,6 @@ export const Marital = [
 //     {name:"2024",value:"2024"},
 
 
-export const relation=[
-    {name:"Father",value:"f1"},
-    {name:"Mother",value:"m1"},
-    {name:"Brother",value:"b1"},
-]
 
 export const Occupation=[
     {name:"Business",value:"b1"},

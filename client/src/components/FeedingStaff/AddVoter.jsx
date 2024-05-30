@@ -4,8 +4,10 @@ import Select from 'react-select';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import VoterDetailsForm from './VoterDetailsForm.jsx';
+// import VoterDetailsForm from '../FeedingStaff/VoterDetailsForm.jsx';
 import ReferenceDetailsForm from './ReferenceDetailsForm.jsx';
+import VoterDetailsForm from './VoterDetailsForm.jsx';
+import AddressInformationForm from './AddressInformationForm.jsx';
 
 function AddVoter() {
     const [referenceDetails, setReferenceDetails] = useState({
@@ -72,7 +74,30 @@ function AddVoter() {
 
     });
 
+    const [addressDetail, setAddressDetail] = useState({
+       
+        AreaId: '',
+        EAreaVill: '',
 
+        TehId: '',
+        EName: '',
+
+        CounId: '',
+        ECouncil: '',
+
+        VSId: '',
+        EVidhanSabha: '',
+
+        WBId: '',
+        EWardBlock: '',
+
+        ChkBlkId: '',
+        ECBPanch: '',
+
+        HNo: '',
+        Landmark: '',
+
+    });
    
 
 
@@ -83,6 +108,7 @@ function AddVoter() {
             const detailsToSend = {
                 IncRefId: referenceDetails.IncRefId,
                 PacketNo: referenceDetails.PacketNo,
+                voterDetails
             };
             const result = await fetch('/api/v1/admin/addVoter', {
                 method: 'POST',
@@ -121,6 +147,12 @@ function AddVoter() {
                         voterDetails={voterDetails}
                         setVoterDetails={setVoterDetails}
                         />
+
+                    <AddressInformationForm
+                        addressDetail={addressDetail}
+                        setAddressDetail={setAddressDetail}
+                    
+                    />
 
 
 

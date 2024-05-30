@@ -36,7 +36,7 @@ app.use("/api/v1/users", userRouter)
 app.use("/api/v1/formsAdmin", formsAdminRouter)
 app.use("/api/v1/admin", AdminRouter)
 app.use("/api/v1/subAdmin", subAdminRouter)
-app.use("/api/v1/qualityStaffRouter", QualityStaffRouter)
-app.use("/api/v1/feedingStaffRouter", feedingStaffRouter)
+app.use("/api/v1/qualityStaff", QualityStaffRouter)
+app.use("/api/v1/feedingStaff", feedingStaffRouter)
 
 export {app};

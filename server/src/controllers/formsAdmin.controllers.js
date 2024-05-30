@@ -68,7 +68,7 @@ const AddOutForm = asyncHandler(async (req, res) => {
             volunteerId2 = volunteer2[0].Id;
             await queryDatabase(
                 `UPDATE volunteer SET VEName = ?, VHName = ? WHERE id = ?`,
-                [VEName, VHName, volunteerId2]
+                [CEName, CHName, volunteerId2]
             );
         } else {
           

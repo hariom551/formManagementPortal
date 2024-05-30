@@ -1,59 +1,62 @@
-import React, {useState, useEffect}from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form } from 'react-bootstrap';
 import { Relation, Occupation } from '../Pages/Constaint.jsx';
+import { Typeahead } from 'react-bootstrap-typeahead';
+import 'react-bootstrap-typeahead/css/Typeahead.css';
 
 
 function VoterDetailsForm({ voterDetails, setVoterDetails }) {
 
+    const [surnameOptions, setSurnameOptions] = useState([]);
+    const [relativeSurnameOptions, setRelativeSurnameOptions] = useState([]);
     const [casteOptions, setCasteOptions] = useState([]);
 
-    useEffect(() => {
-        const fetchCasteOptions = async (lastName) => {
-            try {
-                const response = await fetch('https://api.example.com/castes', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ lastName }),
-                });
-                const data = await response.json();
-                setCasteOptions(data);
-                if (data.length === 1) {
-                    setVoterDetails(prevDetails => ({
-                        ...prevDetails,
-                        ECaste: data[0].name,
-                        CasteId: data[0].id,
-                    }));
-                } else {
-                    setVoterDetails(prevDetails => ({
-                        ...prevDetails,
-                        ECaste: "", // Reset if multiple or no options
-                        CasteId: "", // Reset CasteId as well
-                    }));
-                }
-            } catch (error) {
-                console.error('Error fetching caste options:', error);
-                setCasteOptions([]);
-                setVoterDetails(prevDetails => ({
-                    ...prevDetails,
-                    ECaste: "", // Reset in case of error
-                    CasteId: "", // Reset CasteId as well
-                }));
+    const fetchSurnameOptions = async (input, setter) => {
+        try {
+            const response = await fetch('/api/v1/feedingStaff/searchSurname', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ query: input })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch suggested Caste');
             }
-        };
-        console.log(voterDetails);
-        if (voterDetails.ELName) {
-            fetchCasteOptions(voterDetails.ELName);
-        } else {
-            setCasteOptions([]);
-            setVoterDetails(prevDetails => ({
-                ...prevDetails,
-                ECaste: "",
-                CasteId: "",
-            }));
+
+            const data = await response.json();
+            setter(data);
+
+
+        } catch (error) {
+            console.error('Error fetching suggested Caste:', error);
         }
-    }, [voterDetails.ELName, setVoterDetails]);
+    };
+
+    const fetchCasteOptions = async (surname) => {
+        try {
+            const response = await fetch('/api/v1/feedingStaff/searchCaste', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ surname })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch suggested castes');
+            }
+
+            const data = await response.json();
+            setCasteOptions(data);
+
+            console.log(data);
+        } catch (error) {
+            console.error('Error fetching suggested castes:', error);
+        }
+    };
+
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -63,15 +66,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
         }));
     };
 
-    const handleCasteChange = (event) => {
-        const { value } = event.target;
-        const selectedCaste = casteOptions.find(caste => caste.name === value);
-        setVoterDetails(prevDetails => ({
-            ...prevDetails,
-            ECaste: value,
-            CasteId: selectedCaste ? selectedCaste.id : "",
-        }));
-    };
+
 
     return (
         <>
@@ -114,19 +109,35 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                             />
                         </Form.Group>
                     </div>
-                    <div className="col-md-3 mt-1">
+
+                    <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
                             <Form.Label>Last Name (English)</Form.Label>
-                            <Form.Control
-                                type="text"
-                                className='px-2'
-                                name="ELName"
-                                value={voterDetails.ELName}
-                                onChange={handleChange}
-                                placeholder="Last Name (English)"
+                            <Typeahead
+                                onInputChange={(value) => fetchSurnameOptions(value, setSurnameOptions)}
+                                onChange={(selected) => {
+                                    if (selected.length > 0) {
+                                        const [choice] = selected;
+                                        setVoterDetails(prevDetails => ({
+                                            ...prevDetails,
+                                            ELName: choice.ESurname,
+                                        }));
+                                        fetchCasteOptions(choice.ESurname);
+                                    }
+                                }}
+                                options={surnameOptions}
+                                placeholder='Last Name (English)'
+                                labelKey="ESurname"
+                                renderMenuItemChildren={(option) => (
+                                    <div>
+                                        {option.ESurname}
+                                    </div>
+                                )}
                             />
                         </Form.Group>
                     </div>
+
+
                     <div className="col-md-3 mt-1">
                         <Form.Group>
                             <Form.Label>Last Name (Hindi)</Form.Label>
@@ -142,13 +153,14 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                     </div>
                 </div>
 
-                <div className="row mt-5">
+                <div className="row mt-3">
+
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
                             <Form.Label>Relation</Form.Label>
                             <Form.Control
                                 as="select"
-                                className='form-select px-2' 
+                                className='form-select px-2'
                                 name="RType"
                                 value={voterDetails.RType}
                                 onChange={handleChange}
@@ -188,22 +200,38 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                             />
                         </Form.Group>
                     </div>
+
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
                             <Form.Label>Rel. Last Name (English)</Form.Label>
-                            <Form.Control
-                                type="text"
-                                className='px-2'
-                                name="ERLName"
-                                value={voterDetails.ERLName}
-                                onChange={handleChange}
-                                placeholder="Rel. Last Name (English)"
+                            <Typeahead
+                                onInputChange={(value) => fetchSurnameOptions(value, setRelativeSurnameOptions)}
+                                onChange={(selected) => {
+                                    if (selected.length > 0) {
+                                        const [choice] = selected;
+                                        setVoterDetails(prevDetails => ({
+                                            ...prevDetails,
+                                            ERLName: choice.ESurname,
+                                        }));
+                                    }
+                                }}
+                                options={relativeSurnameOptions}
+                                placeholder='Rel. Last Name (English)'
+                                labelKey="ESurname"
+                                defaultInputValue={voterDetails.ERLName}
+                                renderMenuItemChildren={(option) => (
+                                    <div>
+                                        {option.ESurname}
+                                    </div>
+                                )}
                             />
                         </Form.Group>
                     </div>
+
                 </div>
 
-                <div className="row flex mt-5">
+                <div className="row mt-3">
+
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
                             <Form.Label>Rel. Last Name (Hindi)</Form.Label>
@@ -212,37 +240,53 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 className='px-2'
                                 name="HRLName"
                                 value={voterDetails.HRLName}
-                                onChange={handleChange}
+                                onChange={(e) => setVoterDetails(prevDetails => ({
+                                    ...prevDetails,
+                                    HRLName: e.target.value,
+                                }))}
                                 placeholder="Rel. Last Name (Hindi)"
-
                             />
                         </Form.Group>
                     </div>
-               
+
+
+
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
                             <Form.Label>Caste</Form.Label>
-                            <Form.Control
-                                as="select"
-                                className='form-select px-2'
-                                name="ECaste"
-                                value={voterDetails.ECaste}
-                                onChange={handleCasteChange}
-                                required
-                            >
-                                <option value="">--select caste--</option>
-                                {casteOptions.map((caste, index) => (
-                                    <option key={index} value={caste.name}>{caste.name}</option>
-                                ))}
-                            </Form.Control>
+                            {casteOptions.length === 1 ? (
+                                <Form.Control
+                                    type="text"
+                                    className='px-2'
+                                    name="CasteId"
+                                    value={casteOptions[0].ECaste}
+                                    readOnly
+                                />
+                            ) : (
+                                <Form.Control
+                                    as="select"
+                                    className='form-select px-2'
+                                    name="CasteId"
+                                    value={voterDetails.CasteId}
+                                    onChange={handleChange}
+                                    required
+                                >
+                                    <option value="">--Select Caste--</option>
+                                    {casteOptions.map((caste) => (
+                                        <option key={caste.CasteId} value={caste.CasteId}>{caste.ECaste}</option>
+                                    ))}
+                                </Form.Control>
+                            )}
                         </Form.Group>
                     </div>
+
+
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
                             <Form.Label>Qualification</Form.Label>
                             <Form.Control
                                 as="select"
-                                className='form-select px-2' 
+                                className="form-select px-2"
                                 name="Qualification"
                                 value={voterDetails.Qualification}
                                 onChange={handleChange}
@@ -255,33 +299,68 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                         </Form.Group>
                     </div>
 
+
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
                             <Form.Label>Occupation</Form.Label>
                             <Form.Control
                                 as="select"
-                                className='form-select px-2' 
+                                className='form-select px-2'
                                 name="Occupation"
                                 value={voterDetails.Occupation}
                                 onChange={handleChange}
                                 required
                             >
-                                <option value="">--Select Occupation--</option>
+                                <option value="">--select Occupation--</option>
                                 {Occupation.map((c) => (
                                     <option key={c.value} value={c.value}>{c.name}</option>
                                 ))}
                             </Form.Control>
                         </Form.Group>
                     </div>
+
+
                 </div>
 
-                <div className="row flex mt-5">
+
+
+                <div className="row mt-3">
+                    <div className="col-md-3 flex-col gap-2 flex mt-1">
+                        <Form.Group>
+                            <Form.Label>Age</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="Age"
+                                value={voterDetails.Age}
+                                onChange={handleChange}
+                                className="outline-none border w-full px-2"
+                                placeholder="Enter Age"
+                            />
+                        </Form.Group>
+                    </div>
+
+                    <div className="col-md-3 flex-col gap-2 flex mt-1">
+                        <Form.Group>
+                            <Form.Label>DOB</Form.Label>
+                            <Form.Control
+                                type="date"
+                                name="DOB"
+                                value={voterDetails.DOB}
+                                onChange={handleChange}
+                                className="outline-none border w-full px-2"
+                                placeholder="DOB"
+                            />
+                            {/* {error && <p className='text-red-500 text-[.7rem]'>{error}</p>} */}
+                        </Form.Group>
+                    </div>
+
+
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
                             <Form.Label>Gender</Form.Label>
                             <Form.Control
                                 as="select"
-                                className='form-select px-2' 
+                                className='form-select px-2'
                                 name="Sex"
                                 value={voterDetails.Sex}
                                 onChange={handleChange}
@@ -294,6 +373,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                             </Form.Control>
                         </Form.Group>
                     </div>
+
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
                             <Form.Label>Mobile No</Form.Label>
@@ -308,6 +388,10 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                             />
                         </Form.Group>
                     </div>
+
+                </div>
+
+                <div className="row mt-3">
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
                             <Form.Label>Mobile No.2</Form.Label>
@@ -365,53 +449,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                     </div>
                 </div>
 
-                <div className='flex items-center justify-between py-4'>
-                    <div className='text-xl text-black'>Address Information</div>
-                </div>
 
-                {/* Address Information Fields */}
-                {/* Uncomment and update as needed */}
-                <div className="row flex mt-3">
-                    <div className="col-md-3 flex-col gap-2 flex mt-1">
-                        <Form.Group>
-                            <Form.Label>Area / Village</Form.Label>
-                            <Form.Control
-                                type="text"
-                                className='px-2'
-                                name="AreaId"
-                                value={voterDetails.AreaId}
-                                onChange={handleChange}
-                                placeholder='Area/Village'
-                            />
-                        </Form.Group>
-                    </div>
-                    <div className="col-md-3 flex-col gap-2 flex mt-1">
-                        <Form.Group>
-                            <Form.Label>District</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="DistrictId"
-                                className='px-2'
-                                value={voterDetails.DistrictId}
-                                onChange={handleChange}
-                                placeholder='District'
-                            />
-                        </Form.Group>
-                    </div>
-                    <div className="col-md-3 flex-col gap-2 flex mt-1">
-                        <Form.Group>
-                            <Form.Label>State</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="StateId"
-                                className='px-2'
-                                value={voterDetails.StateId}
-                                onChange={handleChange}
-                                placeholder='State'
-                            />
-                        </Form.Group>
-                    </div>
-                </div>
 
             </div>
         </>
