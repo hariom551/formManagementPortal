@@ -108,7 +108,8 @@ function AddVoter() {
             const detailsToSend = {
                 IncRefId: referenceDetails.IncRefId,
                 PacketNo: referenceDetails.PacketNo,
-                voterDetails
+                voterDetails,
+                addressDetail
             };
             const result = await fetch('/api/v1/admin/addVoter', {
                 method: 'POST',

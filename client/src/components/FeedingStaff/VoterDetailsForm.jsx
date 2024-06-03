@@ -51,7 +51,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
             const data = await response.json();
             setCasteOptions(data);
 
-            console.log(data);
+          
         } catch (error) {
             console.error('Error fetching suggested castes:', error);
         }
@@ -105,7 +105,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 value={voterDetails.HFName}
                                 onChange={handleChange}
                                 placeholder="First Name (Hindi)"
-                                required
+                 
                             />
                         </Form.Group>
                     </div>
