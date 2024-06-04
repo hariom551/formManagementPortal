@@ -78,9 +78,9 @@ function UserForm() {
         // window.location.href = '/userForm';
       
         toast.success('Form submitted successfully.');
-        setTimeout(() => {
-          window.location.reload()
-        }, 2000);
+        // setTimeout(() => {
+        //   window.location.reload()
+        // }, 2000);
 
       } else {
         toast.error("Error submitting form:", result.statusText);

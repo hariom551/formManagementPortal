@@ -541,6 +541,7 @@ const AddVoterForm = () => {
                 <input type="text" name="Landmark" id="" value={data.Landmark} onChange={handleChange} className='outline-none border w-full px-2' placeholder='Landmark' />
               </div>
             </div>
+
             <div className="col-md-3 flex-col gap-2 flex mt-1">
               <label htmlFor="" className=''>Document 1</label>
               <div className='flex gap-2 items-center '>
@@ -568,7 +569,7 @@ const AddVoterForm = () => {
         <div className='w-[90%]  h-[full] mx-auto my-5 px-8 py-5 bg-gray-100 ' style={{ boxShadow: "0 0 5px 1px #ddd" }}>
           <div className="container-fluid flex-col gap-2 flex">
             <div className='flex items-center justify-between py-3'>
-              <div className='text-xl text-black'>Voter's Image</div>
+              <div className='text-xl text-black'>Voter's Documents</div>
               <p className='select-none text-sm'></p>
             </div>
             <hr />

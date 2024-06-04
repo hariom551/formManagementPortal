@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import ReferenceDetailsForm from './ReferenceDetailsForm.jsx';
 import VoterDetailsForm from './VoterDetailsForm.jsx';
 import AddressInformationForm from './AddressInformationForm.jsx';
+import VoterDocs from './VoterDocs.jsx';
 
 function AddVoter() {
     const [referenceDetails, setReferenceDetails] = useState({
@@ -50,28 +51,6 @@ function AddVoter() {
         AadharNo: '',
         VIdNo: '',
         GCYear: '',
-
-        AreaId: '',
-        EAreaVill: '',
-
-        TehId: '',
-        EName: '',
-
-        CounId: '',
-        ECouncil: '',
-
-        VSId: '',
-        EVidhanSabha: '',
-
-        WBId: '',
-        EWardBlock: '',
-
-        ChkBlkId: '',
-        ECBPanch: '',
-
-        HNo: '',
-        Landmark: '',
-
     });
 
     const [addressDetail, setAddressDetail] = useState({
@@ -96,41 +75,56 @@ function AddVoter() {
 
         HNo: '',
         Landmark: '',
-
     });
    
+
+    const [voterDocs, setVoterDocs] = useState({
+        Image: '',
+        IDProof: '',
+        Degree: '',
+        VImage: '',
+    });
 
 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const detailsToSend = {
+            const formData = new FormData();
+    
+            formData.append('referenceDetails', JSON.stringify({
                 IncRefId: referenceDetails.IncRefId,
-                PacketNo: referenceDetails.PacketNo,
-                voterDetails,
-                addressDetail
-            };
-            const result = await fetch('/api/v1/admin/addVoter', {
-                method: 'POST',
-                body: JSON.stringify(detailsToSend),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+                PacketNo: referenceDetails.PacketNo
+            }));
+            formData.append('voterDetails', JSON.stringify(voterDetails));
+            formData.append('addressDetail', JSON.stringify(addressDetail));
 
+            Object.keys(voterDocs).forEach(key => {
+                if (voterDocs[key].file) {
+                    formData.append(key, voterDocs[key].file);
+                }
+            });
+    
+
+            const result = await fetch('/api/v1/formsAdmin/addVoter', {
+                method: 'POST',
+                body: formData,
+
+            });
+    
             if (result.ok) {
                 toast.success('Voters Added Successfully.');
                 setTimeout(() => {
                     window.location.reload();
                 }, 1000);
             } else {
-                toast.error(`Error in Adding Council: ${result.statusText}`);
+                toast.error(`Error in Adding Voters: ${result.statusText}`);
             }
         } catch (error) {
-            toast.error(`Error in Adding Council: ${error.message}`);
+            toast.error(`Error in Adding Voters: ${error.message}`);
         }
     };
+    
 
     return (
         <main className="bg-gray-100">
@@ -155,9 +149,10 @@ function AddVoter() {
                     
                     />
 
-
-
-
+                    <VoterDocs
+                        voterDocs={voterDocs}
+                        setVoterDocs={setVoterDocs}
+                    />
 
                     <Button type="submit" className="mt-4">Submit</Button>
                 </Form>
