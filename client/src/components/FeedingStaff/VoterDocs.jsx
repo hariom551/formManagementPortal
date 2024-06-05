@@ -14,14 +14,14 @@ function VoterDocs({ voterDocs, setVoterDocs }) {
             ...prevDetails,
             [name]: {
               file,
-              dataUrl: reader.result, // Storing the data URL for the file preview
+              dataUrl: reader.result, 
             },
           };
-          console.log(newDetails);
+        
           return newDetails;
         });
       };
-      reader.readAsDataURL(file); // Read the file as a data URL
+      reader.readAsDataURL(file);
     }
   };
 
@@ -38,20 +38,20 @@ function VoterDocs({ voterDocs, setVoterDocs }) {
           <Row>
             <Col md={4}>
               <Form.Group>
-                <Form.Label>Document 1</Form.Label>
-                <Form.Control type="file" name="Document1" onChange={handleChange} />
+                <Form.Label>Image</Form.Label>
+                <Form.Control type="file" name="Image" onChange={handleChange} />
               </Form.Group>
             </Col>
             <Col md={4}>
               <Form.Group>
-                <Form.Label>Document 2</Form.Label>
-                <Form.Control type="file" name="Document2" onChange={handleChange} />
+                <Form.Label>Id</Form.Label>
+                <Form.Control type="file" name="IdProof" onChange={handleChange} />
               </Form.Group>
             </Col>
             <Col md={4}>
               <Form.Group>
-                <Form.Label>Document 3</Form.Label>
-                <Form.Control type="file" name="Document3" onChange={handleChange} />
+                <Form.Label>Degree</Form.Label>
+                <Form.Control type="file" name="Degree" onChange={handleChange} />
               </Form.Group>
             </Col>
           </Row>
@@ -85,8 +85,8 @@ export default VoterDocs;
 //   }, [webref, setVoterDocs]);
 
 
-   {/* Uncomment and adjust the following block if you want to use the camera functionality */}
-        {/* <div className="row border-2 mt-5">
+{/* Uncomment and adjust the following block if you want to use the camera functionality */ }
+{/* <div className="row border-2 mt-5">
           <div className="col-md-4 border-r-2">
             <div className='border-b-2'>
               <p className='underline flex items-center justify-center text-black py-4'>Live Camera</p>

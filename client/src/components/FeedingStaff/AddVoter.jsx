@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Button, Form, Row } from 'react-bootstrap';
-import Select from 'react-select';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-// import VoterDetailsForm from '../FeedingStaff/VoterDetailsForm.jsx';
 import ReferenceDetailsForm from './ReferenceDetailsForm.jsx';
 import VoterDetailsForm from './VoterDetailsForm.jsx';
 import AddressInformationForm from './AddressInformationForm.jsx';
 import VoterDocs from './VoterDocs.jsx';
+import { Occupation } from '../Pages/Constaint.jsx';
 
 function AddVoter() {
     const [referenceDetails, setReferenceDetails] = useState({
@@ -42,7 +40,7 @@ function AddVoter() {
         CasteId: "",
         ECaste: '',
         Qualification: '',
-        Occupation: '',
+        Occupation: Occupation?'':"NA",
         Age: '',
         DOB: '',
         Sex: '',
@@ -80,7 +78,7 @@ function AddVoter() {
 
     const [voterDocs, setVoterDocs] = useState({
         Image: '',
-        IDProof: '',
+        IdProof: '',
         Degree: '',
         VImage: '',
     });
@@ -106,7 +104,7 @@ function AddVoter() {
             });
     
 
-            const result = await fetch('/api/v1/formsAdmin/addVoter', {
+            const result = await fetch('/api/v1/feedingStaff/addVoter', {
                 method: 'POST',
                 body: formData,
 

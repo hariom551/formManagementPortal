@@ -61,18 +61,18 @@ export const Marital = [
 
 
 export const Occupation=[
-    {name:"Business",value:"b1"},
-    {name:"House Wife",value:"h1"},
-    {name:"Student",value:"s1"},
-    {name:"Govt.Job",value:"g1"},
-    {name:"Job",value:"j1"},
-    {name:"Retired",value:"r1"},
-    {name:"Teacher",value:"t1"},
-    {name:"Advocate",value:"A1"},
-    {name:"Agriculture",value:"a1"},
-    {name:"Doctor",value:"d1"},
-    {name:"UnEmployed",value:"e1"},
-    {name:"Other",value:"o1"},
+    {name:"Business",value:"Business"},
+    {name:"House Wife",value:"House Wife"},
+    {name:"Student",value:"Student"},
+    {name:"Govt.Job",value:"Govt.Job"},
+    {name:"Job",value:"Job"},
+    {name:"Retired",value:"Retired"},
+    {name:"Teacher",value:"Teacher"},
+    {name:"Advocate",value:"Advocate"},
+    {name:"Agriculture",value:"Agriculture"},
+    {name:"Doctor",value:"Doctor"},
+    {name:"UnEmployed",value:"UnEmployed"},
+    {name:"Other",value:"Other"},
     
 ]
 
