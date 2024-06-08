@@ -4,7 +4,6 @@ import { Relation, Occupation } from '../Pages/Constaint.jsx';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 
-
 function VoterDetailsForm({ voterDetails, setVoterDetails }) {
 
     const [surnameOptions, setSurnameOptions] = useState([]);
@@ -27,8 +26,6 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
 
             const data = await response.json();
             setter(data);
-
-
         } catch (error) {
             console.error('Error fetching suggested Caste:', error);
         }
@@ -50,13 +47,10 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
 
             const data = await response.json();
             setCasteOptions(data);
-
-          
         } catch (error) {
             console.error('Error fetching suggested castes:', error);
         }
     };
-
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -65,8 +59,6 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
             [name]: value,
         }));
     };
-
-
 
     return (
         <>
@@ -78,7 +70,6 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                     </div>
                     <hr />
                 </div>
-
 
                 <div className="row mt-5">
                     <div className="col-md-3 mt-1">
@@ -105,7 +96,6 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 value={voterDetails.HFName}
                                 onChange={handleChange}
                                 placeholder="First Name (Hindi)"
-                 
                             />
                         </Form.Group>
                     </div>
@@ -114,6 +104,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                         <Form.Group>
                             <Form.Label>Last Name (English)</Form.Label>
                             <Typeahead
+                                id="last-name-english" // Adding id prop
                                 onInputChange={(value) => fetchSurnameOptions(value, setSurnameOptions)}
                                 onChange={(selected) => {
                                     if (selected.length > 0) {
@@ -137,7 +128,6 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                         </Form.Group>
                     </div>
 
-
                     <div className="col-md-3 mt-1">
                         <Form.Group>
                             <Form.Label>Last Name (Hindi)</Form.Label>
@@ -154,7 +144,6 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                 </div>
 
                 <div className="row mt-3">
-
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
                             <Form.Label>Relation</Form.Label>
@@ -205,6 +194,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                         <Form.Group>
                             <Form.Label>Rel. Last Name (English)</Form.Label>
                             <Typeahead
+                                id="rel-last-name-english" // Adding id prop
                                 onInputChange={(value) => fetchSurnameOptions(value, setRelativeSurnameOptions)}
                                 onChange={(selected) => {
                                     if (selected.length > 0) {
@@ -227,11 +217,9 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                             />
                         </Form.Group>
                     </div>
-
                 </div>
 
                 <div className="row mt-3">
-
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
                             <Form.Label>Rel. Last Name (Hindi)</Form.Label>
@@ -248,8 +236,6 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                             />
                         </Form.Group>
                     </div>
-
-
 
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
@@ -280,7 +266,6 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                         </Form.Group>
                     </div>
 
-
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
                             <Form.Label>Qualification</Form.Label>
@@ -298,7 +283,6 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                             </Form.Control>
                         </Form.Group>
                     </div>
-
 
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
@@ -318,11 +302,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                             </Form.Control>
                         </Form.Group>
                     </div>
-
-
                 </div>
-
-
 
                 <div className="row mt-3">
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
@@ -350,10 +330,8 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 className="outline-none border w-full px-2"
                                 placeholder="DOB"
                             />
-                            {/* {error && <p className='text-red-500 text-[.7rem]'>{error}</p>} */}
                         </Form.Group>
                     </div>
-
 
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
@@ -388,7 +366,6 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                             />
                         </Form.Group>
                     </div>
-
                 </div>
 
                 <div className="row mt-3">
@@ -448,9 +425,6 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                         </Form.Group>
                     </div>
                 </div>
-
-
-
             </div>
         </>
     );

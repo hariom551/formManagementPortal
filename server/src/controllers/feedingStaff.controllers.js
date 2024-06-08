@@ -90,19 +90,13 @@ const searchAreaVill = asyncHandler(async (req, res) => {
 const AddVoter = [
     asyncHandler(async (req, res, next) => {
         try {
-            let maxRegNoResult;
-            try {
-                maxRegNoResult = await queryDatabase(`SELECT MAX(RegNo) AS maxRegNo FROM voterlist`);
-            } catch (error) {
-                return res.status(500).json(new ApiResponse(500, null, 'Database query error'));
-            }
-
+            const maxRegNoResult = await queryDatabase(`SELECT MAX(RegNo) AS maxRegNo FROM voterlist`);
             const RegNo = maxRegNoResult && maxRegNoResult.length > 0 && maxRegNoResult[0].maxRegNo !== null ? maxRegNoResult[0].maxRegNo + 1 : 1001;
             req.regNo = RegNo;
             next();
         } catch (error) {
             console.error('Error:', error.message);
-            return res.status(error.statusCode || 500).json(new ApiResponse(error.statusCode || 500, null, error.message || "Internal Server Error"));
+            return res.status(500).json(new ApiResponse(500, null, 'Database query error'));
         }
     }),
     uploadFiles,
@@ -133,48 +127,39 @@ const AddVoter = [
                 voterDocs.Degree = req.files['Degree'][0].filename; 
             }
 
-            const query = `INSERT INTO Voterlist (
+            const query = `INSERT INTO voterlist (
                 RegNo, PacketNo, IncRefId, EFName, HFName,
-                 ELName, HLName, RType, ERFName, HRFName, 
-                 ERLName, RLName, CasteId, Qualification, Occupation, 
-                 Age, DOB, Sex, MNo, MNo2,
-                  AadharNo, VIdNo, GCYear, AreaId, TehId, 
-                  CounId, VSId,WBId, ChkBlkId, HNo,
-                   Landmark, Image, IdProof, Degree)
-                 VALUES (?, ?, ?, ?, ?, 
-                    ?, ?, ?, ?, ?,
-                     ?, ?, ?, ?, ?,
-                      ?,?,?, ?, ?,
-                       ?, ?, ?, ?, ?,
-                        ?, ?, ?, ?, ?,
-                         ?, ?, ?, ?)`;
+                ELName, HLName, RType, ERFName, HRFName, 
+                ERLName, HRLName, CasteId, Qualification, Occupation, 
+                Age, DOB, Sex, MNo, MNo2,
+                AadharNo, VIdNo, GCYear, AreaId, TehId, 
+                CounId, VSId, WBId, ChkBlkId, HNo,
+                Landmark, Image, IdProof, Degree)
+                VALUES (?, ?, ?, ?, ?, 
+                ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?,
+                ?, ?, ?, ?)`;
 
             const values = [
                 req.regNo, referenceDetails.PacketNo, referenceDetails.IncRefId, voterDetails.EFName, voterDetails.HFName,
-                voterDetails.ELName, voterDetails.HLName, voterDetails.RType, voterDetails.ERFName, voterDetails.HRFName, voterDetails.ERLName,
-                voterDetails.HRLName, voterDetails.CasteId, voterDetails.Qualification, voterDetails.Occupation, voterDetails.Age,
-                voterDetails.DOB, voterDetails.Sex, voterDetails.MNo, voterDetails.MNo2, voterDetails.AadharNo,
-                voterDetails.VIdNo, voterDetails.GCYear, addressDetail.AreaId, addressDetail.TehId, addressDetail.CounId,
-                addressDetail.VSId, addressDetail.WBId, addressDetail.ChkBlkId, addressDetail.HNo, addressDetail.Landmark,
-                voterDocs.Image, voterDocs.IdProof, voterDocs.Degree
+                voterDetails.ELName, voterDetails.HLName, voterDetails.RType, voterDetails.ERFName, voterDetails.HRFName, 
+                voterDetails.ERLName, voterDetails.HRLName, voterDetails.CasteId, voterDetails.Qualification, voterDetails.Occupation, 
+                voterDetails.Age, voterDetails.DOB, voterDetails.Sex, voterDetails.MNo, voterDetails.MNo2, 
+                voterDetails.AadharNo, voterDetails.VIdNo, voterDetails.GCYear, addressDetail.AreaId, addressDetail.TehId, 
+                addressDetail.CounId, addressDetail.VSId, addressDetail.WBId, addressDetail.ChkBlkId, addressDetail.HNo, 
+                addressDetail.Landmark, voterDocs.Image, voterDocs.IdProof, voterDocs.Degree
             ];
 
-            try {
-                await queryDatabase(query, values);
-                return res.status(201).json(new ApiResponse(201, null, "Voter added successfully"));
-            } catch (error) {
-                console.error('Database insert error:', error);
-                return res.status(500).json(new ApiResponse(500, null, 'Database insert error'));
-            }
-            
-
-           
+            await queryDatabase(query, values);
+            return res.status(201).json(new ApiResponse(201, null, "Voter added successfully"));
         } catch (error) {
-            console.error('Error:', error.message);
-            return res.status(error.statusCode || 500).json(new ApiResponse(error.statusCode || 500, null, error.message || "Internal Server Error"));
+            console.error('Database insert error:', error);
+            return res.status(500).json(new ApiResponse(500, null, 'Database insert error'));
         }
     })
 ];
-
 
 export { searchSurname, searchCaste, searchAreaVill, allAreaDetails, AddVoter };

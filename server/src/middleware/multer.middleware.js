@@ -25,7 +25,7 @@ const storage = multer.diskStorage({
             case 'Degree':
                 folder = 'Degree';
                 break;
-            case 'Id':
+            case 'IdProof':
                 folder = 'IdProof';
                 break;
             default:

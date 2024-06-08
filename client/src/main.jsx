@@ -93,7 +93,7 @@ const getRoutesForRole = (role) => {
             <>
               <Route path="/Home" element={<Home />} />
               {/* <Route path="/AddVoterForm" element={<AddVoterForm />} /> */}
-              <Route path="/AddVoterForm" element={<AddVoter />} />
+              <Route path="/addVotersForm" element={<AddVoter />} />
              
             
             </>
