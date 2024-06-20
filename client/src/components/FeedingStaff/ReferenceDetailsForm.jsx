@@ -3,7 +3,7 @@ import { Form, Row } from 'react-bootstrap';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { validateVoterDetails } from '../../Validation/voterDetailsValidation.js';
 function ReferenceDetailsForm({
     referenceDetails,
     setReferenceDetails
@@ -12,7 +12,7 @@ function ReferenceDetailsForm({
 
 
     const [packetOptions, setPacketOptions] = useState([]);
-
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         const fetchPacketOptions = async () => {
@@ -45,6 +45,12 @@ function ReferenceDetailsForm({
         setReferenceDetails(prevDetails => ({
             ...prevDetails,
             [name]: value,
+        }));
+
+        const error = validateVoterDetails(name, value);
+        setErrors(prevErrors => ({
+            ...prevErrors,
+            [name]: error,
         }));
     };
 
@@ -172,7 +178,9 @@ function ReferenceDetailsForm({
                                             onChange={handleSelectChange}
                                             options={packetOptions}
                                             placeholder="Packet No"
+                                            required
                                         />
+                                         {errors.PacketNo && <div className="text-danger">{errors.PacketNo}</div>}
                                     </Form.Group>
                                 </div>
                             </div>
@@ -188,6 +196,7 @@ function ReferenceDetailsForm({
                                             onChange={handleChange}
                                             placeholder='Enter Mobile 1'
                                         />
+                                         {errors.VMob1 && <div className="text-danger">{errors.VMob1}</div>}
                                     </Form.Group>
                                 </div>
                                 <div className="col-md-3 flex-col gap-2 flex mt-1">

@@ -1,11 +1,14 @@
+// src/components/VoterDetailsForm.jsx
+
 import React, { useState, useEffect } from 'react';
 import { Form } from 'react-bootstrap';
 import { Relation, Occupation } from '../Pages/Constaint.jsx';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
+import { validateVoterDetails } from '../../Validation/voterDetailsValidation.js';
 
 function VoterDetailsForm({ voterDetails, setVoterDetails }) {
-
+    const [errors, setErrors] = useState({});
     const [surnameOptions, setSurnameOptions] = useState([]);
     const [relativeSurnameOptions, setRelativeSurnameOptions] = useState([]);
     const [casteOptions, setCasteOptions] = useState([]);
@@ -54,11 +57,43 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
 
     const handleChange = (event) => {
         const { name, value } = event.target;
+
+        // Update the state for the changed field
         setVoterDetails(prevDetails => ({
             ...prevDetails,
             [name]: value,
         }));
+
+     
+        if (name === 'DOB') {
+            const dob = new Date(value);
+            const ageDate = new Date(Date.now() - dob.getTime());
+            const age = Math.abs(ageDate.getUTCFullYear() - 1970);
+            setVoterDetails(prevDetails => ({
+                ...prevDetails,
+                Age: age,
+            }));
+        }
+
+      
+        if (name === 'Age') {
+            const today = new Date();
+            const birthDate = new Date(today.getFullYear() - value, today.getMonth(), today.getDate());
+            setVoterDetails(prevDetails => ({
+                ...prevDetails,
+                DOB: birthDate.toISOString().split('T')[0],
+            }));
+        }
+
+        const error = validateVoterDetails(name, value);
+        setErrors(prevErrors => ({
+            ...prevErrors,
+            [name]: error,
+        }));
     };
+
+
+  
 
     return (
         <>
@@ -84,6 +119,8 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 placeholder="First Name (English)"
                                 required
                             />
+                            {errors.EFName && <div className="text-danger mt-1 text-[0.8rem]">{errors.EFName}</div>}
+
                         </Form.Group>
                     </div>
                     <div className="col-md-3 mt-1">
@@ -99,12 +136,12 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                             />
                         </Form.Group>
                     </div>
-
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
                             <Form.Label>Last Name (English)</Form.Label>
                             <Typeahead
-                                id="last-name-english" // Adding id prop
+                                id="last-name-english"
+                                name="ELName"
                                 onInputChange={(value) => fetchSurnameOptions(value, setSurnameOptions)}
                                 onChange={(selected) => {
                                     if (selected.length > 0) {
@@ -114,7 +151,19 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                             ELName: choice.ESurname,
                                         }));
                                         fetchCasteOptions(choice.ESurname);
+                                    } else {
+                                        setVoterDetails(prevDetails => ({
+                                            ...prevDetails,
+                                            ELName: '',
+                                        }));
                                     }
+
+                                    const error = validateVoterDetails("ELName", selected.length > 0 ? selected[0].ESurname : "");
+                                    console.log(error)
+                                    setErrors(prevErrors => ({
+                                        ...prevErrors,
+                                        ELName: error,
+                                    }));
                                 }}
                                 options={surnameOptions}
                                 placeholder='Last Name (English)'
@@ -125,6 +174,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                     </div>
                                 )}
                             />
+                            {errors.ELName && <div className="text-danger mt-1">{errors.ELName}</div>}
                         </Form.Group>
                     </div>
 
@@ -160,8 +210,10 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                     <option key={c.value} value={c.value}>{c.name}</option>
                                 ))}
                             </Form.Control>
+                            {errors.RType && <div className="text-danger mt-1 text-[0.8rem]">{errors.RType}</div>}
                         </Form.Group>
                     </div>
+
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
                             <Form.Label>Rel. First Name (English)</Form.Label>
@@ -174,6 +226,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 placeholder="Rel. First Name (English)"
                                 required
                             />
+                            {errors.ERFName && <div className="text-danger">{errors.ERFName}</div>}
                         </Form.Group>
                     </div>
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
@@ -194,7 +247,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                         <Form.Group>
                             <Form.Label>Rel. Last Name (English)</Form.Label>
                             <Typeahead
-                                id="rel-last-name-english" // Adding id prop
+                                id="rel-last-name-english"
                                 onInputChange={(value) => fetchSurnameOptions(value, setRelativeSurnameOptions)}
                                 onChange={(selected) => {
                                     if (selected.length > 0) {
@@ -281,6 +334,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 <option value="Post Graduate">Post Graduate</option>
                                 <option value="Graduate">Graduate</option>
                             </Form.Control>
+                            {errors.Qualification && <div className="text-danger mt-1 text-[0.8rem]">{errors.Qualification}</div>}
                         </Form.Group>
                     </div>
 
@@ -300,6 +354,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                     <option key={c.value} value={c.value}>{c.name}</option>
                                 ))}
                             </Form.Control>
+                            {errors.Occupation && <div className="text-danger mt-1 text-[0.8rem]">{errors.Occupation}</div>}
                         </Form.Group>
                     </div>
                 </div>
@@ -364,6 +419,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 placeholder="Mobile No"
                                 required
                             />
+                            {errors.MNo && <div className="text-danger">{errors.MNo}</div>}
                         </Form.Group>
                     </div>
                 </div>
@@ -380,8 +436,10 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 onChange={handleChange}
                                 placeholder="Mobile No 2"
                             />
+                            {errors.MNo2 && <div className="text-danger">{errors.MNo2}</div>}
                         </Form.Group>
                     </div>
+
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
                             <Form.Label>Aadhar No</Form.Label>
@@ -395,6 +453,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 onChange={handleChange}
                                 placeholder="Aadhar No"
                             />
+                            {errors.AadharNo && <div className="text-danger">{errors.AadharNo}</div>}
                         </Form.Group>
                     </div>
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
@@ -422,6 +481,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 placeholder="Graduate Comp Year"
                                 required
                             />
+                             {errors.GCYear && <div className="text-danger">{errors.GCYear}</div>}
                         </Form.Group>
                     </div>
                 </div>
