@@ -7,7 +7,7 @@ import { Typeahead } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import { validateVoterDetails } from '../../Validation/voterDetailsValidation.js';
 
-function VoterDetailsForm({ voterDetails, setVoterDetails }) {
+function VoterDetailsForm({ voterDetails, setVoterDetails}) {
     const [errors, setErrors] = useState({});
     const [surnameOptions, setSurnameOptions] = useState([]);
     const [relativeSurnameOptions, setRelativeSurnameOptions] = useState([]);
@@ -58,7 +58,6 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
     const handleChange = (event) => {
         const { name, value } = event.target;
 
-        // Update the state for the changed field
         setVoterDetails(prevDetails => ({
             ...prevDetails,
             [name]: value,
@@ -159,7 +158,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                     }
 
                                     const error = validateVoterDetails("ELName", selected.length > 0 ? selected[0].ESurname : "");
-                                    console.log(error)
+                              
                                     setErrors(prevErrors => ({
                                         ...prevErrors,
                                         ELName: error,
@@ -370,7 +369,9 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 onChange={handleChange}
                                 className="outline-none border w-full px-2"
                                 placeholder="Enter Age"
+                                required
                             />
+                             {errors.Age && <div className="text-danger mt-1 text-[0.8rem]">{errors.Age}</div>}
                         </Form.Group>
                     </div>
 
@@ -384,8 +385,10 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 onChange={handleChange}
                                 className="outline-none border w-full px-2"
                                 placeholder="DOB"
-                            />
-                        </Form.Group>
+                                required
+                                />
+                                {errors.DOB && <div className="text-danger mt-1 text-[0.8rem]">{errors.DOB}</div>}
+                            </Form.Group>
                     </div>
 
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
@@ -404,6 +407,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 <option value="Female">Female</option>
                                 <option value="Third Gender">Third Gender</option>
                             </Form.Control>
+                            {errors.Sex && <div className="text-danger mt-1 text-[0.8rem]">{errors.Sex}</div>}
                         </Form.Group>
                     </div>
 
@@ -427,7 +431,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                 <div className="row mt-3">
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
-                            <Form.Label>Mobile No.2</Form.Label>
+                            <Form.Label>Alternative Mobile Number</Form.Label>
                             <Form.Control
                                 type="text"
                                 name="MNo2"

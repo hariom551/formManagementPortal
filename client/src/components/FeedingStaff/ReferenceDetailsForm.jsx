@@ -3,7 +3,7 @@ import { Form, Row } from 'react-bootstrap';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { validateVoterDetails } from '../../Validation/voterDetailsValidation.js';
+import { validateReferenceDetails } from '../../Validation/refrenceDetailsValidation';
 function ReferenceDetailsForm({
     referenceDetails,
     setReferenceDetails
@@ -47,7 +47,7 @@ function ReferenceDetailsForm({
             [name]: value,
         }));
 
-        const error = validateVoterDetails(name, value);
+        const error = validateReferenceDetails(name, value);
         setErrors(prevErrors => ({
             ...prevErrors,
             [name]: error,

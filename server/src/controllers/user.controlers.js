@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import {pool} from '../db/database.js';
+import { pool } from '../db/database.js';
 
 
 
@@ -13,7 +13,7 @@ function queryDatabase(sql, params) {
             if (error) {
                 reject(error);
             } else {
-                resolve(results);   
+                resolve(results);
             }
         });
     });
@@ -21,10 +21,10 @@ function queryDatabase(sql, params) {
 
 const generateToken = (payload) => {
     return jwt.sign(
-        payload, 
+        payload,
         process.env.ACCESS_TOKEN_SECRET,
-        { 
-            expiresIn: '5m' 
+        {
+            expiresIn: '5m'
         });
 };
 
@@ -59,31 +59,31 @@ const loginUser = asyncHandler(async (req, res) => {
                 const tokenPayload = {
                     userid: user.userid,
                     role: user.role,
-                    name:user.name
+                    name: user.name
                     // ipaddress: req.ip,
                 };
-            
+
                 const token = generateToken(tokenPayload); // Generate JWT token
-            
+
                 console.log('JWT token generated');
 
-                const options={
+                const options = {
                     httpOnly: true,
-                    secure: true 
+                    secure: true
                 }
-                
+
                 return res
-                .status(200)
-                .cookie("token", token, options)
-                .json(
-                    new ApiResponse(
-                        200,
-                        {
-                            user: user, token
-                        },
-                        "User logged in successfully"
-                    )
-                );
+                    .status(200)
+                    .cookie("token", token, options)
+                    .json(
+                        new ApiResponse(
+                            200,
+                            {
+                                user: user, token
+                            },
+                            "User logged in successfully"
+                        )
+                    );
 
             } else {
                 throw new ApiError(401, "Invalid user credentials")
@@ -99,21 +99,21 @@ const loginUser = asyncHandler(async (req, res) => {
 
 
 const submitDetails = asyncHandler(async (req, res) => {
-    const { userId, password, confirmPassword, name, mobile1, mobile2, email, address, permission, role } = req.body;
+    const { userId, password, confirmPassword, name, mobile1, mobile2, email, address, permission, role, loginUserId } = req.body;
 
-    
-    if (!userId || !password || !confirmPassword || !name || !mobile1  || !role) {
-        // return res.send('Please enter all details!');
-        throw new ApiError(400, "Please enter all details!")
+    if (!userId || !password || !confirmPassword || !name || !mobile1 || !role || !loginUserId) {
+        throw new ApiError(400, "Please enter all details!");
     }
+
+    const currentDate = new Date();
+    const SDate = currentDate.toISOString(); // Use ISO 8601 format
 
     try {
         await queryDatabase(
-            'INSERT INTO usersadminformsdata (userId, password, name, mobile1, mobile2, email, address, permissionAccess, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [userId, password, name, mobile1, mobile2, email, address, permission, role]
+            'INSERT INTO usersadminformsdata (userId, password, name, mobile1, mobile2, email, address, permissionAccess, role, SBy, SDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [userId, password, name, mobile1, mobile2, email, address, permission, role, loginUserId, SDate]
         );
 
-        // Assuming createdUser should represent the newly created user data
         const createdUser = {
             userId,
             password,
@@ -135,15 +135,16 @@ const submitDetails = asyncHandler(async (req, res) => {
     }
 });
 
+
 const hariom = asyncHandler(async (req, res) => {
-    const { role } = req.body;
-        try {
-            const results = await queryDatabase('SELECT * FROM usersadminformsdata WHERE role = ?', [role]);  // no need to destructure
-            return res.json(results); // Should correctly return the results array
-        } catch (error) {
-            console.error('Database query error', error);
-            return res.status(500).send('A database error occurred.');
-        }
+    const { role, loginUserId } = req.body;
+    try {
+        const results = await queryDatabase('SELECT * FROM usersadminformsdata WHERE role = ? AND SBy= ?', [role, loginUserId]);  // no need to destructure
+        return res.json(results); // Should correctly return the results array
+    } catch (error) {
+        console.error('Database query error', error);
+        return res.status(500).send('A database error occurred.');
+    }
     // } else {
     //     res.status(401).send('Please login to view this page!');
     // }
@@ -151,7 +152,7 @@ const hariom = asyncHandler(async (req, res) => {
 
 
 const changePassword = asyncHandler(async (req, res) => {
-    const { userId, password, confirmPassword} = req.body;
+    const { userId, password, confirmPassword } = req.body;
 
     console.log(req.body);
     if (!userId || !password || !confirmPassword) {
@@ -160,10 +161,10 @@ const changePassword = asyncHandler(async (req, res) => {
 
     try {
         await queryDatabase(
-        'UPDATE usersadminformsdata SET userId = ?, password = ? WHERE userId = ?',
-        [userId, password, userId]
-      );
-      
+            'UPDATE usersadminformsdata SET userId = ?, password = ? WHERE userId = ?',
+            [userId, password, userId]
+        );
+
 
         return res.status(201).json(
             new ApiResponse(200, "User details submitted successfully")
@@ -175,7 +176,7 @@ const changePassword = asyncHandler(async (req, res) => {
 });
 
 const AddDistrict = asyncHandler(async (req, res) => {
-    const { DistCode, EDistrict, HDistrict, ESGraduate, HSGraduate} = req.body;
+    const { DistCode, EDistrict, HDistrict, ESGraduate, HSGraduate } = req.body;
     if (!DistCode || !EDistrict || !HDistrict || !ESGraduate || !HSGraduate) {
         throw new ApiError(400, "Please enter all details!")
     }
@@ -200,19 +201,19 @@ const AddDistrict = asyncHandler(async (req, res) => {
 });
 
 const GetDistrictDetails = asyncHandler(async (req, res) => {
-    
-        try {
-            const results = await queryDatabase('SELECT * FROM district');  
-            return res.json(results); 
-        } catch (error) {
-            console.error('Database query error', error);
-            return res.status(500).send('A database error occurred.');
-        }
-   
+
+    try {
+        const results = await queryDatabase('SELECT * FROM district');
+        return res.json(results);
+    } catch (error) {
+        console.error('Database query error', error);
+        return res.status(500).send('A database error occurred.');
+    }
+
 });
- 
-const UpdateDistrictDetail = asyncHandler(async(req, res)=> {
-    const { Id, EName, HName,} = req.body;
+
+const UpdateDistrictDetail = asyncHandler(async (req, res) => {
+    const { Id, EName, HName, } = req.body;
     if (!Id || !EName || !HName) {
         throw new ApiError(400, "Please enter all details!")
     }
@@ -236,8 +237,8 @@ const UpdateDistrictDetail = asyncHandler(async(req, res)=> {
     }
 });
 
-const DeleteDistrictDetail = asyncHandler(async(req, res)=> {
-    const { DistCode} = req.body;
+const DeleteDistrictDetail = asyncHandler(async (req, res) => {
+    const { DistCode } = req.body;
     // if (!DistCode || !EDistrict || !HDistrict || !ESGraduate || !HSGraduate) {
     //     throw new ApiError(400, "Please enter all details!")
     // }
@@ -259,7 +260,7 @@ const DeleteDistrictDetail = asyncHandler(async(req, res)=> {
 });
 
 
-export { loginUser, submitDetails, hariom, changePassword, AddDistrict,  GetDistrictDetails, UpdateDistrictDetail, DeleteDistrictDetail, checkRole,}
+export { loginUser, submitDetails, hariom, changePassword, AddDistrict, GetDistrictDetails, UpdateDistrictDetail, DeleteDistrictDetail, checkRole, }
 
 
 

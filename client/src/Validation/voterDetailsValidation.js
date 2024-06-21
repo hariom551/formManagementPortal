@@ -1,4 +1,4 @@
-// src/validation/voterDetailsValidation.js
+
 
 export const validateVoterDetails = (name, value) => {
     let error = '';
@@ -16,7 +16,7 @@ export const validateVoterDetails = (name, value) => {
             break;
         case 'MNo':
         case 'MNo2':
-        case 'VMob1':
+ 
             if (value && !/^[0-9]+$/.test(value)) {
                 error = 'Mobile number must be digits';
             } else if (value && value.length != 10) {
@@ -37,7 +37,6 @@ export const validateVoterDetails = (name, value) => {
         case 'Occupation':
         case 'Sex':
         case 'GCYear':
-        case 'PacketNo':
             if (!value) {
                 error = 'This field is required';
             }

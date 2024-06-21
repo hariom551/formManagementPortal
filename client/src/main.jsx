@@ -20,19 +20,12 @@ import WardBlock from './components/Admin/WardBlock.jsx';
 import ChakBlock from './components/Admin/ChakBlock.jsx';
 import AreaVill from './components/Admin/AreaVill.jsx';
 import PollongStationList from './components/Admin/pollingStationList.jsx';
-
 import PollingStationAllotment from './components/Admin/pollingStationAllotment.jsx';
 import OutgoingForms from './components/FormsAdmin/OutcomingForm.jsx';
-import AddVoterForm from './components/FeedingStaff/AddVoterForm.jsx';
 import IncomingForms from './components/FormsAdmin/IncomingForms.jsx';
 import UpdateIncomingForm from './components/FormsAdmin/UpdateIncomingForm.jsx';
 import AddVoter from './components/FeedingStaff/AddVoter.jsx';
-
-
-
-
-
-
+import SearchChakBlock from './components/FeedingStaff/SearchChakBlock.jsx';
 
 
 const getRoutesForRole = (role) => {
@@ -94,6 +87,7 @@ const getRoutesForRole = (role) => {
               <Route path="/Home" element={<Home />} />
               {/* <Route path="/AddVoterForm" element={<AddVoterForm />} /> */}
               <Route path="/addVotersForm" element={<AddVoter />} />
+              <Route path="/SearchChakBlock" element={<SearchChakBlock />} />
              
             
             </>

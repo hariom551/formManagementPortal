@@ -121,10 +121,10 @@ const AddVoter = [
                 voterDocs.Image = req.files['Image'][0].filename;
             }
             if (req.files['IdProof']) {
-                voterDocs.IdProof = req.files['IdProof'][0].filename; 
+                voterDocs.IdProof = req.files['IdProof'][0].filename;
             }
             if (req.files['Degree']) {
-                voterDocs.Degree = req.files['Degree'][0].filename; 
+                voterDocs.Degree = req.files['Degree'][0].filename;
             }
 
             const query = `INSERT INTO voterlist (
@@ -145,11 +145,11 @@ const AddVoter = [
 
             const values = [
                 req.regNo, referenceDetails.PacketNo, referenceDetails.IncRefId, voterDetails.EFName, voterDetails.HFName,
-                voterDetails.ELName, voterDetails.HLName, voterDetails.RType, voterDetails.ERFName, voterDetails.HRFName, 
-                voterDetails.ERLName, voterDetails.HRLName, voterDetails.CasteId, voterDetails.Qualification, voterDetails.Occupation, 
-                voterDetails.Age, voterDetails.DOB, voterDetails.Sex, voterDetails.MNo, voterDetails.MNo2, 
-                voterDetails.AadharNo, voterDetails.VIdNo, voterDetails.GCYear, addressDetail.AreaId, addressDetail.TehId, 
-                addressDetail.CounId, addressDetail.VSId, addressDetail.WBId, addressDetail.ChkBlkId, addressDetail.HNo, 
+                voterDetails.ELName, voterDetails.HLName, voterDetails.RType, voterDetails.ERFName, voterDetails.HRFName,
+                voterDetails.ERLName, voterDetails.HRLName, voterDetails.CasteId, voterDetails.Qualification, voterDetails.Occupation,
+                voterDetails.Age, voterDetails.DOB, voterDetails.Sex, voterDetails.MNo, voterDetails.MNo2,
+                voterDetails.AadharNo, voterDetails.VIdNo, voterDetails.GCYear, addressDetail.AreaId, addressDetail.TehId,
+                addressDetail.CounId, addressDetail.VSId, addressDetail.WBId, addressDetail.ChkBlkId, addressDetail.HNo,
                 addressDetail.Landmark, voterDocs.Image, voterDocs.IdProof, voterDocs.Degree
             ];
 
@@ -160,6 +160,37 @@ const AddVoter = [
             return res.status(500).json(new ApiResponse(500, null, 'Database insert error'));
         }
     })
+
+
+
+
+
+
+
 ];
 
-export { searchSurname, searchCaste, searchAreaVill, allAreaDetails, AddVoter };
+
+const getPerseemanDetails = asyncHandler(async (req, res) => {
+    const { ChakNo, ECBPanch, EAreaVill } = req.body;
+
+    try {
+        const results = await queryDatabase(`
+            SELECT CBP.ChakNo, CBP.ECBPanch, AV.EAreaVill, WB.WardNo
+            FROM chakblockpanch AS CBP 
+            JOIN areavill AS AV ON CBP.Id = AV.CBPId 
+            JOIN wardblock AS WB ON WB.Id = CBP.WBId
+            WHERE (AV.EAreaVill LIKE ? OR AV.EAreaVill IS NULL OR AV.EAreaVill = '')
+              AND (CBP.ChakNo LIKE ? OR CBP.ChakNo IS NULL OR CBP.ChakNo = '')
+              AND (CBP.ECBPanch LIKE ? OR CBP.ECBPanch IS NULL OR CBP.ECBPanch = '')
+        `, [`%${EAreaVill}%`, `%${ChakNo}%`, `%${ECBPanch}%`]);
+
+        res.json(results);
+    } catch (error) {
+        console.error('Database query error:', error);
+        res.status(500).send('A database error occurred.');
+    }
+});
+
+
+
+export { searchSurname, searchCaste, searchAreaVill, allAreaDetails, AddVoter, getPerseemanDetails };
