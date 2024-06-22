@@ -116,7 +116,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                                 value={voterDetails.EFName}
                                 onChange={handleChange}
                                 placeholder="First Name (English)"
-                                required
+                             
                             />
                             {errors.EFName && <div className="text-danger mt-1 text-[0.8rem]">{errors.EFName}</div>}
 
@@ -202,7 +202,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                                 name="RType"
                                 value={voterDetails.RType}
                                 onChange={handleChange}
-                                required
+                               
                             >
                                 <option value="">--select relation--</option>
                                 {Relation.map((c) => (
@@ -223,7 +223,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                                 value={voterDetails.ERFName}
                                 onChange={handleChange}
                                 placeholder="Rel. First Name (English)"
-                                required
+                        
                             />
                             {errors.ERFName && <div className="text-danger">{errors.ERFName}</div>}
                         </Form.Group>
@@ -307,7 +307,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                                     name="CasteId"
                                     value={voterDetails.CasteId}
                                     onChange={handleChange}
-                                    required
+                                  
                                 >
                                     <option value="">--Select Caste--</option>
                                     {casteOptions.map((caste) => (
@@ -327,7 +327,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                                 name="Qualification"
                                 value={voterDetails.Qualification}
                                 onChange={handleChange}
-                                required
+                                
                             >
                                 <option value="">--Select Qualification--</option>
                                 <option value="Post Graduate">Post Graduate</option>
@@ -346,7 +346,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                                 name="Occupation"
                                 value={voterDetails.Occupation}
                                 onChange={handleChange}
-                                required
+                   
                             >
                                 <option value="">--select Occupation--</option>
                                 {Occupation.map((c) => (
@@ -363,13 +363,13 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                         <Form.Group>
                             <Form.Label>Age</Form.Label>
                             <Form.Control
-                                type="text"
+                                type="number"
                                 name="Age"
                                 value={voterDetails.Age}
                                 onChange={handleChange}
                                 className="outline-none border w-full px-2"
                                 placeholder="Enter Age"
-                                required
+                       
                             />
                              {errors.Age && <div className="text-danger mt-1 text-[0.8rem]">{errors.Age}</div>}
                         </Form.Group>
@@ -385,7 +385,8 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                                 onChange={handleChange}
                                 className="outline-none border w-full px-2"
                                 placeholder="DOB"
-                                required
+                         
+                                
                                 />
                                 {errors.DOB && <div className="text-danger mt-1 text-[0.8rem]">{errors.DOB}</div>}
                             </Form.Group>
@@ -400,7 +401,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                                 name="Sex"
                                 value={voterDetails.Sex}
                                 onChange={handleChange}
-                                required
+                              
                             >
                                 <option value="">--Select Gender--</option>
                                 <option value="Male">Male</option>
@@ -421,7 +422,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                                 value={voterDetails.MNo}
                                 onChange={handleChange}
                                 placeholder="Mobile No"
-                                required
+                             
                             />
                             {errors.MNo && <div className="text-danger">{errors.MNo}</div>}
                         </Form.Group>
@@ -483,7 +484,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                                 value={voterDetails.GCYear}
                                 onChange={handleChange}
                                 placeholder="Graduate Comp Year"
-                                required
+                             
                             />
                              {errors.GCYear && <div className="text-danger">{errors.GCYear}</div>}
                         </Form.Group>

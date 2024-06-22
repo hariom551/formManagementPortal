@@ -7,7 +7,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { mkConfig, generateCsv, download } from 'export-to-csv';
 import FormsAdminInfo from './FormsAdminInfo';
-
+import { validateFormsAdmin } from '../../Validation/formsAdminValidation';
 const formatDate = (date) => {
     const d = new Date(date);
     const month = `${d.getMonth() + 1}`.padStart(2, '0');
@@ -20,7 +20,7 @@ const today = formatDate(new Date());
 
 function OutgoingForms() {
     const [OFDetails, setOFListDetails] = useState([]);
-    const [formData, setFormData] = useState({
+    const initialFormData = {
         VMob1: '',
         VMob2: '',
         VEName: '',
@@ -33,8 +33,9 @@ function OutgoingForms() {
         CMob1: '',
         CEName: '',
         CHName: '',
-    });
-
+    };
+    const [formData, setFormData] = useState(initialFormData);
+    const [errors, setErrors] = useState({});
     const [suggestedMobiles, setSuggestedMobiles] = useState([]);
     const [suggestedCareOfMobiles, setSuggestedCareOfMobiles] = useState([]);
 
@@ -90,7 +91,22 @@ function OutgoingForms() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(formData);
+
+        let formHasErrors = false;
+        const newErrors = {};
+        for (let key in formData) {
+            const error = validateFormsAdmin(key, formData[key]);
+            if (error) {
+                newErrors[key] = error;
+                formHasErrors = true;
+            }
+        }
+        setErrors(newErrors);
+        if (formHasErrors) {
+            toast.error("Please fix the validation errors");
+            return;
+        }
+
         try {
             const result = await fetch("/api/v1/FormsAdmin/addOutForm", {
                 method: 'POST',
@@ -101,24 +117,24 @@ function OutgoingForms() {
             });
 
             if (result.ok) {
-                window.location.reload();
-                console.log("OutgoingForms Added Successfully.");
+
+                toast.success("OutgoingForms Added Successfully.");
+                setFormData(initialFormData);
             } else {
-                console.error("Error in Adding OutgoingForms:", result.statusText);
+                toast.error("Error in Adding OutgoingForms:", result.statusText);
             }
         } catch (error) {
-            console.error("Error in Adding OutgoingForms:", error.message);
+            toast.error("Error in Adding OutgoingForms:", error.message);
         }
     };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-            setFormData(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
+        setFormData((prevData) => ({ ...prevData, [name]: value }));
+        const error = validateFormsAdmin(name, value);
+        setErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
     };
-    
+
 
 
     const handleExportData = () => {
@@ -207,7 +223,13 @@ function OutgoingForms() {
                                 <Form.Label>Mobile Number<sup className='text-red-500'>*</sup></Form.Label>
                                 <Typeahead
                                     id="VMob1"
-                                    onInputChange={(value) => fetchSuggestedMobiles(value, setSuggestedMobiles)}
+                                    name="VMob1"
+                                    onInputChange={(value) => {fetchSuggestedMobiles(value, setSuggestedMobiles);
+                                        const error = validateFormsAdmin("VMob1", value);
+                                        setErrors((prevErrors) => ({ ...prevErrors, VMob1: error }));
+                                    }}
+                                    
+                                    
                                     onChange={(selected) => {
                                         if (selected.length > 0) {
                                             const [choice] = selected;
@@ -220,6 +242,8 @@ function OutgoingForms() {
                                                 VEAddress: choice.VEAddress,
                                                 VHAddress: choice.VHAddress,
                                             }));
+                                            const error = validateFormsAdmin("VMob1", choice.VMob1);
+                                            setErrors((prevErrors) => ({ ...prevErrors, VMob1: error }));
                                         }
                                     }}
                                     options={suggestedMobiles}
@@ -231,20 +255,32 @@ function OutgoingForms() {
                                         </div>
                                     )}
                                 />
-
+                                {errors.VMob1 && <div className="text-danger">{errors.VMob1}</div>}
                             </Form.Group>
                         </div>
                         <div className="col-md-3 mb-3">
                             <Form.Group>
                                 <Form.Label>Name (English) <sup className='text-red-500'>*</sup></Form.Label>
-                                <Form.Control type="text" placeholder="Name (English)" id="VEName" name="VEName" value={formData.VEName} onChange={handleChange} required />
+                                <Form.Control type="text"
+                                    placeholder="Name (English)"
+                                    id="VEName"
+                                    name="VEName"
+                                    value={formData.VEName}
+                                    onChange={handleChange}
+                                />
+                                {errors.VEName && <div className="text-danger">{errors.VEName}</div>}
                             </Form.Group>
                         </div>
                         <div className="col-md-3 mb-3">
                             <Form.Group>
                                 <Form.Label>Name (Hindi) <sup className='text-red-500'>*</sup></Form.Label>
-                                <Form.Control type="text" placeholder="Name (Hindi)" id="VHName" name="VHName" value={formData.VHName} onChange={handleChange} />
+                                <Form.Control type="text"
+                                    placeholder="Name (Hindi)"
+                                    id="VHName" name="VHName"
+                                    value={formData.VHName}
+                                    onChange={handleChange} />
                             </Form.Group>
+                            {errors.VHName && <div className="text-danger">{errors.VHName}</div>}
                         </div>
                     </Row>
 
@@ -252,13 +288,26 @@ function OutgoingForms() {
                         <div className="col-md-6 mb-3">
                             <Form.Group>
                                 <Form.Label>Address (English)<sup className='text-red-500'>*</sup></Form.Label>
-                                <Form.Control type="text" placeholder="Address (English)" id="VEAddress" name="VEAddress" value={formData.VEAddress} onChange={handleChange} required />
+                                <Form.Control type="text"
+                                    placeholder="Address (English)"
+                                    id="VEAddress"
+                                    name="VEAddress"
+                                    value={formData.VEAddress}
+                                    onChange={handleChange}
+                                />
+                                {errors.VEAddress && <div className="text-danger">{errors.VEAddress}</div>}
                             </Form.Group>
                         </div>
                         <div className="col-md-6 mb-3">
                             <Form.Group>
                                 <Form.Label>Address (Hindi)<sup className='text-red-500'>*</sup></Form.Label>
-                                <Form.Control type="text" placeholder="Address (Hindi)" id="VHAddress" name="VHAddress" value={formData.VHAddress} onChange={handleChange} />
+                                <Form.Control type="text"
+                                    placeholder="Address (Hindi)"
+                                    id="VHAddress"
+                                    name="VHAddress"
+                                    value={formData.VHAddress}
+                                    onChange={handleChange} />
+                                {errors.VHAddress && <div className="text-danger">{errors.VHAddress}</div>}
                             </Form.Group>
                         </div>
                     </Row>
@@ -268,7 +317,12 @@ function OutgoingForms() {
                                 <Form.Label>Care Of Mobile<sup className='text-red-500'>*</sup></Form.Label>
                                 <Typeahead
                                     id="CMob1"
-                                    onInputChange={(value) => fetchSuggestedMobiles(value, setSuggestedCareOfMobiles)}
+                                    name="CMob1"
+                                    onInputChange={(value) => {
+                                        fetchSuggestedMobiles(value, setSuggestedCareOfMobiles);
+                                        const error = validateFormsAdmin("CMob1", value);
+                                        setErrors((prevErrors) => ({ ...prevErrors, CMob1: error }));
+                                    }}
                                     onChange={(selected) => {
                                         if (selected.length > 0) {
                                             const [choice] = selected;
@@ -278,6 +332,8 @@ function OutgoingForms() {
                                                 CEName: choice.VEName,
                                                 CHName: choice.VHName,
                                             }));
+                                            const error = validateFormsAdmin("CMob1", choice.VMob1);
+                                            setErrors((prevErrors) => ({ ...prevErrors, CMob1: error }));
                                         }
                                     }}
                                     options={suggestedCareOfMobiles}
@@ -289,13 +345,17 @@ function OutgoingForms() {
                                         </div>
                                     )}
                                 />
-
+                                {errors.CMob1 && <div className="text-danger">{errors.CMob1}</div>}
                             </Form.Group>
                         </div>
                         <div className="col-md-3 mb-3">
                             <Form.Group>
                                 <Form.Label>Careof (English)<sup className='text-red-500'>*</sup></Form.Label>
-                                <Form.Control type="text" placeholder="Careof (English)" id="CEName" name="CEName" value={formData.CEName} onChange={handleChange} required />
+                                <Form.Control type="text"
+                                    placeholder="Careof (English)"
+                                    id="CEName"
+                                    name="CEName" value={formData.CEName} onChange={handleChange} />
+                                {errors.CEName && <div className="text-danger">{errors.CEName}</div>}
                             </Form.Group>
                         </div>
                         <div className="col-md-3 mb-3">
@@ -303,11 +363,16 @@ function OutgoingForms() {
                                 <Form.Label>Careof (Hindi)<sup className='text-red-500'>*</sup></Form.Label>
                                 <Form.Control type="text" placeholder="Careof (Hindi)" id="CHName" name="CHName" value={formData.CHName} onChange={handleChange} />
                             </Form.Group>
+                            {errors.CHName && <div className="text-danger">{errors.CHName}</div>}
                         </div>
                         <div className="col-md-3 mb-3">
                             <Form.Group>
                                 <Form.Label>No. of Forms<sup className='text-red-500'>*</sup></Form.Label>
-                                <Form.Control type="number" placeholder="No. of Forms" id="NoOfForms" name="NoOfForms" value={formData.NoOfForms} onChange={handleChange} required />
+                                <Form.Control type="number"
+                                    placeholder="No. of Forms"
+                                    id="NoOfForms"
+                                    name="NoOfForms" value={formData.NoOfForms} onChange={handleChange} />
+                                {errors.NoOfForms && <div className="text-danger">{errors.NoOfForms}</div>}
                             </Form.Group>
                         </div>
                     </div>
@@ -315,7 +380,7 @@ function OutgoingForms() {
                         <div className="col-md-3 mb-3">
                             <Form.Group>
                                 <Form.Label>Sending Date:<sup className='text-red-500'>*</sup></Form.Label>
-                                <Form.Control type="date" placeholder="Sending Date" id="SendingDate" name="SendingDate" value={formData.SendingDate} onChange={handleChange} required />
+                                <Form.Control type="date" placeholder="Sending Date" id="SendingDate" name="SendingDate" value={formData.SendingDate} onChange={handleChange} />
                             </Form.Group>
                         </div>
                         <div className="col-md-9 mb-3">

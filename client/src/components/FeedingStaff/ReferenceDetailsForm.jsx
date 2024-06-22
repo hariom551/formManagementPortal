@@ -178,7 +178,7 @@ function ReferenceDetailsForm({
                                             onChange={handleSelectChange}
                                             options={packetOptions}
                                             placeholder="Packet No"
-                                            required
+                                       
                                         />
                                          {errors.PacketNo && <div className="text-danger">{errors.PacketNo}</div>}
                                     </Form.Group>

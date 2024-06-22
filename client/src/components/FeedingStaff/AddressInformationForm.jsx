@@ -131,7 +131,8 @@ function AddressInformationForm({ addressDetail, setAddressDetail }) {
                 name="TehId"
                 value={addressDetail.TehId}
                 onChange={handleChange}
-                required
+     
+
               >
                 <option value="">--Select Tehsil--</option>
                 {AreaFullDetails.map((tehsil) => (
@@ -160,7 +161,7 @@ function AddressInformationForm({ addressDetail, setAddressDetail }) {
                 name="CounId"
                 value={addressDetail.CounId}
                 onChange={handleChange}
-                required
+               
               >
                 <option value="">--Select Nikaya--</option>
                 {AreaFullDetails.map((council) => (
@@ -189,7 +190,7 @@ function AddressInformationForm({ addressDetail, setAddressDetail }) {
                 name="VSId"
                 value={addressDetail.VSId}
                 onChange={handleChange}
-                required
+            
               >
                 <option value="">--Select VidhanSabha--</option>
                 {AreaFullDetails.map((VS) => (
@@ -227,7 +228,7 @@ function AddressInformationForm({ addressDetail, setAddressDetail }) {
                 name="WBId"
                 value={addressDetail.WBId}
                 onChange={handleChange}
-                required
+       
               >
                 <option value="">--Select Ward/Block--</option>
                 {AreaFullDetails.map((WB) => (
@@ -256,7 +257,7 @@ function AddressInformationForm({ addressDetail, setAddressDetail }) {
                 name="ChkBlkId"
                 value={addressDetail.ChkBlkId}
                 onChange={handleChange}
-                required
+            
               >
                 <option value="">--Select Chak Block/ Panchayat--</option>
                 {AreaFullDetails.map((CBP) => (

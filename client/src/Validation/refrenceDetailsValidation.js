@@ -14,7 +14,7 @@ export const validateReferenceDetails = (field, value) => {
             } else if (value && value.length != 10) {
                 error = 'Mobile number must be 10 digits';
             }
-            console.log(error);
+          
             break;
     
         default:
