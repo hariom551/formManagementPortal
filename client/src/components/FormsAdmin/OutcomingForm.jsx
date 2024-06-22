@@ -8,6 +8,9 @@ import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 import { mkConfig, generateCsv, download } from 'export-to-csv';
 import FormsAdminInfo from './FormsAdminInfo';
 import { validateFormsAdmin } from '../../Validation/formsAdminValidation';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const formatDate = (date) => {
     const d = new Date(date);
     const month = `${d.getMonth() + 1}`.padStart(2, '0');
@@ -62,8 +65,6 @@ function OutgoingForms() {
         }
     };
 
-
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -91,7 +92,7 @@ function OutgoingForms() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         let formHasErrors = false;
         const newErrors = {};
         for (let key in formData) {
@@ -106,7 +107,7 @@ function OutgoingForms() {
             toast.error("Please fix the validation errors");
             return;
         }
-
+    
         try {
             const result = await fetch("/api/v1/FormsAdmin/addOutForm", {
                 method: 'POST',
@@ -115,11 +116,16 @@ function OutgoingForms() {
                 },
                 body: JSON.stringify(formData),
             });
-
+    
             if (result.ok) {
-
                 toast.success("OutgoingForms Added Successfully.");
-                setFormData(initialFormData);
+                window.location.reload();
+                // Reset the form data while preserving visibility of VMob1 and CMob1
+                setFormData({
+                    ...initialFormData,
+                    VMob1: '',
+                    CMob1: ''
+                });
             } else {
                 toast.error("Error in Adding OutgoingForms:", result.statusText);
             }
@@ -127,6 +133,8 @@ function OutgoingForms() {
             toast.error("Error in Adding OutgoingForms:", error.message);
         }
     };
+    
+    
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -134,8 +142,6 @@ function OutgoingForms() {
         const error = validateFormsAdmin(name, value);
         setErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
     };
-
-
 
     const handleExportData = () => {
         const csvConfig = mkConfig({
@@ -228,8 +234,6 @@ function OutgoingForms() {
                                         const error = validateFormsAdmin("VMob1", value);
                                         setErrors((prevErrors) => ({ ...prevErrors, VMob1: error }));
                                     }}
-                                    
-                                    
                                     onChange={(selected) => {
                                         if (selected.length > 0) {
                                             const [choice] = selected;

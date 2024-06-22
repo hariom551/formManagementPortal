@@ -5,6 +5,7 @@ import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Select from 'react-select';
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -46,8 +47,8 @@ function ChakBlock() {
         if (!data || !Array.isArray(data) || data.length === 0) {
           throw new Error('Empty or invalid wardblock options data');
         }
-        // Map data to an array of { value, label } objects
-        const options = data.map(wb => ({ value: wb.Id, label: wb.EWardBlock }));
+        
+        const options = data.map(wb => ({ value: wb.Id, label: `${wb.WardNo} - ${wb.EWardBlock}` }));
         setWBOptions(options);
         
       } catch (error) {
@@ -250,25 +251,18 @@ function ChakBlock() {
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>Select WardBlock</Form.Label>
-                <Form.Select
+                <Form.Label>Select WardBlock<sup className="text-red-600">*</sup></Form.Label>
+                <Select
                   id="WBSelect"
                   name="WBId"
-                  value={formData.WBId}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Select WardBlock</option>
-                  {WBOptions.map(option => (
-                    <option
-                      key={option.value}
-                      value={option.value} 
-
-                    >
-                      {option.label}
-                    </option>
-                  ))}
-                </Form.Select>
+                  value={WBOptions.find(option => option.value === formData.WBId)}
+                  onChange={option => setFormData(prevFormData => ({ ...prevFormData, WBId: option.value}))}
+                  options={WBOptions}
+                  placeholder="Select WardBlock"
+                 
+                />
+              
+    
               </Form.Group>
             </div>
             

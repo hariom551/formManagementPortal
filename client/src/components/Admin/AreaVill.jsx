@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
+import Select from 'react-select'; // Import react-select
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -47,7 +48,7 @@ function AreaVill() {
           throw new Error('Empty or invalid Ward block options data');
         }
         // Map data to an array of { value, label } objects
-        const options = data.map(WB => ({ value: WB.Id, label: WB.EWardBlock }));
+        const options = data.map(wb => ({ value: wb.Id, label: `${wb.WardNo} - ${wb.EWardBlock}` }));
         setWBOptions(options);
       } catch (error) {
         console.error('Error fetching wb options:', error);
@@ -58,7 +59,6 @@ function AreaVill() {
   }, []);
 
   const fetchCBOptions = async (wbId) => {
-    // console.log(wbId);
     try {
       const response = await fetch(`/api/v1/admin/chakBlockDetails`, {
         method: 'GET',
@@ -74,16 +74,12 @@ function AreaVill() {
       if (!data || !Array.isArray(data) || data.length === 0) {
         throw new Error('Empty or invalid chakblock options data');
       }
-      
-      console.log('Data:', data);
-      console.log('wbId:', wbId);
+
       const options = data
         .filter(CB => CB.WBId == wbId)
-        .map(CB => ({ value: CB.Id, label: CB.ECBPanch }));
-
+        .map(CB => ({ value: CB.Id, label: CB.ChakNo + "  - " + CB.ECBPanch }));
 
       setCBOptions(options);
-      console.log(options);
     } catch (error) {
       console.error('Error fetching CB options:', error);
     }
@@ -98,7 +94,7 @@ function AreaVill() {
             'Content-Type': 'application/json'
           }
         });
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch AreaVill details');
         }
@@ -111,7 +107,6 @@ function AreaVill() {
           const AreaVill = data.find(item => item.Id == content);
           if (AreaVill) {
             setFormData(AreaVill);
-            // console.log("set ",formData.counId);
             fetchCBOptions(AreaVill.WBId);
           } else {
             console.error(`AreaVill with ID ${content} not found`);
@@ -147,20 +142,16 @@ function AreaVill() {
     }
   };
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    // Update the formData with the new value
+  const handleChange = (selectedOption, name) => {
+
     setFormData(prevFormData => ({
       ...prevFormData,
-      [name]: value
+      [name]: selectedOption.value
     }));
-    // console.log(value);
-    if (name == 'WBID') {
-      fetchCBOptions(value);
-      
 
+    if (name === 'WBID') {
+      fetchCBOptions(selectedOption.value);
     }
-   
   };
 
   const handleDelete = async (Id) => {
@@ -172,23 +163,20 @@ function AreaVill() {
           'Content-Type': 'application/json'
         }
       });
-      
-      console.log(response);
+
       if (!response.ok) {
         throw new Error('Failed to delete AreaVill');
       }
-  
-      // Assuming the deletion was successful, reload the 
+
       toast.success("AreaVill deleted successfully.");
       setTimeout(() => {
         window.location.reload()
       }, 1000);
     } catch (error) {
       toast.error("Error deleting AreaVill:", error.message);
-      // Handle error (e.g., show a notification to the user)
     }
   };
-  
+
   const handleEdit = async (e) => {
     e.preventDefault();
 
@@ -201,11 +189,8 @@ function AreaVill() {
         }
       });
 
-  
       if (result.ok) {
-
         window.location.href = '/AreaVill';
-
         console.log("AreaVill Updated successfully.");
       } else {
         console.error("Error in Updating AreaVill:", result.statusText);
@@ -214,7 +199,6 @@ function AreaVill() {
       console.error("Error in updating :", error.message);
     }
   };
-  
 
   const columns = useMemo(() => [
     {
@@ -246,12 +230,6 @@ function AreaVill() {
       header: 'Chak Block',
       size: 20,
     },
-    // {
-    //   accessorKey: 'ECouncil',
-    //   header: 'Nikaya',
-    //   size: 20,
-    // },
-    
     {
       accessorKey: 'EAreaVill',
       header: 'AreaVill Name (English)',
@@ -263,10 +241,10 @@ function AreaVill() {
       size: 20,
     },
     {
-        accessorKey: 'HnoRange',
-        header: 'HNo Range',
-        size: 5,
-      },
+      accessorKey: 'HnoRange',
+      header: 'HNo Range',
+      size: 5,
+    },
   ], []);
 
   const table = useMaterialReactTable({
@@ -276,54 +254,40 @@ function AreaVill() {
 
   return (
     <main className="bg-gray-100">
-      <ToastContainer/>
+      <ToastContainer />
       <div className="container py-4 pl-6 text-black">
-        <h1 className="text-2xl font-bold mb-4">Add AreaVill<sup className='text-red-600'>*</sup></h1>
-        <Form onSubmit={content ? handleEdit :handleSubmit} className="AreaVill-form">
+        <h1 className="text-2xl font-bold mb-4">Add AreaVill</h1>
+        <Form onSubmit={content ? handleEdit : handleSubmit} className="AreaVill-form">
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group>
                 <Form.Label>Select Ward Block</Form.Label>
-                <Form.Select
+                <Select
                   id="wbSelect"
                   name="WBID"
-                  value={formData.WBId}
-                  onChange={handleChange}
+                  value={wbOptions.find(option => option.value === formData.WBID)}
+                  onChange={(selectedOption) => handleChange(selectedOption, 'WBID')}
+                  options={wbOptions}
+                  placeholder="Select Ward Block"
+                  isSearchable={true} // Enable search
                   required
-                >
-                  <option value="">Select Ward Block</option>
-                  {wbOptions.map(option => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                    >
-                      {option.label}
-                    </option>
-                  ))}
-                </Form.Select>
+                />
               </Form.Group>
             </div>
 
             <div className="col-md-3 mb-3">
               <Form.Group>
                 <Form.Label>Select Chak Block<sup className='text-red-600'>*</sup></Form.Label>
-                <Form.Select
+                <Select
                   id="CBSelect"
                   name="CBPId"
-                  value={formData.CBPId}
-                  onChange={handleChange}
+                  value={cbOptions.find(option => option.value === formData.CBPId)}
+                  onChange={(selectedOption) => handleChange(selectedOption, 'CBPId')}
+                  options={cbOptions}
+                  placeholder="Select Chak Block"
+                  isSearchable={true} // Enable search
                   required
-                >
-                  <option value="">Select Chak Block</option>
-                  {cbOptions.map(option => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                    >
-                      {option.label}
-                    </option>
-                  ))}
-                </Form.Select>
+                />
               </Form.Group>
             </div>
 

@@ -3,12 +3,11 @@ import { Link, useLocation } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
-import {
-  MaterialReactTable,
-  useMaterialReactTable,
-} from 'material-react-table';
+import Select from 'react-select';
+import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 function WardBlock() {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -22,12 +21,11 @@ function WardBlock() {
     WardNo: '',
     EVidhanSabha: '',
     VSId: ''
-
   });
 
   const [vsOptions, setVSOptions] = useState([]);
-  useEffect(() => {
 
+  useEffect(() => {
     const fetchVSOptions = async () => {
       try {
         const response = await fetch('/api/v1/admin/vidhanSabhaDetails', {
@@ -36,7 +34,6 @@ function WardBlock() {
             'Content-Type': 'application/json'
           }
         });
-
         if (!response.ok) {
           throw new Error('Failed to fetch vidhanSabha options');
         }
@@ -44,12 +41,13 @@ function WardBlock() {
         if (!data || !Array.isArray(data) || data.length === 0) {
           throw new Error('Empty or invalid vidhansabha options data');
         }
-        // Map data to an array of { value, label } objects
-        const options = data.map(vs => ({ value: vs.Id, label: vs.EVidhanSabha }));
+        const options = data.map(vs => ({
+          value: vs.Id,
+          label: `${vs.VSNo} - ${vs.EVidhanSabha}`
+        }));
         setVSOptions(options);
-
       } catch (error) {
-        toast.error('Error fetching vidhanSabha options:', error);
+        toast.error('Error fetching vidhanSabha options: ' + error.message);
       }
     };
 
@@ -74,7 +72,7 @@ function WardBlock() {
         }
         setWardBlockDetails(data);
         if (content) {
-          const WardBlock = data.find(item => { return item.Id == content });
+          const WardBlock = data.find(item => item.Id == content);
           if (WardBlock) {
             setFormData(WardBlock);
           } else {
@@ -82,19 +80,17 @@ function WardBlock() {
           }
         }
       } catch (error) {
-        toast.error('Error fetching WardBlock data:', error);
+        toast.error('Error fetching WardBlock data: ' + error.message);
       }
     };
 
     fetchData();
   }, [content]);
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
     try {
-      const result = await fetch("/api/v1/admin/addWardBlock", {
+      const result = await fetch('/api/v1/admin/addWardBlock', {
         method: 'POST',
         body: JSON.stringify(formData),
         headers: {
@@ -103,26 +99,22 @@ function WardBlock() {
       });
 
       if (result.ok) {
-
-        toast.success("WardBlock Added Successfully.");
+        toast.success('WardBlock Added Successfully.');
         setTimeout(() => {
           window.location.reload();
         }, 1000);
       } else {
-        toast.error("Error in Adding WardBlock:", result.statusText);
+        toast.error('Error in Adding WardBlock: ' + result.statusText);
       }
     } catch (error) {
-      toast.error("Error in Adding WardBlock:", error.message);
+      toast.error('Error in Adding WardBlock: ' + error.message);
     }
   };
 
   const handleEdit = async (e) => {
     e.preventDefault();
-
-
-
     try {
-      const result = await fetch("/api/v1/admin/updateWardBlockDetails", {
+      const result = await fetch('/api/v1/admin/updateWardBlockDetails', {
         method: 'POST',
         body: JSON.stringify(formData),
         headers: {
@@ -131,21 +123,17 @@ function WardBlock() {
       });
 
       if (result.ok) {
-
-
-        toast.success("WardBlock Updated successfully.");
+        toast.success('WardBlock Updated successfully.');
         setTimeout(() => {
-
           window.location.href = '/WardBlock';
         }, 1000);
       } else {
-        toast.error("Error in Updating WardBlock:", result.statusText);
+        toast.error('Error in Updating WardBlock: ' + result.statusText);
       }
     } catch (error) {
-      toast.error("Error in updating :", error.message);
+      toast.error('Error in updating: ' + error.message);
     }
   };
-
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -153,16 +141,11 @@ function WardBlock() {
       ...prevFormData,
       [name]: value
     }));
-
   };
 
-
-
   const handleDelete = async (Id) => {
-
-
     try {
-      let result = await fetch("/api/v1/Admin/deleteWardBlockDetail", {
+      let result = await fetch('/api/v1/Admin/deleteWardBlockDetail', {
         method: 'POST',
         body: JSON.stringify({ Id }),
         headers: {
@@ -171,19 +154,17 @@ function WardBlock() {
       });
 
       if (result.ok) {
-
-        toast.success("WardBlock Added Successfully successfully.");
+        toast.success('WardBlock Deleted Successfully.');
         setTimeout(() => {
-          window.location.reload()
+          window.location.reload();
         }, 1000);
       } else {
-        toast.error("Error in Adding WardBlock:", result.statusText);
+        toast.error('Error in Deleting WardBlock: ' + result.statusText);
       }
     } catch (error) {
-      toast.error("Error in Adding WardBlock:", error.message);
+      toast.error('Error in Deleting WardBlock: ' + error.message);
     }
   };
-
 
   const columns = useMemo(() => [
     {
@@ -198,17 +179,9 @@ function WardBlock() {
       Cell: ({ row }) => (
         <>
           <Button variant="primary" className="changepassword">
-            <Link
-              to={{ pathname: "/WardBlock", search: `?content=${row.original.Id}` }}
-            >
-              Edit
-            </Link>
+            <Link to={{ pathname: "/WardBlock", search: `?content=${row.original.Id}` }}>Edit</Link>
           </Button>
-          <Button variant="danger" onClick={() => handleDelete(row.original.Id)} className="delete" type='button'>
-
-            Delete
-
-          </Button>
+          <Button variant="danger" onClick={() => handleDelete(row.original.Id)} className="delete" type="button">Delete</Button>
         </>
       ),
     },
@@ -227,15 +200,11 @@ function WardBlock() {
       header: 'WardBlock (English)',
       size: 20,
     },
-
-
     {
       accessorKey: 'HWardBlock',
       header: 'WardBlock (Hindi)',
       size: 20,
     },
-
-
   ], []);
 
   const table = useMaterialReactTable({
@@ -247,60 +216,67 @@ function WardBlock() {
     <main className="bg-gray-100">
       <ToastContainer />
       <div className="container py-4 pl-6 text-black">
-        <h1 className="text-2xl font-bold mb-4">Add WardBlock</h1>
+        <h1 className="text-2xl font-bold mb-4">{content ? 'Edit WardBlock' : 'Add WardBlock'}</h1>
         <Form onSubmit={content ? handleEdit : handleSubmit} className="WardBlock-form">
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
               <Form.Group>
-                <Form.Label>Select VidhanSabha<sup className='text-red-600'>*</sup></Form.Label>
-                <Form.Select
+                <Form.Label>Select VidhanSabha<sup className="text-red-600">*</sup></Form.Label>
+                <Select
                   id="VSSelect"
                   name="VSId"
-                  value={formData.VSId}
+                  value={vsOptions.find(option => option.value === formData.VSId)}
+                  onChange={option => setFormData(prevFormData => ({ ...prevFormData, VSId: option.value }))}
+                  options={vsOptions}
+                  placeholder="Select VidhanSabha"
+                />
+              </Form.Group>
+            </div>
+            <div className="col-md-3 mb-3">
+              <Form.Group>
+                <Form.Label>Ward No<sup className="text-red-600">*</sup></Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Ward No"
+                  id="WardNo"
+                  name="WardNo"
+                  value={formData.WardNo}
                   onChange={handleChange}
                   required
-                >
-                  <option value="">Select VidhanSabha</option>
-                  {vsOptions.map(option => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-
-                    >
-                      {option.label}
-                    </option>
-                  ))}
-                </Form.Select>
+                />
               </Form.Group>
             </div>
-
-            <div className="col-md-3 mb-3">
-              <Form.Group >
-                <Form.Label>Ward No<sup className='text-red-600'>*</sup></Form.Label>
-                <Form.Control type="text" placeholder="Ward No" id="WardNo" name="WardNo" value={formData.WardNo} onChange={handleChange} required />
-              </Form.Group>
-            </div>
-
-
-
           </Row>
           <Row className="mb-3">
             <div className="col-md-3 mb-3">
-              <Form.Group >
-                <Form.Label>WardBlock Name (English)<sup className='text-red-600'>*</sup></Form.Label>
-                <Form.Control type="text" placeholder="WardBlock Name (English)" id="EWardBlock" name="EWardBlock" value={formData.EWardBlock} onChange={handleChange} required />
+              <Form.Group>
+                <Form.Label>WardBlock Name (English)<sup className="text-red-600">*</sup></Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="WardBlock Name (English)"
+                  id="EWardBlock"
+                  name="EWardBlock"
+                  value={formData.EWardBlock}
+                  onChange={handleChange}
+                  required
+                />
               </Form.Group>
             </div>
-
-
             <div className="col-md-3 mb-3">
-              <Form.Group >
-                <Form.Label>WardBlock Name (Hindi)<sup className='text-red-600'>*</sup></Form.Label>
-                <Form.Control type="text" placeholder="WardBlock Name (Hindi)" id="HWardBlock" name="HWardBlock" value={formData.HWardBlock} onChange={handleChange} required />
+              <Form.Group>
+                <Form.Label>WardBlock Name (Hindi)<sup className="text-red-600">*</sup></Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="WardBlock Name (Hindi)"
+                  id="HWardBlock"
+                  name="HWardBlock"
+                  value={formData.HWardBlock}
+                  onChange={handleChange}
+                  required
+                />
               </Form.Group>
             </div>
           </Row>
-
           <Button variant="primary" type="submit">
             {content ? 'Update' : 'Submit'}
           </Button>

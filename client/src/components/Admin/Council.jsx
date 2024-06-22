@@ -78,7 +78,7 @@ function Council() {
           const Council = data.find(item => { return item.Id == content });
           if (Council) {
             setFormData(Council);
-            
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
           } else {
@@ -107,9 +107,9 @@ function Council() {
       });
 
       if (result.ok) {
-     
+
         // window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-       
+
         toast.success("Council Added Successfully.");
         setTimeout(() => {
           window.location.reload();
@@ -124,8 +124,6 @@ function Council() {
 
   const handleEdit = async (e) => {
     e.preventDefault();
-
-  
 
     try {
       const result = await fetch("/api/v1/admin/updateCouncilDetail", {
@@ -148,7 +146,7 @@ function Council() {
       toast.error("Error in updating :", error.message);
     }
   };
-  
+
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -158,7 +156,7 @@ function Council() {
     }));
 
   };
-  
+
 
 
   const handleDelete = async (Id) => {
@@ -178,7 +176,7 @@ function Council() {
         setTimeout(() => {
           window.location.reload();
         }, 2000);
-    
+
       } else {
         toast.error("Error in Adding Council:", result.statusText);
       }
@@ -242,24 +240,25 @@ function Council() {
 
   return (
     <main className="bg-gray-100">
-      <ToastContainer/>
+      <ToastContainer />
       <div className="container py-4 pl-6 text-black">
         <h1 className="text-2xl font-bold mb-4">Add Council</h1>
         <Form onSubmit={content ? handleEdit : handleSubmit} className="Council-form">
           <Row className="mb-3">
-          <div className="col-md-3 mb-3">
-          <Form.Group>
-            <Form.Label>Select Tehsil<sup className='text-red-600'>*</sup></Form.Label>
-            <Select
-              id="tehsilSelect"
-              name="TehId"
-              value={tehsilOptions.find(option => option.value === formData.TehId)}
-              onChange={option => setFormData(prevFormData => ({ ...prevFormData, TehId: option.value }))}
-              options={tehsilOptions}
-              placeholder="Select Tehsil"
-            />
-          </Form.Group>
-</div>
+
+            <div className="col-md-3 mb-3">
+              <Form.Group>
+                <Form.Label>Select Tehsil<sup className='text-red-600'>*</sup></Form.Label>
+                <Select
+                  id="tehsilSelect"
+                  name="TehId"
+                  value={tehsilOptions.find(option => option.value === formData.TehId)}
+                  onChange={option => setFormData(prevFormData => ({ ...prevFormData, TehId: option.value }))}
+                  options={tehsilOptions}
+                  placeholder="Select Tehsil"
+                />
+              </Form.Group>
+            </div>
 
 
             <div className="col-md-3 mb-3">
