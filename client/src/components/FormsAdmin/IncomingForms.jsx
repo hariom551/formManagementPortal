@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Button, Form, Row } from 'react-bootstrap';
 import { Box } from '@mui/material';
 import { Typeahead } from 'react-bootstrap-typeahead';
@@ -7,8 +8,14 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { mkConfig, generateCsv, download } from 'export-to-csv';
 import FormsAdminInfo from './FormsAdminInfo.jsx';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function IncomingForms() {
+
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const content = searchParams.get('content');
 
     const formatDate = (date) => {
         const d = new Date(date);
@@ -19,9 +26,10 @@ function IncomingForms() {
     };
 
     const today = formatDate(new Date());
-    
+
     const [IFDetails, setIFDetails] = useState([]);
     const [formData, setFormData] = useState({
+
         VMob1: '',
         VMob2: '',
         VEName: '',
@@ -29,7 +37,7 @@ function IncomingForms() {
         VEAddress: '',
         VHAddress: '',
         TotalForms: '',
-        PacketNo: '',
+        PacketNo: content || '',
         ReceivedDate: today,
         ERemarks: '',
         COList: [{
@@ -45,9 +53,6 @@ function IncomingForms() {
     const [suggestedMobiles, setSuggestedMobiles] = useState([]);
     const [suggestedCareOfMobiles, setSuggestedCareOfMobiles] = useState([]);
 
-
-
-
     const fetchSuggestedMobiles = async (input, setter) => {
         try {
             const response = await fetch('/api/v1/formsAdmin/searchVMobNo', {
@@ -61,21 +66,14 @@ function IncomingForms() {
             if (!response.ok) {
                 throw new Error('Failed to fetch suggested mobile numbers');
             }
-
             const data = await response.json();
             setter(data);
 
-          
+
         } catch (error) {
             console.error('Error fetching suggested mobile numbers:', error);
         }
     };
-
- 
-
-
-
-
 
     useEffect(() => {
         const fetchData = async () => {
@@ -92,21 +90,65 @@ function IncomingForms() {
                 }
 
                 const data = await response.json();
-                // const data = result.incomingForms;
-
                 if (!data || !Array.isArray(data) || data.length === 0) {
                     throw new Error('Empty or invalid IncomingForms details data');
                 }
 
                 setIFDetails(data);
-             
+
+                if (content) {
+                    const IF = data.find(item => item.PacketNo === content);
+                    if (IF) {
+                        setFormData({
+                            VMob1: IF.RMob1,
+                            VMob2: IF.RMob2 || '',
+                            VEName: IF.RName,
+                            VHName: IF.RHName,
+                            VEAddress: IF.RAddress || '',
+                            VHAddress: IF.RHAddress || '',
+                            TotalForms: IF.TotalForms,
+                            PacketNo: IF.PacketNo,
+                            ReceivedDate: IF.ReceivedDate.split('T')[0],
+                            ERemarks: IF.ERemarks || '',
+                            COList: [
+                                {
+                                    VMob1: IF.C1Mob,
+                                    VEName: IF.C1Name,
+                                    VHName: IF.C1HName,
+                                    NoOfFormsKN: IF.NFormsKN1 || 0,
+                                    NoOfFormsKD: IF.NFormsKd1 || 0,
+                                    NoOfFormsU: IF.NFormsU1 || 0,
+                                },
+                                IF.C2Name ? {
+                                    VMob1: IF.C2Mob,
+                                    VEName: IF.C2Name,
+                                    VHName: IF.C2HName,
+                                    NoOfFormsKN: IF.NFormsKN2 || 0,
+                                    NoOfFormsKD: IF.NFormsKd2 || 0,
+                                    NoOfFormsU: IF.NFormsU2 || 0,
+                                } : null,
+                                IF.C3Name ? {
+                                    VMob1: IF.C3Mob,
+                                    VEName: IF.C3Name,
+                                    VHName: IF.C3HName,
+                                    NoOfFormsKN: IF.NFormsKN3 || 0,
+                                    NoOfFormsKD: IF.NFormsKd3 || 0,
+                                    NoOfFormsU: IF.NFormsU3 || 0,
+                                } : null
+                            ].filter(co => co !== null)
+                        });
+                    } else {
+                        console.error(`IncomingForm with PacketNo ${content} not found`);
+                    }
+                }
             } catch (error) {
                 console.error('Error fetching IncomingForms data:', error);
             }
         };
 
         fetchData();
-    }, []);
+    }, [content]);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -130,6 +172,31 @@ function IncomingForms() {
         }
     };
 
+    const handleEdit = async (e) => {
+        e.preventDefault();
+        try {
+            const result = await fetch("/api/v1/formsAdmin/UpdateIncomForm", {
+                method: 'POST',
+                body: JSON.stringify(formData),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (result.ok) {
+                toast.success("incomingForms Updated successfully.");
+                setTimeout(() => {
+                    window.location.href = '/incomingForms';
+                }, 1000);
+            } else {
+                toast.error("Error in Updating incomingForms:", result.statusText);
+            }
+        } catch (error) {
+            toast.error("Error in updating :", error.message);
+        }
+    };
+
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
@@ -145,10 +212,6 @@ function IncomingForms() {
         download(csvConfig)(csv);
     };
 
-
-
-
-
     const columns = useMemo(() => [
         {
             accessor: (index) => index + 1,
@@ -156,6 +219,28 @@ function IncomingForms() {
             Header: 'S.No',
             size: 5,
             Cell: ({ cell }) => cell.row.index + 1
+        },
+        {
+            accessorKey: 'PacketNo',
+            header: 'PacketNo',
+            size: 5,
+        },
+        {
+            accessorKey: 'Action',
+            header: 'Action',
+            size: 1,
+            Cell: ({ row }) => (
+                <>
+                    <Button variant="primary" className="changepassword">
+                        <Link
+                            to={{ pathname: "/incomingForms", search: `?content=${row.original.PacketNo}` }}
+                        >
+                            Edit
+                        </Link>
+                    </Button>
+
+                </>
+            ),
         },
         {
             accessorKey: 'RName',
@@ -177,11 +262,6 @@ function IncomingForms() {
             header: 'Total Form',
             size: 4,
             Footer: () => calculateColumnTotals('TotalForms')
-        },
-        {
-            accessorKey: 'PacketNo',
-            header: 'PacketNo',
-            size: 5,
         },
         {
             accessorKey: 'C1Name',
@@ -287,15 +367,6 @@ function IncomingForms() {
         },
     });
 
-    // const handleAddCareOf = () => {
-    //     if (formData.COList.length < 5) {
-    //         setFormData({
-    //             ...formData,
-    //             COList: [...formData.COList, { VMob1: '', VEName: '', VHName: '', NoOfFormsKN: '', NoOfFormsKD: '', NoOfFormsU: '', }]
-    //         });
-    //     }
-    // };
-
     const handleCareOfChange = (e, index) => {
         const { name, value } = e.target;
         const updatedCOList = [...formData.COList];
@@ -323,7 +394,6 @@ function IncomingForms() {
         return IFDetails.reduce((sum, row) => sum + (Number(row[key]) || 0), 0);
     };
 
-
     const calculateTotalForms = () => {
         let totalForms = 0;
         formData.COList.forEach(co => {
@@ -332,26 +402,22 @@ function IncomingForms() {
         return totalForms;
     };
 
-
-
-
     return (
         <main className="bg-gray-100">
             <div className="container py-4 pl-6 text-black">
                 <div className='w-full h-full my-1 container-fluid'>
-                   <FormsAdminInfo/>
+                    <FormsAdminInfo />
                 </div>
 
-
                 <h1 className="text-3xl font-bold my-4">Incoming Form Info</h1>
-                <Form onSubmit={handleSubmit} className="IncomingForms-form">
+                <Form onSubmit={content ? handleEdit : handleSubmit} className="IncomingForms-form">
                     <Row className="mb-3">
-
                         <div className="col-md-3 mb-3">
-                        <Form.Group>
+                            <Form.Group>
                                 <Form.Label>Mobile Number<sup className='text-red-500'>*</sup></Form.Label>
                                 <Typeahead
                                     id="VMob1"
+                                    selected={formData.VMob1 ? [{ VMob1: formData.VMob1 }] : []}
                                     onInputChange={(value) => fetchSuggestedMobiles(value, setSuggestedMobiles)}
                                     onChange={(selected) => {
                                         if (selected.length > 0) {
@@ -359,27 +425,26 @@ function IncomingForms() {
                                             setFormData(prevData => ({
                                                 ...prevData,
                                                 VMob1: choice.VMob1,
-                                                VMob2: choice.VMob2,
+                                                VMob2: choice.VMob2 || '',
                                                 VEName: choice.VEName,
                                                 VHName: choice.VHName,
-                                                VEAddress: choice.VEAddress,
-                                                VHAddress: choice.VHAddress,
+                                                VEAddress: choice.VEAddress || '',
+                                                VHAddress: choice.VHAddress || '',
                                             }));
                                         }
                                     }}
                                     options={suggestedMobiles}
                                     placeholder="Mobile Number"
                                     labelKey="VMob1"
+                                    defaultInputValue={formData.VMob1}
                                     renderMenuItemChildren={(option) => (
                                         <div>
                                             {option.VMob1} - {option.VEName}
                                         </div>
                                     )}
                                 />
-
                             </Form.Group>
                         </div>
-
 
                         <div className="col-md-3 mb-3">
                             <Form.Group >
@@ -419,7 +484,7 @@ function IncomingForms() {
 
                     <Row className="mb-3">
 
-                    <div className="col-md-5 mb-3">
+                        <div className="col-md-5 mb-3">
                             <Form.Group >
                                 <Form.Label>Remarks</Form.Label>
                                 <Form.Control type="text" placeholder="Remarks" name="ERemarks" value={formData.ERemarks} onChange={handleChange} />
@@ -446,50 +511,43 @@ function IncomingForms() {
                                 <Form.Control type="number" name="TotalForms" value={formData.TotalForms = calculateTotalForms()} onChange={handleChange} readOnly />
                             </Form.Group>
                         </div>
-
-                        
                     </Row>
 
                     {formData.COList.map((e, index) => (
                         <div className="row mb-3" key={index}>
                             <Row className="mb-3">
                                 <div className="col-md-3 mb-3">
-                                   
-
                                     <Form.Group controlId={`COList[${index}].VMob1`}>
-                                <Form.Label>Care Of Mobile {index + 1}</Form.Label>
-                                <Typeahead
-    id={`COList[${index}].VMob1`}
-    onInputChange={(input) => fetchSuggestedMobiles(input, setSuggestedCareOfMobiles)}
-    onChange={(selected) => {
-        if (selected.length > 0) {
-            const [choice] = selected;
-            const updatedCOList = [...formData.COList];
-            updatedCOList[index] = {
-                ...updatedCOList[index],
-                VMob1: choice.VMob1,
-                VEName: choice.VEName,
-                VHName: choice.VHName,
-            };
-            setFormData({ ...formData, COList: updatedCOList });
-        }
-    }}
-    options={suggestedCareOfMobiles}
-    placeholder="Search mobile"
-    labelKey="VMob1"
-    renderMenuItemChildren={(option) => (
-        <div>
-            {option.VMob1} - {option.VEName}
-        </div>
-    )}
-/>
+                                        <Form.Label>Care Of Mobile {index + 1}</Form.Label>
+                                        <Typeahead
+                                            id={`COList[${index}].VMob1`}
+                                            selected={formData.COList[index].VMob1 ? [{ VMob1: formData.COList[index].VMob1 }] : []}
+                                            onInputChange={(input) => fetchSuggestedMobiles(input, setSuggestedCareOfMobiles)}
+                                            onChange={(selected) => {
+                                                if (selected.length > 0) {
+                                                    const [choice] = selected;
+                                                    const updatedCOList = [...formData.COList];
+                                                    updatedCOList[index] = {
+                                                        ...updatedCOList[index],
+                                                        VMob1: choice.VMob1,
+                                                        VEName: choice.VEName,
+                                                        VHName: choice.VHName,
+                                                    };
+                                                    setFormData({ ...formData, COList: updatedCOList });
+                                                }
+                                            }}
+                                            options={suggestedCareOfMobiles}
+                                            placeholder="Search mobile"
+                                            labelKey="VMob1"
+                                            renderMenuItemChildren={(option) => (
+                                                <div>
+                                                    {option.VMob1} - {option.VEName}
+                                                </div>
+                                            )}
+                                        />
 
-                            </Form.Group>
+                                    </Form.Group>
 
-
-
-
-                             
                                 </div>
                                 <div className="col-md-3 mb-3">
                                     <Form.Group>
@@ -501,7 +559,7 @@ function IncomingForms() {
                                             value={formData.COList[index].VEName}
                                             onChange={(e) => handleCareOfChange(e, index)}
                                             required
-                                            
+
                                         />
                                     </Form.Group>
                                 </div>
@@ -514,49 +572,46 @@ function IncomingForms() {
                                             name="VHName"
                                             value={formData.COList[index].VHName}
                                             onChange={(e) => handleCareOfChange(e, index)}
-                                         
+
                                         />
                                     </Form.Group>
                                 </div>
                             </Row>
-
-
-
 
                             <Row className="mb-3">
                                 <div className="col-md-3 mb-3">
                                     <Form.Group>
                                         <Form.Label>No. of Forms (Kanpur) {index + 1}<sup className='text-red-500'>*</sup></Form.Label>
                                         <Form.Control
-                                                 type="number"
-                                                 placeholder={`No. of Forms (Kanpur) ${index + 1}`} 
-                                                 name="NoOfFormsKN" 
-                                                 value={ e.NoOfFormsKN} 
-                                                 onChange={(event) => handleCareOfChange(event, index)} 
-                                                 />
+                                            type="number"
+                                            placeholder={`No. of Forms (Kanpur) ${index + 1}`}
+                                            name="NoOfFormsKN"
+                                            value={e.NoOfFormsKN}
+                                            onChange={(event) => handleCareOfChange(event, index)}
+                                        />
                                     </Form.Group>
                                 </div>
                                 <div className="col-md-3 mb-3">
                                     <Form.Group>
                                         <Form.Label>No. of Forms (Dehat)<sup className='text-red-500'>*</sup></Form.Label>
-                                        <Form.Control 
-                                                    type="number" 
-                                                    placeholder="No. of Forms" 
-                                                    name="NoOfFormsKD" 
-                                                    value={e.NoOfFormsKD} 
-                                                    onChange={(event) => handleCareOfChange(event, index)} 
-                                                     />
+                                        <Form.Control
+                                            type="number"
+                                            placeholder="No. of Forms"
+                                            name="NoOfFormsKD"
+                                            value={e.NoOfFormsKD}
+                                            onChange={(event) => handleCareOfChange(event, index)}
+                                        />
                                     </Form.Group>
                                 </div>
                                 <div className="col-md-3 mb-3">
                                     <Form.Group>
                                         <Form.Label>No. of Forms (Unnao)<sup className='text-red-500'>*</sup></Form.Label>
-                                        <Form.Control type="number" 
-                                                placeholder="No. of Forms" 
-                                                name="NoOfFormsU" 
-                                                value={e.NoOfFormsU} 
-                                                onChange={(event) => handleCareOfChange(event, index)} 
-                                                 />
+                                        <Form.Control type="number"
+                                            placeholder="No. of Forms"
+                                            name="NoOfFormsU"
+                                            value={e.NoOfFormsU}
+                                            onChange={(event) => handleCareOfChange(event, index)}
+                                        />
                                     </Form.Group>
                                 </div>
 
@@ -580,15 +635,13 @@ function IncomingForms() {
                                             />
                                         </Form.Group>
                                     </div>
-
-
                                 )}
                             </Row>
                         </div>
                     ))}
 
                     <Button variant="primary" type="submit">
-                        Submit
+                    {content ? 'Update' : 'Submit'}
                     </Button>
                 </Form>
 
@@ -617,7 +670,6 @@ function IncomingForms() {
         </main>
     );
 }
-
 export default IncomingForms;
 
 

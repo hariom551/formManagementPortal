@@ -20,7 +20,7 @@ const FormsAdminInfo = () => {
                 }
 
                 const data = await response.json();
-                console.log(data);
+   
                 if (!data) {
                     throw new Error('Empty or invalid IncomingForms details data');
                 }

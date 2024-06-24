@@ -39,6 +39,8 @@ const getRoutesForRole = (role) => {
           <Route path="/editDistrictDetails" element={<EditDistrictDetails />} />
           <Route path="/userform" element={<UserForm />} />
           <Route path="/changePassword" element={<ChangePassword />} />
+          <Route path="/incomingForms" element={<IncomingForms />} />
+          <Route path="/outgoingForms" element={<OutgoingForms />} />
         </>
       );
 
@@ -48,7 +50,7 @@ const getRoutesForRole = (role) => {
             <Route path="/Home" element={<Home />} />
             <Route path="/incomingForms" element={<IncomingForms />} />
             <Route path="/outgoingForms" element={<OutgoingForms />} />
-            <Route path="/updatedIncomingForms" element={<UpdateIncomingForm />} />
+            {/* <Route path="/updatedIncomingForms" element={<UpdateIncomingForm />} /> */}
           
           </>
         );

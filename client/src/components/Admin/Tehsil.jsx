@@ -144,7 +144,7 @@ function Tehsil() {
         toast.success("Tehsil Added Successfully successfully.");
         setTimeout(() => {
           window.location.reload();
-        }, 1000);
+        }, 500);
       } else {
         toast.error("Error in Adding Tehsil:", result.statusText);
       }

@@ -31,7 +31,6 @@ function SideNavBar({ show }) {
         }));
     };
 
-
     const handleLogout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -68,18 +67,17 @@ function SideNavBar({ show }) {
                             </div>
                         </div>
 
-
                         <div className="dropdown">
                             <button className="dropbtn flex items-center gap-2" onClick={() => toggleDropdown('outgoing')}>
                             <FaUserGroup className='text-xl'/>Out./Inc.List <span className="dropdown-symbol">{dropdownStates.outgoing ? '-' : '+'}</span>
                             </button>
                             <div className={`dropdown-content ${dropdownStates.outgoing ? 'show' : ''}`} id="outgoing-dropdown-content">
-                                <ul><li><Link to="/OutgoingList">Outgoing List</Link></li></ul>
-                                <ul><li><Link to="/IncomingList">Incoming List</Link></li></ul>
+                                <ul><li><Link to="/outgoingForms">Outgoing List</Link></li></ul>
+                                <ul><li><Link to="/incomingForms">Incoming List</Link></li></ul>
                             </div>
                         </div>
 
-                        <div className="dropdown">
+                        {/* <div className="dropdown">
                             <button className="dropbtn flex items-center gap-2" onClick={() => toggleDropdown('incoming')}>
                             <FaUserGroup className='text-xl'/> Out./Inc.History <span className="dropdown-symbol">{dropdownStates.incoming ? '-' : '+'}</span>
                             </button>
@@ -87,9 +85,9 @@ function SideNavBar({ show }) {
                                 <ul><li><Link to="/OutgoingList">Outgoing List</Link></li></ul>
                                 <ul><li><Link to="/IncomingList">Incoming List</Link></li></ul>
                             </div>
-                        </div>
+                        </div> */}
 
-                        {/* Other menu items and dropdowns */}
+                  
 
                         <ul><li><Link onClick={handleLogout} className='flex gap-2'><IoLogOutSharp className='text-2xl' />Logout</Link></li></ul>
                      
@@ -108,7 +106,7 @@ function SideNavBar({ show }) {
                             <div className={`dropdown-content ${dropdownStates.VoterL ? 'show' : ''}`} id="caste-dropdown-content">
                                 <ul><li><a href="/outgoingForms">Outgoing Forms</a></li></ul>
                                 <ul><li><a href="/incomingForms">Incoming Forms</a></li></ul>
-                                <ul><li><a href="/updatedIncomingForms">Updated Incoming Forms</a></li></ul>
+                                {/* <ul><li><a href="/updatedIncomingForms">Updated Incoming Forms</a></li></ul> */}
                             </div>
                         </div>
 
@@ -183,7 +181,6 @@ function SideNavBar({ show }) {
                             </div>
                         </div>
 
-
                         <ul><li><Link onClick={handleLogout} className='flex gap-2'><IoLogOutSharp className='text-2xl' />Logout</Link></li></ul>
                      
                     </div>
@@ -232,7 +229,6 @@ function SideNavBar({ show }) {
                     </div>
                 )}
 
-
                 {role === 'Feeding Staff' && (
                     <div className="feedingStaff-link">
                         <ul><li><Link to="/Home" className='flex items-center gap-2'><IoMdHome className='text-2xl'/>Home</Link></li></ul>
@@ -247,8 +243,7 @@ function SideNavBar({ show }) {
                             </div>
                         </div>
 
-
-                        <ul><li><Link onClick={handleLogout} className='flex gap-2'><IoLogOutSharp className='text-2xl' />Logout</Link></li></ul>
+                    <ul><li><Link onClick={handleLogout} className='flex gap-2'><IoLogOutSharp className='text-2xl' />Logout</Link></li></ul>
                      
                     </div>
                 )}

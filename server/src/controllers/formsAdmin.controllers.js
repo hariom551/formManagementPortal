@@ -233,6 +233,102 @@ const AddIncomForm = asyncHandler(async (req, res) => {
     }
 });
 
+const UpdateIncomForm = asyncHandler(async (req, res) => {
+    const {
+        VMob1,
+        VMob2,
+        VEName,
+        VHName,
+        VEAddress,
+        VHAddress,
+        TotalForms,
+        PacketNo,
+        ReceivedDate,
+        ERemarks,
+        COList
+    } = req.body;
+
+    try {
+      
+        let volunteer = await queryDatabase(
+            'SELECT Id FROM volunteer WHERE VMob1 = ?',
+            [VMob1]
+        );
+
+        let volunteerId;
+        if (volunteer.length > 0) {
+            // Update existing volunteer
+            volunteerId = volunteer[0].Id;
+            await queryDatabase(
+                `UPDATE volunteer SET VEName = ?, VHName = ?, VEAddress = ?, VHAddress = ? WHERE id = ?`,
+                [VEName, VHName, VEAddress, VHAddress, volunteerId]
+            );
+        } 
+
+        let insertedCareOfIds = [];
+
+        if (COList && Array.isArray(COList) && COList.length > 0) {
+            const careOfQueries = COList.map(async (co) => {
+                let careOfVolunteer = await queryDatabase(
+                    'SELECT Id FROM volunteer WHERE VMob1 = ?',
+                    [co.VMob1]
+                );
+
+                let careOfId;
+                if (careOfVolunteer.length > 0) {
+                    // Update existing care_of volunteer
+                    careOfId = careOfVolunteer[0].Id;
+                    await queryDatabase(
+                        `UPDATE volunteer SET VEName = ?, VHName = ? WHERE Id = ?`,
+                        [co.VEName, co.VHName, careOfId]
+                    );
+                }
+
+               
+                return careOfId;
+            });
+
+            insertedCareOfIds = await Promise.all(careOfQueries);
+        }
+
+        const careOfValues = insertedCareOfIds.slice(0, 3); 
+
+        while (careOfValues.length < 3) {
+            careOfValues.push(null);
+        }
+
+        let careOfFormDetails = [];
+        if (COList && Array.isArray(COList) && COList.length > 0) {
+            careOfFormDetails = COList.reduce((acc, co, index) => {
+                if (index < 3) { 
+                    acc.push(co.NoOfFormsKN || null, co.NoOfFormsKD || null, co.NoOfFormsU || null);
+                }
+                return acc;
+            }, []);
+        }
+
+        while (careOfFormDetails.length < 9) { // Adjusted to fill up to 9
+            careOfFormDetails.push(null);
+        }
+
+        await queryDatabase(
+            `UPDATE incomingform SET
+                RefId= ?, ERemarks= ?, ReceivedDate= ?, TotalForms= ?,
+                COID1= ?, COID2= ?, COID3= ?,
+                NFormsKN1= ?, NFormsKd1= ?, NFormsU1= ?,
+                NFormsKN2= ?, NFormsKd2= ?, NFormsU2= ?,
+                NFormsKN3= ?, NFormsKd3= ?, NFormsU3= ? WHERE PacketNo= ?`,
+            [volunteerId, ERemarks, ReceivedDate, TotalForms, ...careOfValues, ...careOfFormDetails, PacketNo]
+        );
+
+        res.status(201).json(
+            new ApiResponse(200, "IF details Updated successfully")
+        );
+    } catch (error) {
+        console.error('Error in adding incoming forms:', error);
+        return res.status(error.statusCode || 500).json(new ApiResponse(error.statusCode || 500, null, error.message || "Internal Server Error"));
+    }
+});
 
 const incomFormDetails = asyncHandler(async (req, res) => {
 
@@ -248,7 +344,7 @@ const incomFormDetails = asyncHandler(async (req, res) => {
         LEFT JOIN volunteer AS v1 ON i.RefId = v1.Id
         LEFT JOIN volunteer AS v2 ON i.COId1 = v2.Id
         LEFT JOIN volunteer AS v3 ON i.COId2 = v3.Id
-        LEFT JOIN volunteer AS v4 ON i.COId2 = v4.Id
+        LEFT JOIN volunteer AS v4 ON i.COId3 = v4.Id
         `);
         return res.json(incomingForms);
         // res.status(200).json(new ApiResponse(200, incomingForms, "Fetched all incoming forms successfully"));
@@ -281,7 +377,6 @@ const SearchVMobNo = asyncHandler(async (req, res) => {
     }
 });
 
-
 const FormsAdminInfo= asyncHandler(async (req, res) => {
     try {
         const result = await queryDatabase(`
@@ -310,10 +405,9 @@ const FormsAdminInfo= asyncHandler(async (req, res) => {
 })
 
 
-
 export {
     SearchVMobNo,
     AddOutForm, OutFormDetails,
-    AddIncomForm, incomFormDetails,
+    AddIncomForm, UpdateIncomForm, incomFormDetails,
     FormsAdminInfo
 };
