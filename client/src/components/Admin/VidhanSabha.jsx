@@ -191,19 +191,7 @@ function VidhanSabha() {
   const handleEdit = async (e) => {
     e.preventDefault();
 
-    // const Id = content;
-    // const ECouncil = document.getElementById("ECouncil").value;
-    // const HCouncil = document.getElementById("HCouncil").value;
-    // const TehId = document.getElementById("tehsilSelect").value;
 
-    // const requestBody = {
-    //   Id,
-    //   ECouncil,
-    //   HCouncil,
-    //   TehId,
-
-    // };
-    // console.log(requestBody);
 
     try {
       const result = await fetch("/api/v1/admin/updateVidhanSabhaDetail", {

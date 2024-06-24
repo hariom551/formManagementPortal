@@ -20,7 +20,6 @@ function PollingStationList() {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const content = searchParams.get('content');
-
   const [PSListDetails, setPSListDetails] = useState([]);
   const [formData, setFormData] = useState({
     Id: content || '',
@@ -42,6 +41,7 @@ function PollingStationList() {
             'Content-Type': 'application/json'
           }
         });
+
         if (!response.ok) {
           throw new Error('Failed to fetch PollingStationList details');
         }
@@ -106,7 +106,7 @@ function PollingStationList() {
         toast.success("PollingStationList Updated successfully.");
         setTimeout(() => {
           window.location.href = '/PollingStationList';
-        }, 1000);
+        }, 500);
       } else {
         toast.error("Error in Updating PollingStationList:", result.statusText);
       }
@@ -136,7 +136,7 @@ function PollingStationList() {
       if (result.ok) {
         setTimeout(() => {
           window.location.reload();
-        }, 1000);
+        }, 500);
         toast.success("PollingStationList deleted successfully.");
       } else {
         toast.error("Error in deleting PollingStationList:", result.statusText);
@@ -153,13 +153,23 @@ function PollingStationList() {
   });
 
   const handleExport = (rows, format) => {
+    const exportData = rows.map((row, index) => ({
+      "S.No": index + 1,
+      "PS Area (English)": row.original.ESPArea,
+      "PS Area (Hindi)": row.original.HSPArea,
+      "PS No.": row.original.PSNo,
+      "PS Name (English)": row.original.ESPName,
+      "PS Name (Hindi)": row.original.HSPName,
+      "Room No.": row.original.RoomNo,
+    }));
+
     if (format === 'csv') {
-      const csv = generateCsv(csvConfig)(rows.map(row => row.original));
+      const csv = generateCsv(csvConfig)(exportData);
       download(csvConfig)(csv);
     } else if (format === 'pdf') {
       const doc = new jsPDF();
-      const tableData = rows.map(row => Object.values(row.original));
-      const tableHeaders = columns.map(c => c.header);
+      const tableData = exportData.map(row => Object.values(row));
+      const tableHeaders = ["S.No", "PS Area (English)", "PS Area (Hindi)", "PS No.", "PS Name (English)", "PS Name (Hindi)", "Room No."];
       autoTable(doc, {
         head: [tableHeaders],
         body: tableData,
@@ -170,9 +180,10 @@ function PollingStationList() {
 
   const columns = useMemo(() => [
     {
-      accessorKey: 'Id',
+      accessorKey: 'Serial No',
       header: 'S.No',
-      size: 10,
+      size: 50,
+      Cell: ({ row }) => row.index + 1,
     },
     {
       accessorKey: 'Action',
@@ -226,7 +237,7 @@ function PollingStationList() {
   const table = useMaterialReactTable({
     columns,
     data: PSListDetails,
-    enableRowSelection: true,
+    // enableRowSelection: true,
     columnFilterDisplayMode: 'popover',
     paginationDisplayMode: 'pages',
     positionToolbarAlertBanner: 'bottom',
