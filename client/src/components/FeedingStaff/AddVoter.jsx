@@ -133,7 +133,7 @@ function AddVoter() {
                     }
                 });
 
-                const response = await fetch('/api/v1/feedingStaff/create-voter', {
+                const response = await fetch('/api/v1/feedingStaff/addVoter', {
                     method: 'POST',
                     body: formData,
                 });
@@ -144,7 +144,7 @@ function AddVoter() {
 
                 const data = await response.json();
                 toast.success('Voter created successfully!');
-
+                window.location.reload();
                 // Reset forms after successful submission
                 setReferenceDetails({
                     PacketNo: '',
@@ -213,6 +213,7 @@ function AddVoter() {
                     voterDetails: {},
                     addressDetail: {},
                 });
+
             } catch (error) {
                 toast.error('Error creating voter.');
             }

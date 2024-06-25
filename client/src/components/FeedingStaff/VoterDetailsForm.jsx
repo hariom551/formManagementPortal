@@ -7,7 +7,7 @@ import { Typeahead } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import { validateVoterDetails } from '../../Validation/voterDetailsValidation.js';
 
-function VoterDetailsForm({ voterDetails, setVoterDetails}) {
+function VoterDetailsForm({ voterDetails, setVoterDetails }) {
     const [errors, setErrors] = useState({});
     const [surnameOptions, setSurnameOptions] = useState([]);
     const [relativeSurnameOptions, setRelativeSurnameOptions] = useState([]);
@@ -63,7 +63,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
             [name]: value,
         }));
 
-     
+
         if (name === 'DOB') {
             const dob = new Date(value);
             const ageDate = new Date(Date.now() - dob.getTime());
@@ -74,7 +74,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
             }));
         }
 
-      
+
         if (name === 'Age') {
             const today = new Date();
             const birthDate = new Date(today.getFullYear() - value, today.getMonth(), today.getDate());
@@ -92,7 +92,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
     };
 
 
-  
+
 
     return (
         <>
@@ -116,7 +116,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                                 value={voterDetails.EFName}
                                 onChange={handleChange}
                                 placeholder="First Name (English)"
-                             
+
                             />
                             {errors.EFName && <div className="text-danger mt-1 text-[0.8rem]">{errors.EFName}</div>}
 
@@ -158,7 +158,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                                     }
 
                                     const error = validateVoterDetails("ELName", selected.length > 0 ? selected[0].ESurname : "");
-                              
+
                                     setErrors(prevErrors => ({
                                         ...prevErrors,
                                         ELName: error,
@@ -202,7 +202,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                                 name="RType"
                                 value={voterDetails.RType}
                                 onChange={handleChange}
-                               
+
                             >
                                 <option value="">--select relation--</option>
                                 {Relation.map((c) => (
@@ -223,7 +223,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                                 value={voterDetails.ERFName}
                                 onChange={handleChange}
                                 placeholder="Rel. First Name (English)"
-                        
+
                             />
                             {errors.ERFName && <div className="text-danger">{errors.ERFName}</div>}
                         </Form.Group>
@@ -292,29 +292,19 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
                             <Form.Label>Caste</Form.Label>
-                            {casteOptions.length === 1 ? (
-                                <Form.Control
-                                    type="text"
-                                    className='px-2'
-                                    name="CasteId"
-                                    value={casteOptions[0].ECaste}
-                                    readOnly
-                                />
-                            ) : (
-                                <Form.Control
-                                    as="select"
-                                    className='form-select px-2'
-                                    name="CasteId"
-                                    value={voterDetails.CasteId}
-                                    onChange={handleChange}
-                                  
-                                >
-                                    <option value="">--Select Caste--</option>
-                                    {casteOptions.map((caste) => (
-                                        <option key={caste.CasteId} value={caste.CasteId}>{caste.ECaste}</option>
-                                    ))}
-                                </Form.Control>
-                            )}
+                            <Form.Control
+                                as="select"
+                                className='form-select px-2'
+                                name="CasteId"
+                                value={voterDetails.CasteId}
+                                onChange={handleChange}
+
+                            >
+                                <option value="">--Select Caste--</option>
+                                {casteOptions.map((caste) => (
+                                    <option key={caste.CasteId} value={caste.CasteId}>{caste.ECaste}</option>
+                                ))}
+                            </Form.Control>
                         </Form.Group>
                     </div>
 
@@ -327,7 +317,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                                 name="Qualification"
                                 value={voterDetails.Qualification}
                                 onChange={handleChange}
-                                
+
                             >
                                 <option value="">--Select Qualification--</option>
                                 <option value="Post Graduate">Post Graduate</option>
@@ -346,7 +336,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                                 name="Occupation"
                                 value={voterDetails.Occupation}
                                 onChange={handleChange}
-                   
+
                             >
                                 <option value="">--select Occupation--</option>
                                 {Occupation.map((c) => (
@@ -369,9 +359,9 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                                 onChange={handleChange}
                                 className="outline-none border w-full px-2"
                                 placeholder="Enter Age"
-                       
+
                             />
-                             {errors.Age && <div className="text-danger mt-1 text-[0.8rem]">{errors.Age}</div>}
+                            {errors.Age && <div className="text-danger mt-1 text-[0.8rem]">{errors.Age}</div>}
                         </Form.Group>
                     </div>
 
@@ -385,11 +375,11 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                                 onChange={handleChange}
                                 className="outline-none border w-full px-2"
                                 placeholder="DOB"
-                         
-                                
-                                />
-                                {errors.DOB && <div className="text-danger mt-1 text-[0.8rem]">{errors.DOB}</div>}
-                            </Form.Group>
+
+
+                            />
+                            {errors.DOB && <div className="text-danger mt-1 text-[0.8rem]">{errors.DOB}</div>}
+                        </Form.Group>
                     </div>
 
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
@@ -401,7 +391,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                                 name="Sex"
                                 value={voterDetails.Sex}
                                 onChange={handleChange}
-                              
+
                             >
                                 <option value="">--Select Gender--</option>
                                 <option value="Male">Male</option>
@@ -422,7 +412,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                                 value={voterDetails.MNo}
                                 onChange={handleChange}
                                 placeholder="Mobile No"
-                             
+
                             />
                             {errors.MNo && <div className="text-danger">{errors.MNo}</div>}
                         </Form.Group>
@@ -484,9 +474,9 @@ function VoterDetailsForm({ voterDetails, setVoterDetails}) {
                                 value={voterDetails.GCYear}
                                 onChange={handleChange}
                                 placeholder="Graduate Comp Year"
-                             
+
                             />
-                             {errors.GCYear && <div className="text-danger">{errors.GCYear}</div>}
+                            {errors.GCYear && <div className="text-danger">{errors.GCYear}</div>}
                         </Form.Group>
                     </div>
                 </div>

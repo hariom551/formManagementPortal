@@ -95,7 +95,7 @@ function ChakBlock() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+
     try {
       const result = await fetch("/api/v1/admin/addChakBlock", {
         method: 'POST',

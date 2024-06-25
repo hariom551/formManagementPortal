@@ -26,6 +26,7 @@ import IncomingForms from './components/FormsAdmin/IncomingForms.jsx';
 import UpdateIncomingForm from './components/FormsAdmin/UpdateIncomingForm.jsx';
 import AddVoter from './components/FeedingStaff/AddVoter.jsx';
 import SearchChakBlock from './components/FeedingStaff/SearchChakBlock.jsx';
+import VoterList from './components/SubAdmin/VoterList.jsx';
 
 
 const getRoutesForRole = (role) => {
@@ -80,6 +81,7 @@ const getRoutesForRole = (role) => {
             <Route path="/Home" element={<Home />} />
             <Route path="/userform" element={<UserForm />} />
             <Route path="/changePassword" element={<ChangePassword />} />
+            <Route path="/VoterList" element={<VoterList />} /> 
           </>
         );
 
@@ -90,8 +92,6 @@ const getRoutesForRole = (role) => {
               {/* <Route path="/AddVoterForm" element={<AddVoterForm />} /> */}
               <Route path="/addVotersForm" element={<AddVoter />} />
               <Route path="/SearchChakBlock" element={<SearchChakBlock />} />
-             
-            
             </>
           );
       
