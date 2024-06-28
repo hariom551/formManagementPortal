@@ -6,12 +6,11 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Select from 'react-select';
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
-import img from '../../../../server/public/photo/1015_photo.jpg'
+
+
 function VoterList() {
     const [votersDetails, setVotersDetails] = useState([]);
-    const [formData, setFormData] = useState({
-        WBId: undefined
-    });
+    const [formData, setFormData] = useState({ WBId: undefined });
     const [WBOptions, setWBOptions] = useState([]);
 
     useEffect(() => {
@@ -19,18 +18,13 @@ function VoterList() {
             try {
                 const response = await fetch('/api/v1/admin/wardBlockDetails', {
                     method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
+                    headers: { 'Content-Type': 'application/json' }
                 });
 
-                if (!response.ok) {
-                    throw new Error('Failed to fetch wardblock options');
-                }
+                if (!response.ok) throw new Error('Failed to fetch wardblock options');
+                
                 const data = await response.json();
-                if (!data || !Array.isArray(data) || data.length === 0) {
-                    throw new Error('Empty or invalid wardblock options data');
-                }
+                if (!data || !Array.isArray(data) || data.length === 0) throw new Error('Empty or invalid wardblock options data');
 
                 const options = data.map(wb => ({ value: wb.Id, label: `${wb.WardNo} - ${wb.EWardBlock}` }));
                 setWBOptions(options);
@@ -50,16 +44,13 @@ function VoterList() {
             const result = await fetch("/api/v1/subAdmin/voterList", {
                 method: 'POST',
                 body: JSON.stringify(formData),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                headers: { 'Content-Type': 'application/json' }
             });
 
             if (result.ok) {
                 const data = await result.json();
-                if (!data || !Array.isArray(data) || data.length === 0) {
-                    throw new Error('Empty or invalid voter list data');
-                }
+                if (!data || !Array.isArray(data) || data.length === 0) throw new Error('Empty or invalid voter list data');
+                
                 setVotersDetails(data);
                 toast.success("Voter list fetched successfully.");
             } else {
@@ -71,12 +62,7 @@ function VoterList() {
     };
 
     const columns = useMemo(() => [
-        {
-            accessorKey: 'Serial No',
-            header: 'S.No',
-            size: 50,
-            Cell: ({ row }) => row.index + 1,
-        },
+        { accessorKey: 'Serial No', header: 'S.No', size: 50, Cell: ({ row }) => row.index + 1 },
         { accessorKey: 'RegNo', header: 'RegNo', size: 10 },
         { accessorKey: 'EFName', header: 'Name (English)', size: 20 },
         { accessorKey: 'HFName', header: 'Name (Hindi)', size: 20 },
@@ -101,47 +87,37 @@ function VoterList() {
             Cell: ({ cell }) => {
                 const image = cell.getValue();
                 if (!image) return 'N/A';
-
-                
-                // const encodedUrl = encodeURIComponent(imageUrl.replace(/\\/g, '/'));
-                // const fullImageUrl = `/api/v1/images?path=${encodedUrl}`; // Adjust API endpoint as per server setup
-                // const publicFolderPath = 'C:\\Hariom Nathani\\Swapnil goverment project\\Swapnil-Project-main\\server\\public';
-                return <img src={`../../../../server/public/photo/${image}`} alt="voter" style={{ width: '50px', height: '50px' }} />;
+                const imageUrl = `/public/photo/${image}`;
+                return <img src={imageUrl} alt="voter" style={{ width: '50px', height: '50px' }} />;
             }
         },
         {
-            accessorKey: 'DegreeUrl',
+            accessorKey: 'Degree',
             header: 'Degree',
             size: 20,
             Cell: ({ cell }) => {
                 const degreeUrl = cell.getValue();
                 if (!degreeUrl) return 'N/A';
-                const encodedUrl = encodeURIComponent(degreeUrl.replace(/\\/g, '/'));
-                const fullDegreeUrl = `/api/v1/files?path=${encodedUrl}`; // Adjust API endpoint as per server setup
-
-                return <a href={fullDegreeUrl} target="_blank" rel="noopener noreferrer">View Degree</a>;
+                const imageUrl = `/public/Degree/${degreeUrl}`;
+                console.log(`Rendering degree: ${imageUrl}`);
+                return <img src={imageUrl} alt="degree" style={{ width: '50px', height: '50px' }} />;
             }
         },
         {
-            accessorKey: 'IdProofUrl',
+            accessorKey: 'IdProof',
             header: 'Id',
             size: 20,
             Cell: ({ cell }) => {
                 const idProofUrl = cell.getValue();
                 if (!idProofUrl) return 'N/A';
-
-                const encodedUrl = encodeURIComponent(idProofUrl.replace(/\\/g, '/'));
-                const fullIdProofUrl = `/api/v1/files?path=${encodedUrl}`;
-
-                return <a href={fullIdProofUrl} target="_blank" rel="noopener noreferrer">View ID Proof</a>;
+                const imageUrl = `/public/IdProof/${idProofUrl}`;
+                console.log(`Rendering id proof: ${imageUrl}`);
+                return <img src={imageUrl} alt="id proof" style={{ width: '50px', height: '50px' }} />;
             }
         }
     ], []);
 
-    const table = useMaterialReactTable({
-        columns,
-        data: votersDetails,
-    });
+    const table = useMaterialReactTable({ columns, data: votersDetails });
 
     return (
         <main className="bg-gray-100">

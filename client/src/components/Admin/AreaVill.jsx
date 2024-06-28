@@ -106,8 +106,19 @@ function AreaVill() {
         if (content) {
           const AreaVill = data.find(item => item.Id == content);
           if (AreaVill) {
-            setFormData(AreaVill);
+            setFormData({
+              WBID: AreaVill.WBId,
+              EAreaVill: AreaVill.EAreaVill,
+              HAreaVill: AreaVill.HAreaVill,
+              HnoRange: AreaVill.HnoRange,
+              EWardBlock: AreaVill.EWardBlock,
+              CBPId: AreaVill.CBPId,
+              ECBPanch: AreaVill.ECBPanch
+
+            });
+
             fetchCBOptions(AreaVill.WBId);
+       
           } else {
             console.error(`AreaVill with ID ${content} not found`);
           }
@@ -119,6 +130,19 @@ function AreaVill() {
 
     fetchData();
   }, [content]);
+
+  // Effect to ensure formData is set correctly once wbOptions are available
+  // useEffect(() => {
+  //   if (formData.WBID && wbOptions.length > 0) {
+  //     const selectedWB = wbOptions.find(option => option.value === formData.WBID);
+  //     if (selectedWB) {
+  //       setFormData(prevFormData => ({
+  //         ...prevFormData,
+  //         WBID: selectedWB.value
+  //       }));
+  //     }
+  //   }
+  // }, [wbOptions, formData.WBID]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -171,7 +195,7 @@ function AreaVill() {
       toast.success("AreaVill deleted successfully.");
       setTimeout(() => {
         window.location.reload()
-      }, 1000);
+      }, 100);
     } catch (error) {
       toast.error("Error deleting AreaVill:", error.message);
     }
@@ -189,14 +213,17 @@ function AreaVill() {
         }
       });
 
+
+
       if (result.ok) {
         window.location.href = '/AreaVill';
-        console.log("AreaVill Updated successfully.");
+
+        toast.success("AreaVill Updated successfully.");
       } else {
-        console.error("Error in Updating AreaVill:", result.statusText);
+        toast.error("Error in Updating AreaVill:", result.statusText);
       }
     } catch (error) {
-      console.error("Error in updating :", error.message);
+      toast.error("Error in updating :", error.message);
     }
   };
 
@@ -215,6 +242,7 @@ function AreaVill() {
           <Button variant="primary" className="changepassword">
             <Link
               to={{ pathname: "/AreaVill", search: `?content=${row.original.Id}` }}
+
             >
               Edit
             </Link>
@@ -259,14 +287,16 @@ function AreaVill() {
         <h1 className="text-2xl font-bold mb-4">Add AreaVill</h1>
         <Form onSubmit={content ? handleEdit : handleSubmit} className="AreaVill-form">
           <Row className="mb-3">
+
             <div className="col-md-3 mb-3">
               <Form.Group>
                 <Form.Label>Select Ward Block</Form.Label>
                 <Select
                   id="wbSelect"
                   name="WBID"
-                  value={wbOptions.find(option => option.value === formData.WBID)}
-                  onChange={(selectedOption) => handleChange(selectedOption, 'WBID')}
+                  value={wbOptions.find(option => option.value == formData.WBID)}
+                  onChange={option => setFormData(prevFormData => ({ ...prevFormData, WBID: option.value }))}
+
                   options={wbOptions}
                   placeholder="Select Ward Block"
                   isSearchable={true} // Enable search
@@ -294,7 +324,7 @@ function AreaVill() {
             <div className="col-md-3 mb-3">
               <Form.Group >
                 <Form.Label>Hno Range<sup className='text-red-600'>*</sup></Form.Label>
-                <Form.Control type="text" placeholder="Hno Range" id="HnoRange" name="HnoRange" value={formData.HnoRange} onChange={handleChange} />
+                <Form.Control type="text" placeholder="Hno Range" id="HnoRange" name="HnoRange" value={formData.HnoRange} onChange={(e) => setFormData(prevFormData => ({ ...prevFormData, HnoRange: e.target.value }))} />
               </Form.Group>
             </div>
           </Row>
@@ -303,13 +333,13 @@ function AreaVill() {
             <div className="col-md-3 mb-3">
               <Form.Group >
                 <Form.Label>AreaVill Name (English)<sup className='text-red-600'>*</sup></Form.Label>
-                <Form.Control type="text" placeholder="AreaVill Name (English)" id="EAreaVill" name="EAreaVill" value={formData.EAreaVill} onChange={handleChange} required />
+                <Form.Control type="text" placeholder="AreaVill Name (English)" id="EAreaVill" name="EAreaVill" value={formData.EAreaVill} onChange={(e) => setFormData(prevFormData => ({ ...prevFormData, EAreaVill: e.target.value }))} required />
               </Form.Group>
             </div>
             <div className="col-md-3 mb-3">
               <Form.Group >
                 <Form.Label>AreaVill Name (Hindi)<sup className='text-red-600'>*</sup></Form.Label>
-                <Form.Control type="text" placeholder="AreaVill Name (Hindi)" id="HAreaVill" name="HAreaVill" value={formData.HAreaVill} onChange={handleChange} required />
+                <Form.Control type="text" placeholder="AreaVill Name (Hindi)" id="HAreaVill" name="HAreaVill" value={formData.HAreaVill} onChange={(e) => setFormData(prevFormData => ({ ...prevFormData, HAreaVill: e.target.value }))} required />
               </Form.Group>
             </div>
           </Row>
