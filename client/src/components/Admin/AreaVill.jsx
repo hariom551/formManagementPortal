@@ -114,6 +114,7 @@ function AreaVill() {
               EWardBlock: AreaVill.EWardBlock,
               CBPId: AreaVill.CBPId,
               ECBPanch: AreaVill.ECBPanch
+              //hariom
 
             });
 
