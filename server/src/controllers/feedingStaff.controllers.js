@@ -176,7 +176,7 @@ const getPerseemanDetails = asyncHandler(async (req, res) => {
 
     try {
         let query = `
-            SELECT CBP.ChakNo, CBP.ECBPanch, AV.EAreaVill, WB.WardNo
+            SELECT CBP.ChakNo, CBP.ECBPanch, AV.EAreaVill, WB.WardNo, WB.EWardBlock
             FROM chakblockpanch AS CBP 
             JOIN areavill AS AV ON CBP.Id = AV.CBPId 
             JOIN wardblock AS WB ON WB.Id = CBP.WBId
@@ -198,6 +198,7 @@ const getPerseemanDetails = asyncHandler(async (req, res) => {
             params.push(ECBPanch);
         }
 
+
         const results = await queryDatabase(query, params);
 
         res.json(results);
@@ -208,6 +209,16 @@ const getPerseemanDetails = asyncHandler(async (req, res) => {
 });
 
 
+const ChakNoBlock = asyncHandler(async(req, res)=>{
+    try{
+        const result = await queryDatabase('select ECBPanch, ChakNo FROM chakblockpanch')
+        return res.json(result);
+    }catch(error){
+        return res.status(500).send('A database error occured')
+    }
+})
 
-
-export { searchSurname, searchCaste, searchAreaVill, allAreaDetails, AddVoter, getPerseemanDetails };
+export { searchSurname, searchCaste,
+     searchAreaVill, allAreaDetails,
+    AddVoter, getPerseemanDetails,
+ChakNoBlock };
