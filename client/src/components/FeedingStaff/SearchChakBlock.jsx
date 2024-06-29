@@ -106,38 +106,43 @@ function SearchChakBlock() {
         }));
     };
 
-    const columns = useMemo(
-        () => [
-            {
-                accessor: (index) => index + 1,
-                id: 'serialNumber',
-                Header: 'S.No',
-                size: 5,
-                Cell: ({ cell }) => cell.row.index + 1,
-            },
-            {
-                accessorKey: 'ChakNo',
-                header: 'ChakNo',
-                size: 20,
-            },
-            {
-                accessorKey: 'ECBPanch',
-                header: 'Block',
-                size: 20,
-            },
-            {
-                accessorKey: 'EAreaVill',
-                header: 'Area',
-                size: 20,
-            },
-            {
-                accessorKey: 'WardNo',
-                header: 'WardNo',
-                size: 20,
-            },
-        ],
-        []
-    );
+    const columns = useMemo(() => [
+        {
+            accessor: (index) => index + 1,
+            id: 'serialNumber',
+            Header: 'S.No',
+            size: 5,
+            Cell: ({ cell }) => cell.row.index + 1
+        },
+        {
+            accessorKey: 'ChakNo',
+            header: 'ChakNo',
+            size: 20,
+        },
+        {
+            accessorKey: 'ECBPanch',
+            header: 'Block',
+            size: 20,
+        },
+        {
+            accessorKey: 'EAreaVill',
+            header: 'Area',
+            size: 20,
+       
+        },
+        {
+            accessorKey: 'WardNoEWardBlock',
+            header: 'WardNo',
+            size: 20,
+            Cell: ({ cell }) => {
+                const { WardNo, EWardBlock } = cell.row.original;
+                return `${WardNo} ${EWardBlock}`;
+            }
+        }
+        
+
+
+    ], []);
 
     const table = useMaterialReactTable({
         columns,
