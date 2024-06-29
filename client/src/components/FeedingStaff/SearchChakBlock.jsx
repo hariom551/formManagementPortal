@@ -72,11 +72,15 @@ function SearchChakBlock() {
        
         },
         {
-            accessorKey: 'WardNo',
+            accessorKey: 'WardNoEWardBlock',
             header: 'WardNo',
             size: 20,
-       
+            Cell: ({ cell }) => {
+                const { WardNo, EWardBlock } = cell.row.original;
+                return `${WardNo} ${EWardBlock}`;
+            }
         }
+        
 
 
     ], []);

@@ -24,7 +24,7 @@ const generateToken = (payload) => {
         payload,
         process.env.ACCESS_TOKEN_SECRET,
         {
-            expiresIn: '5m'
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY 
         });
 };
 
