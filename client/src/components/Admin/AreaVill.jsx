@@ -115,11 +115,9 @@ function AreaVill() {
               CBPId: AreaVill.CBPId,
               ECBPanch: AreaVill.ECBPanch
               //hariom
-
             });
 
             fetchCBOptions(AreaVill.WBId);
-       
           } else {
             console.error(`AreaVill with ID ${content} not found`);
           }

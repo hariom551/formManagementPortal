@@ -56,7 +56,8 @@ const allAreaDetails = asyncHandler(async (req, res) => {
     }
 
     try {
-        const results = await queryDatabase(`SELECT C.ECBPanch, C.Id AS ChkBlkId, C.WBId, W.EWardBlock, W.VSId, V.EVidhanSabha, V.counId, cc.ECouncil, cc.TehId, T.EName 
+        const results = await queryDatabase(`
+            SELECT C.ECBPanch, C.Id AS ChkBlkId, C.WBId, W.EWardBlock, W.VSId, V.EVidhanSabha, V.counId, cc.ECouncil, cc.TehId, T.EName 
             FROM areavill AS A 
             LEFT JOIN chakblockpanch as C ON A.CBPId = C.Id 
             LEFT JOIN wardblock AS W ON C.WBId= W.Id 
@@ -174,15 +175,30 @@ const getPerseemanDetails = asyncHandler(async (req, res) => {
     const { ChakNo, ECBPanch, EAreaVill } = req.body;
 
     try {
-        const results = await queryDatabase(`
+        let query = `
             SELECT CBP.ChakNo, CBP.ECBPanch, AV.EAreaVill, WB.WardNo
             FROM chakblockpanch AS CBP 
             JOIN areavill AS AV ON CBP.Id = AV.CBPId 
             JOIN wardblock AS WB ON WB.Id = CBP.WBId
-            WHERE (AV.EAreaVill LIKE ? OR AV.EAreaVill IS NULL OR AV.EAreaVill = '')
-              AND (CBP.ChakNo LIKE ? OR CBP.ChakNo IS NULL OR CBP.ChakNo = '')
-              AND (CBP.ECBPanch LIKE ? OR CBP.ECBPanch IS NULL OR CBP.ECBPanch = '')
-        `, [`%${EAreaVill}%`, `%${ChakNo}%`, `%${ECBPanch}%`]);
+            WHERE 1 = 1
+        `;
+        
+        const params = [];
+
+        if (EAreaVill) {
+            query += " AND (AV.EAreaVill LIKE ? OR AV.EAreaVill IS NULL OR AV.EAreaVill = '')";
+            params.push(`%${EAreaVill}%`);
+        }
+        if (ChakNo) {
+            query += " AND (CBP.ChakNo = ? OR CBP.ChakNo IS NULL OR CBP.ChakNo = '')";
+            params.push(ChakNo);
+        }
+        if (ECBPanch) {
+            query += " AND (CBP.ECBPanch = ? OR CBP.ECBPanch IS NULL OR CBP.ECBPanch = '')";
+            params.push(ECBPanch);
+        }
+
+        const results = await queryDatabase(query, params);
 
         res.json(results);
     } catch (error) {
@@ -190,6 +206,7 @@ const getPerseemanDetails = asyncHandler(async (req, res) => {
         res.status(500).send('A database error occurred.');
     }
 });
+
 
 
 
