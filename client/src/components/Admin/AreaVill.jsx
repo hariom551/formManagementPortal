@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
-import Select from 'react-select'; // Import react-select
+import Select from 'react-select'; 
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -294,7 +294,8 @@ function AreaVill() {
                   id="wbSelect"
                   name="WBID"
                   value={wbOptions.find(option => option.value == formData.WBID)}
-                  onChange={option => setFormData(prevFormData => ({ ...prevFormData, WBID: option.value }))}
+                  onChange={(selectedOption) => handleChange(selectedOption, 'WBID')}
+                  // onChange={option => setFormData(prevFormData => ({ ...prevFormData, WBID: option.value }))}
 
                   options={wbOptions}
                   placeholder="Select Ward Block"
