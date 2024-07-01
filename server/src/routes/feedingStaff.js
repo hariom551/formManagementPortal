@@ -9,5 +9,5 @@ feedingStaffRouter.post('/searchAreaVill', searchAreaVill);
 feedingStaffRouter.post('/allAreaDetails', allAreaDetails);
 feedingStaffRouter.post('/addVoter', AddVoter); 
 feedingStaffRouter.post('/getPerseemanDetails', getPerseemanDetails); 
-
+feedingStaffRouter.get('/ChakNoBlock', ChakNoBlock); 
 export default feedingStaffRouter;
