@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { AddVoter, allAreaDetails, searchAreaVill, searchCaste, searchSurname, getPerseemanDetails  } from "../controllers/feedingStaff.controllers.js";
+import { AddVoter, allAreaDetails, searchAreaVill, searchCaste, searchSurname, getPerseemanDetails, ChakNoBlock  } from "../controllers/feedingStaff.controllers.js";
 
 const feedingStaffRouter = Router()
 
@@ -9,5 +9,6 @@ feedingStaffRouter.post('/searchAreaVill', searchAreaVill);
 feedingStaffRouter.post('/allAreaDetails', allAreaDetails);
 feedingStaffRouter.post('/addVoter', AddVoter); 
 feedingStaffRouter.post('/getPerseemanDetails', getPerseemanDetails); 
+feedingStaffRouter.get('/ChakNoBlock', ChakNoBlock); 
 
 export default feedingStaffRouter;

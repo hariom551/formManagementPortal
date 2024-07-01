@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form } from 'react-bootstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
@@ -6,23 +6,66 @@ import 'react-bootstrap-typeahead/css/Typeahead.css';
 function AddressInformationForm({ addressDetail, setAddressDetail }) {
   const [AreaVillOptions, setAreaVillOptions] = useState([]);
   const [AreaFullDetails, setAreaFullDetails] = useState([]);
+  const [tehsilOption, setTehsilOption] = useState([]);
+  const [councilOption, setCouncilOption] = useState([]);
+  const [VSOption, setVSOption] = useState([]);
+  const [WBOption, setWBOption] = useState([]);
+  const [CBOption, setCBOption] = useState([]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setAddressDetail(prevDetails => ({
+    setAddressDetail((prevDetails) => ({
       ...prevDetails,
       [name]: value,
     }));
+
+    if (name === 'TehId') {
+      const selectedTehsil = tehsilOption.find((tehsil) => tehsil.TehId === parseInt(value));
+      if (selectedTehsil) {
+        const filteredCouncils = AreaFullDetails.filter((detail) => detail.EName === selectedTehsil.EName);
+        const uniqueCouncilsFiltered = Array.from(new Set(filteredCouncils.map((a) => a.counId))).map((counId) =>
+          filteredCouncils.find((a) => a.counId === counId)
+        );
+        setCouncilOption(uniqueCouncilsFiltered);
+      }
+    } else if (name === 'counId') {
+      const selectedCouncil = councilOption.find((council) => council.counId === parseInt(value));
+      if (selectedCouncil) {
+        const filteredVS = AreaFullDetails.filter((detail) => detail.ECouncil === selectedCouncil.ECouncil);
+        const uniqueVSFiltered = Array.from(new Set(filteredVS.map((a) => a.VSId))).map((VSId) =>
+          filteredVS.find((a) => a.VSId === VSId)
+        );
+        setVSOption(uniqueVSFiltered);
+      }
+    } else if (name === 'VSId') {
+      const selectedVS = VSOption.find((vs) => vs.VSId === parseInt(value));
+      if (selectedVS) {
+        const filteredWB = AreaFullDetails.filter((detail) => detail.EVidhanSabha === selectedVS.EVidhanSabha);
+        const uniqueWBFiltered = Array.from(new Set(filteredWB.map((a) => a.WBId))).map((WBId) =>
+          filteredWB.find((a) => a.WBId === WBId)
+        );
+        setWBOption(uniqueWBFiltered);
+      }
+    } else if (name === 'WBId') {
+      const selectedWB = WBOption.find((WB) => WB.WBId === parseInt(value));
+      if (selectedWB) {
+        const filteredCB = AreaFullDetails.filter((detail) => detail.EWardBlock === selectedWB.EWardBlock);
+        const uniqueCBFiltered = Array.from(new Set(filteredCB.map((a) => a.ChkBlkId))).map((ChkBlkId) =>
+          filteredCB.find((a) => a.ChkBlkId === ChkBlkId)
+        );
+        setCBOption(uniqueCBFiltered);
+      }
+    }
   };
 
-  const fetchAreaVillOptions = async (input, setter) => {
+  const fetchAreaVillOptions = async (input) => {
     try {
       const response = await fetch('/api/v1/feedingStaff/searchAreaVill', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ query: input })
+        body: JSON.stringify({ query: input }),
       });
 
       if (!response.ok) {
@@ -30,20 +73,20 @@ function AddressInformationForm({ addressDetail, setAddressDetail }) {
       }
 
       const data = await response.json();
-      setter(data);
+      setAreaVillOptions(data);
     } catch (error) {
       console.error('Error fetching suggested AreaVill:', error);
     }
   };
 
-  const fetchAllAreaDetails = async (AreaId) => {
+  const fetchAllAreaDetails = async (EAreaVill) => {
     try {
       const response = await fetch('/api/v1/feedingStaff/allAreaDetails', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ AreaId })
+        body: JSON.stringify({ EAreaVill }),
       });
 
       if (!response.ok) {
@@ -52,34 +95,100 @@ function AddressInformationForm({ addressDetail, setAddressDetail }) {
 
       const data = await response.json();
       setAreaFullDetails(data);
-      // Update addressDetail with the first area's details if there is only one area detail
-      if (data.length === 1) {
-        const [area] = data;
-        setAddressDetail(prevDetails => ({
-          ...prevDetails,
-          EName: area.EName,
-          TehId: area.TehId,
-          ECouncil: area.ECouncil,
-          CounId: area.CounId,
-          EVidhanSabha: area.EVidhanSabha,
-          VSId: area.VSId,
-          EWardBlock: area.EWardBlock,
-          WBId: area.WBId,
-          ECBPanch: area.ECBPanch,
-          ChkBlkId: area.ChkBlkId
-        }));
-      }
+
+      const Tehsil = [];
+      data.forEach((th) => {
+        if (!Tehsil.some((existing) => existing.TehId === th.TehId)) {
+          Tehsil.push({ TehId: th.TehId, EName: th.EName });
+        }
+      });
+
+      setTehsilOption(Tehsil);
+
     } catch (error) {
       console.error('Error fetching all area details:', error);
     }
   };
 
+  useEffect(() => {
+    if (tehsilOption.length === 1) {
+      const singleTehsil = tehsilOption[0];
+      setAddressDetail((prevDetails) => ({
+        ...prevDetails,
+        TehId: singleTehsil.TehId,
+      }));
+      const filteredCouncils = AreaFullDetails.filter((detail) => detail.EName === singleTehsil.EName);
+      const uniqueCouncilsFiltered = Array.from(new Set(filteredCouncils.map((a) => a.counId))).map((counId) =>
+        filteredCouncils.find((a) => a.counId === counId)
+      );
+      setCouncilOption(uniqueCouncilsFiltered);
+    }
+  }, [tehsilOption, AreaFullDetails, setAddressDetail]);
+
+  useEffect(() => {
+    if (councilOption.length === 1) {
+      const singleCouncil = councilOption[0];
+      setAddressDetail((prevDetails) => ({
+        ...prevDetails,
+        counId: singleCouncil.counId,
+      }));
+      const filteredVS = AreaFullDetails.filter((detail) => detail.ECouncil === singleCouncil.ECouncil);
+      const uniqueVSFiltered = Array.from(new Set(filteredVS.map((a) => a.VSId))).map((VSId) =>
+        filteredVS.find((a) => a.VSId === VSId)
+      );
+      setVSOption(uniqueVSFiltered);
+    }
+  }, [councilOption, AreaFullDetails, setAddressDetail]);
+
+  useEffect(() => {
+    if (VSOption.length === 1) {
+      const singleVS = VSOption[0];
+      setAddressDetail((prevDetails) => ({
+        ...prevDetails,
+        VSId: singleVS.VSId,
+      }));
+      const filteredWB = AreaFullDetails.filter((detail) => detail.EVidhanSabha === singleVS.EVidhanSabha);
+      const uniqueWBFiltered = Array.from(new Set(filteredWB.map((a) => a.WBId))).map((WBId) =>
+        filteredWB.find((a) => a.WBId === WBId)
+      );
+      setWBOption(uniqueWBFiltered);
+    }
+  }, [VSOption, AreaFullDetails, setAddressDetail]);
+
+  useEffect(() => {
+    if (WBOption.length === 1) {
+      const singleWB = WBOption[0];
+      setAddressDetail((prevDetails) => ({
+        ...prevDetails,
+        WBId: singleWB.WBId,
+      }));
+      const filteredCB = AreaFullDetails.filter((detail) => detail.EWardBlock === singleWB.EWardBlock);
+      const uniqueCBFiltered = Array.from(new Set(filteredCB.map((a) => a.ChkBlkId))).map((ChkBlkId) =>
+        filteredCB.find((a) => a.ChkBlkId === ChkBlkId)
+      );
+      setCBOption(uniqueCBFiltered);
+    }
+  }, [WBOption, AreaFullDetails, setAddressDetail]);
+
+  useEffect(() => {
+    if (CBOption.length === 1) {
+      const singleCB = CBOption[0];
+      setAddressDetail((prevDetails) => ({
+        ...prevDetails,
+        ChkBlkId: singleCB.ChkBlkId,
+      }));
+   
+    }
+  }, [ CBOption, AreaFullDetails, setAddressDetail]);
+
   return (
-    <div className='w-full h-full mx-auto my-5 px-2 py-4 bg-gray-100' style={{ boxShadow: "0 0 5px 1px #ddd" }}>
+    <div className="w-full h-full mx-auto my-5 px-2 py-4 bg-gray-100" style={{ boxShadow: '0 0 5px 1px #ddd' }}>
       <div className="container-fluid flex-col gap-2 flex">
-        <div className='flex items-center justify-between py-3'>
-          <div className='text-xl font-bold mb-4'>Address Information</div>
-          <p className='select-none text-sm text-black'><sup>*</sup>fields are required</p>
+        <div className="flex items-center justify-between py-3">
+          <div className="text-xl font-bold mb-4">Address Information</div>
+          <p className="select-none text-sm text-black">
+            <sup>*</sup>fields are required
+          </p>
         </div>
         <hr />
       </div>
@@ -90,193 +199,147 @@ function AddressInformationForm({ addressDetail, setAddressDetail }) {
             <Form.Label>Area / Village</Form.Label>
             <Typeahead
               id="area-village-typeahead"
-              onInputChange={(value) => fetchAreaVillOptions(value, setAreaVillOptions)}
+              onInputChange={(value) => fetchAreaVillOptions(value)}
               onChange={(selected) => {
                 if (selected.length > 0) {
-                  const [choice] = selected;
-                  setAddressDetail(prevDetails => ({
+                  const { EAreaVill, AreaId } = selected[0];
+                  setAddressDetail((prevDetails) => ({
                     ...prevDetails,
-                    EAreaVill: choice.EAreaVill,
-                    AreaId: choice.AreaId
+                    EAreaVill,
+                    AreaId,
+                    TehId: '',
+                    counId: '',
+                    VSId: '',
+                    WBId: '',
+                    ChkBlkId: '',
                   }));
-                  fetchAllAreaDetails(choice.AreaId);
+                  setTehsilOption([]);
+                  setCouncilOption([]);
+                  setVSOption([]);
+                  setWBOption([]);
+                  setCBOption([]);
+                  fetchAllAreaDetails(EAreaVill);
                 }
               }}
               options={AreaVillOptions}
-              placeholder='Area/Village'
-              labelKey={"EAreaVill"}
-              renderMenuItemChildren={(option) => (
-                <div>
-                  {option.EAreaVill}
-                </div>
-              )}
+              placeholder="Area/Village"
+              labelKey="EAreaVill"
+              renderMenuItemChildren={(option) => <div>{option.EAreaVill}</div>}
             />
+
           </Form.Group>
         </div>
+
         <div className="col-md-3 flex-col gap-2 flex mt-1">
           <Form.Group>
             <Form.Label>Tehsil</Form.Label>
-            {AreaFullDetails.length === 1 ? (
-              <Form.Control
-                type="text"
-                className='px-2'
-                name="EName"
-                value={addressDetail.EName}
-                readOnly
-              />
-            ) : (
-              <Form.Control
-                as="select"
-                className='form-select px-2'
-                name="TehId"
-                value={addressDetail.TehId}
-                onChange={handleChange}
-     
-
-              >
-                <option value="">--Select Tehsil--</option>
-                {AreaFullDetails.map((tehsil) => (
-                  <option key={tehsil.TehId} value={tehsil.TehId}>{tehsil.EName}</option>
-                ))}
-              </Form.Control>
-            )}
+            <Form.Control
+              as="select"
+              className="form-select px-2"
+              name="TehId"
+              value={addressDetail.TehId || ''}
+              onChange={handleChange}
+            >
+              <option value="">--Select Tehsil--</option>
+              {tehsilOption.map((tehsil) => (
+                <option key={tehsil.TehId} value={tehsil.TehId}>
+                  {tehsil.EName}
+                </option>
+              ))}
+            </Form.Control>
           </Form.Group>
         </div>
+
         <div className="col-md-3 flex-col gap-2 flex mt-1">
           <Form.Group>
             <Form.Label>Nikaya</Form.Label>
-            {AreaFullDetails.length === 1 ? (
-              <Form.Control
-                type="text"
-                name="ECouncil"
-                className='px-2'
-                value={addressDetail.ECouncil}
-                readOnly
-                placeholder='Nikaya'
-              />
-            ) : (
-              <Form.Control
-                as="select"
-                className='form-select px-2'
-                name="CounId"
-                value={addressDetail.CounId}
-                onChange={handleChange}
-               
-              >
-                <option value="">--Select Nikaya--</option>
-                {AreaFullDetails.map((council) => (
-                  <option key={council.CounId} value={council.CounId}>{council.ECouncil}</option>
-                ))}
-              </Form.Control>
-            )}
+            <Form.Control
+              as="select"
+              className="form-select px-2"
+              name="counId"
+              value={addressDetail.counId || ''}
+              onChange={handleChange}
+            >
+              <option value="">--Select Nikaya--</option>
+              {councilOption.map((council) => (
+                <option key={council.counId} value={council.counId}>
+                  {council.ECouncil}
+                </option>
+              ))}
+            </Form.Control>
           </Form.Group>
         </div>
+
         <div className="col-md-3 flex-col gap-2 flex mt-1">
           <Form.Group>
             <Form.Label>VidhanSabha</Form.Label>
-            {AreaFullDetails.length === 1 ? (
-              <Form.Control
-                type="text"
-                name="EVidhanSabha"
-                className='px-2'
-                value={addressDetail.EVidhanSabha}
-                readOnly
-                placeholder='VidhanSabha'
-              />
-            ) : (
-              <Form.Control
-                as="select"
-                className='form-select px-2'
-                name="VSId"
-                value={addressDetail.VSId}
-                onChange={handleChange}
-            
-              >
-                <option value="">--Select VidhanSabha--</option>
-                {AreaFullDetails.map((VS) => (
-                  <option key={VS.VSId} value={VS.VSId}>{VS.EVidhanSabha}</option>
-                ))}
-              </Form.Control>
-            )}
+            <Form.Control
+              as="select"
+              className="form-select px-2"
+              name="VSId"
+              value={addressDetail.VSId || ''}
+              onChange={handleChange}
+            >
+              <option value="">--Select VidhanSabha--</option>
+              {VSOption.map((vidhanSabha) => (
+                <option key={vidhanSabha.VSId} value={vidhanSabha.VSId}>
+                  {vidhanSabha.EVidhanSabha}
+                </option>
+              ))}
+            </Form.Control>
           </Form.Group>
         </div>
 
         <div className="col-md-3 flex-col gap-2 flex mt-1">
           <Form.Group>
             <Form.Label>Ward/Block</Form.Label>
-            {AreaFullDetails.length === 1 ? (
-              <>
-                <Form.Control
-                  type="text"
-                  name="EWardBlock"
-                  className="px-2"
-                  value={addressDetail.EWardBlock}
-                  readOnly
-                  placeholder="Ward/Block"
-                />
-                <Form.Control
-                  type="hidden"
-                  name="WBId"
-                  value={addressDetail.WBId}
-                  onChange={handleChange}
-                />
-              </>
-            ) : (
-              <Form.Control
-                as="select"
-                className='form-select px-2'
-                name="WBId"
-                value={addressDetail.WBId}
-                onChange={handleChange}
-       
-              >
-                <option value="">--Select Ward/Block--</option>
-                {AreaFullDetails.map((WB) => (
-                  <option key={WB.WBId} value={WB.WBId}>{WB.EWardBlock}</option>
-                ))}
-              </Form.Control>
-            )}
+            <Form.Control
+              as="select"
+              className="form-select px-2"
+              name="WBId"
+              value={addressDetail.WBId || ''}
+              onChange={handleChange}
+            >
+              <option value="">--Select Ward/Block--</option>
+              {WBOption.map((WB) => (
+                <option key={WB.WBId} value={WB.WBId}>
+                  {WB.EWardBlock}
+                </option>
+              ))}
+            </Form.Control>
           </Form.Group>
         </div>
+
         <div className="col-md-3 flex-col gap-2 flex mt-1">
           <Form.Group>
             <Form.Label>Chak Block/ Panchayat</Form.Label>
-            {AreaFullDetails.length === 1 ? (
-              <Form.Control
-                type="text"
-                name="ECBPanch"
-                className='px-2'
-                value={addressDetail.ECBPanch}
-                readOnly
-                placeholder='Chak Block/ Panchayat'
-              />
-            ) : (
-              <Form.Control
-                as="select"
-                className='form-select px-2'
-                name="ChkBlkId"
-                value={addressDetail.ChkBlkId}
-                onChange={handleChange}
-            
-              >
-                <option value="">--Select Chak Block/ Panchayat--</option>
-                {AreaFullDetails.map((CBP) => (
-                  <option key={CBP.ChkBlkId} value={CBP.ChkBlkId}>{CBP.ECBPanch}</option>
-                ))}
-              </Form.Control>
-            )}
+            <Form.Control
+              as="select"
+              className="form-select px-2"
+              name="ChkBlkId"
+              value={addressDetail.ChkBlkId || ''}
+              onChange={handleChange}
+            >
+              <option value="">--Select Chak Block/ Panchayat--</option>
+              {CBOption.map((CBP) => (
+                <option key={CBP.ChkBlkId} value={CBP.ChkBlkId}>
+                  {CBP.ECBPanch}
+                </option>
+              ))}
+            </Form.Control>
           </Form.Group>
         </div>
+
         <div className="col-md-3 flex-col gap-2 flex mt-1">
           <Form.Group>
             <Form.Label>HNo</Form.Label>
             <Form.Control
               type="text"
               name="HNo"
-              className='px-2'
+              className="px-2"
               value={addressDetail.HNo}
               onChange={handleChange}
-              placeholder='HNo'
+              placeholder="HNo"
             />
           </Form.Group>
         </div>
@@ -286,10 +349,10 @@ function AddressInformationForm({ addressDetail, setAddressDetail }) {
             <Form.Control
               type="text"
               name="Landmark"
-              className='px-2'
+              className="px-2"
               value={addressDetail.Landmark}
               onChange={handleChange}
-              placeholder='Landmark'
+              placeholder="Landmark"
             />
           </Form.Group>
         </div>

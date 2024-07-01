@@ -2,6 +2,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
+import { Typeahead } from 'react-bootstrap-typeahead';
+import 'react-bootstrap-typeahead/css/Typeahead.css';
+
+import Select from 'react-select';
+
 import {
     MaterialReactTable,
     useMaterialReactTable,
@@ -11,11 +16,76 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function SearchChakBlock() {
     const [perseemanDetails, setPerseemanDetails] = useState([]);
+    const [CNOption, setCNOptions] = useState([]);
+    const [CBOption, setCBOptions] = useState([]);
+    const [AreaVillOptions, setAreaVillOptions] = useState([]);
+
     const [formData, setFormData] = useState({
         ChakNo: '',
         ECBPanch: '',
         EAreaVill: '',
     });
+
+    useEffect(() => {
+        fetchCBOptions();
+    }, []);
+
+    const fetchCBOptions = async () => {
+        try {
+            const response = await fetch(`/api/v1/feedingstaff/ChakNoBlock`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch chakblock options');
+            }
+
+            const data = await response.json();
+            if (!data || !Array.isArray(data) || data.length === 0) {
+                throw new Error('Empty or invalid chakblock options data');
+            }
+
+            const options = data.map((CB) => ({
+                value: CB.ChakNo,
+                label: CB.ChakNo,
+            }));
+
+            const Boptions = data.map((CB) => ({
+                value: CB.ECBPanch,
+                label: CB.ECBPanch,
+            }));
+
+            setCNOptions(options);
+            setCBOptions(Boptions);
+        } catch (error) {
+            console.error('Error fetching CB options:', error);
+            toast.error('Error fetching CB options');
+        }
+    };
+
+    const fetchAreaVillOptions = async (input) => {
+        try {
+            const response = await fetch('/api/v1/feedingStaff/searchAreaVill', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query: input }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch suggested AreaVill');
+            }
+
+            const data = await response.json();
+            setAreaVillOptions(data);
+        } catch (error) {
+            console.error('Error fetching suggested AreaVill:', error);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -38,13 +108,24 @@ function SearchChakBlock() {
             }
 
             setPerseemanDetails(data);
+           
+            // setFormData({
+            //     ChakNo: '',
+            //     ECBPanch: '',
+            //     EAreaVill: '',
+            // });
+          
+            setAreaVillOptions([]);
         } catch (error) {
             toast.error(`Error in fetching data: ${error.message}`);
         }
     };
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+    const handleSelectChange = (selectedOption, actionMeta) => {
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            [actionMeta.name]: selectedOption ? selectedOption.value : '',
+        }));
     };
 
     const columns = useMemo(() => [
@@ -69,7 +150,6 @@ function SearchChakBlock() {
             accessorKey: 'EAreaVill',
             header: 'Area',
             size: 20,
-       
         },
         {
             accessorKey: 'WardNoEWardBlock',
@@ -80,10 +160,6 @@ function SearchChakBlock() {
                 return `${WardNo} ${EWardBlock}`;
             }
         }
-        //hariom
-        
-
-
     ], []);
 
     const table = useMaterialReactTable({
@@ -99,30 +175,86 @@ function SearchChakBlock() {
                 <Form onSubmit={handleSubmit} className="SearchCB-form">
                     <Row className="mb-3">
                         <div className="col-md-3 mb-3">
-                            <Form.Group >
+                            <Form.Group>
                                 <Form.Label>ChakNo</Form.Label>
-                                <Form.Control type="text"
-                                    placeholder="Enter ChakNo"
-                                    id="ChakNo"
+                                <Select
+                                    id="CBSelect"
                                     name="ChakNo"
-                                    value={formData.ChakNo} onChange={handleChange} />
+                                    value={CNOption.find(
+                                        (option) => option.value === formData.ChakNo
+                                    )}
+                                    onChange={handleSelectChange}
+                                    options={CNOption}
+                                    placeholder="Chak No"
+                                    isSearchable
+                                    isClearable
+                                    styles={{
+                                        menu: (provided) => ({
+                                            ...provided,
+                                            zIndex: 9999,
+                                        }),
+                                    }}
+                                />
                             </Form.Group>
                         </div>
                         <div className="col-md-3 mb-3">
-                            <Form.Group >
+                            <Form.Group>
                                 <Form.Label>Block</Form.Label>
-                                <Form.Control type="text"
-                                    placeholder="Enter Block"
-                                    id="ECBPanch"
-                                    name="ECBPanch" value={formData.ECBPanch} onChange={handleChange} />
+                                <Select
+                                    id="ECBSelect"
+                                    name="ECBPanch"
+                                    value={CBOption.find(
+                                        (option) => option.value === formData.ECBPanch
+                                    )}
+                                    onChange={handleSelectChange}
+                                    options={CBOption}
+                                    placeholder="Block"
+                                    isSearchable
+                                    isClearable
+                                    styles={{
+                                        menu: (provided) => ({
+                                            ...provided,
+                                            zIndex: 9999,
+                                        }),
+                                    }}
+                                />
                             </Form.Group>
                         </div>
 
-                        <div className="col-md-3 mb-3">
-                            <Form.Group >
-                                <Form.Label>Area</Form.Label>
-                                <Form.Control type="text" placeholder="Enter Area" id="EAreaVill"
-                                    name="EAreaVill" value={formData.EAreaVill} onChange={handleChange} />
+                        <div className="col-md-3 flex-col gap-2 flex mt-1">
+                            <Form.Group>
+                                <Form.Label>Area / Village</Form.Label>
+                                <Typeahead
+                                    id="EAreaVill"
+                                    onInputChange={(inputValue) => {
+                                        setFormData((prevDetails) => ({
+                                            ...prevDetails,
+                                            EAreaVill: inputValue,
+                                        }));
+                                        fetchAreaVillOptions(inputValue); // Fetch options based on input value
+                                    }}
+                                    onChange={(selected) => {
+                                        if (selected.length > 0) {
+                                            const { EAreaVill } = selected[0];
+                                            setFormData((prevDetails) => ({
+                                                ...prevDetails,
+                                                EAreaVill,
+                                            }));
+                                        } else {
+                                            setFormData((prevDetails) => ({
+                                                ...prevDetails,
+                                                EAreaVill: '', // Reset if cleared
+                                            }));
+                                        }
+                                    }}
+                                    options={AreaVillOptions}
+                                    placeholder="Area/Village"
+                                    defaultInputValue={formData.EAreaVill}
+                                    labelKey="EAreaVill"
+                                    isClearable
+                                    renderMenuItemChildren={(option) => <div>{option.EAreaVill}</div>}
+                                />
+
 
                             </Form.Group>
                         </div>

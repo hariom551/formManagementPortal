@@ -57,7 +57,7 @@ function AddVoter() {
         EAreaVill: '',
         TehId: '',
         EName: '',
-        CounId: '',
+        counId: '',
         ECouncil: '',
         VSId: '',
         EVidhanSabha: '',
@@ -144,7 +144,7 @@ function AddVoter() {
 
                 const data = await response.json();
                 toast.success('Voter created successfully!');
-                window.location.reload();
+                // window.location.reload();
                 // Reset forms after successful submission
                 setReferenceDetails({
                     PacketNo: '',

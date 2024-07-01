@@ -48,45 +48,111 @@ const searchCaste = asyncHandler(async (req, res) => {
     }
 });
 
-const allAreaDetails = asyncHandler(async (req, res) => {
-    const { AreaId } = req.body;
-
-    if (!AreaId) {
-        return res.status(400).json({ error: 'AreaId parameter is required' });
-    }
-
-    try {
-        const results = await queryDatabase(`
-            SELECT C.ECBPanch, C.Id AS ChkBlkId, C.WBId, W.EWardBlock, W.VSId, V.EVidhanSabha, V.counId, cc.ECouncil, cc.TehId, T.EName 
-            FROM areavill AS A 
-            LEFT JOIN chakblockpanch as C ON A.CBPId = C.Id 
-            LEFT JOIN wardblock AS W ON C.WBId= W.Id 
-            LEFT JOIN vidhansabha AS V ON V.ID = W.VSId 
-            LEFT JOIN council AS cc ON cc.Id = V.counId 
-            LEFT JOIN tehsillist AS T ON T.ID = cc.TehId 
-            WHERE A.Id= ?`, [AreaId]);
-        return res.json(results);
-    } catch (error) {
-        console.error('Database query error', error);
-        return res.status(500).send('A database error occurred.');
-    }
-});
 
 const searchAreaVill = asyncHandler(async (req, res) => {
     const { query } = req.body;
-
+    
     if (!query) {
         return res.status(400).json({ error: 'Query parameter is required' });
     }
 
     try {
-        const results = await queryDatabase(`SELECT EAreaVill, Id as AreaId FROM areavill WHERE EAreaVill LIKE ?`, [`%${query}%`]);
+        const results = await queryDatabase(
+            `SELECT DISTINCT EAreaVill, Id AS AreaId FROM areavill WHERE EAreaVill LIKE ?`, 
+            [`%${query}%`]
+        );
         return res.json(results);
     } catch (error) {
         console.error('Database query error', error);
         return res.status(500).send('A database error occurred.');
     }
 });
+
+const allAreaDetails = asyncHandler(async (req, res) => {
+    const { EAreaVill } = req.body;
+
+    if (!EAreaVill) {
+        return res.status(400).json({ error: 'EAreaVill parameter is required' });
+    }
+
+    try {
+        const results = await queryDatabase(`
+            SELECT 
+                A.EAreaVill, 
+                C.ECBPanch, C.Id AS ChkBlkId, 
+                C.WBId, W.EWardBlock, 
+                W.VSId, V.EVidhanSabha, 
+                V.counId, cc.ECouncil, 
+                cc.TehId, T.EName 
+            FROM areavill AS A 
+            LEFT JOIN chakblockpanch AS C ON A.CBPId = C.Id 
+            LEFT JOIN wardblock AS W ON C.WBId = W.Id 
+            LEFT JOIN vidhansabha AS V ON V.ID = W.VSId 
+            LEFT JOIN council AS cc ON cc.Id = V.counId 
+            LEFT JOIN tehsillist AS T ON T.ID = cc.TehId 
+            WHERE A.EAreaVill = ?`, 
+            [EAreaVill]
+        );
+
+        // const groupedResults = results.reduce((acc, curr) => {
+        //     if (!acc[curr.EAreaVill]) {
+        //         acc[curr.EAreaVill] = {
+        //             chakblocks: [],
+        //             wardblocks: [],
+        //             vidhansabhas: [],
+        //             councils: [],
+        //             tehsils: []
+        //         };
+        //     }
+
+        //     const area = acc[curr.EAreaVill];
+
+        //     if (!area.chakblocks.some(block => block.id === curr.ChkBlkId)) {
+        //         area.chakblocks.push({
+        //             name: curr.ECBPanch,
+        //             id: curr.ChkBlkId
+        //         });
+        //     }
+
+        //     if (!area.wardblocks.some(block => block.id === curr.WBId)) {
+        //         area.wardblocks.push({
+        //             name: curr.EWardBlock,
+        //             id: curr.WBId
+        //         });
+        //     }
+
+        //     if (!area.vidhansabhas.some(vidhansabha => vidhansabha.id === curr.VSId)) {
+        //         area.vidhansabhas.push({
+        //             name: curr.EVidhanSabha,
+        //             id: curr.VSId
+        //         });
+        //     }
+
+        //     if (!area.councils.some(council => council.id === curr.counId)) {
+        //         area.councils.push({
+        //             name: curr.ECouncil,
+        //             id: curr.counId
+        //         });
+        //     }
+
+        //     if (!area.tehsils.some(tehsil => tehsil.id === curr.TehId)) {
+        //         area.tehsils.push({
+        //             name: curr.EName,
+        //             id: curr.TehId
+        //         });
+        //     }
+
+        //     return acc;
+        // }, {});
+
+        return res.json(results);
+    } catch (error) {
+        console.error('Database query error', error);
+        return res.status(500).send('A database error occurred.');
+    }
+});
+
+
 
 const AddVoter = [
     asyncHandler(async (req, res, next) => {
@@ -150,7 +216,7 @@ const AddVoter = [
                 voterDetails.ERLName, voterDetails.HRLName, voterDetails.CasteId, voterDetails.Qualification, voterDetails.Occupation,
                 voterDetails.Age, voterDetails.DOB, voterDetails.Sex, voterDetails.MNo, voterDetails.MNo2,
                 voterDetails.AadharNo, voterDetails.VIdNo, voterDetails.GCYear, addressDetail.AreaId, addressDetail.TehId,
-                addressDetail.CounId, addressDetail.VSId, addressDetail.WBId, addressDetail.ChkBlkId, addressDetail.HNo,
+                addressDetail.counId, addressDetail.VSId, addressDetail.WBId, addressDetail.ChkBlkId, addressDetail.HNo,
                 addressDetail.Landmark, voterDocs.Image, voterDocs.IdProof, voterDocs.Degree
             ];
 
@@ -161,12 +227,6 @@ const AddVoter = [
             return res.status(500).json(new ApiResponse(500, null, 'Database insert error'));
         }
     })
-
-
-
-
-
-
 
 ];
 
@@ -207,7 +267,20 @@ const getPerseemanDetails = asyncHandler(async (req, res) => {
     }
 });
 
+const ChakNoBlock = asyncHandler(async(req, res)=>{
+    try{
+        const result= await queryDatabase('select ECBPanch, ChakNo FROM chakblockpanch')
+     
+        return res.json(result);
+
+    }
+    catch(error){
+        return res.status(500).send('A database error occured ok');
+    }
+})
 
 
-
-export { searchSurname, searchCaste, searchAreaVill, allAreaDetails, AddVoter, getPerseemanDetails };
+export { searchSurname, searchCaste, 
+    searchAreaVill, allAreaDetails, 
+    AddVoter, 
+    getPerseemanDetails, ChakNoBlock };
