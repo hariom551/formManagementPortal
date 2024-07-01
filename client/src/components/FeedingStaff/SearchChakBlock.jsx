@@ -79,12 +79,12 @@ function SearchChakBlock() {
             }
 
             setPerseemanDetails(data);
-            setFormData({
-                ChakNo: '',
-                ECBPanch: '',
-                EAreaVill: '',
+            // setFormData({
+            //     // ChakNo: '',
+            //     // ECBPanch: '',
+            //     EAreaVill: '',
 
-            })
+            // })
 
         } catch (error) {
             toast.error(`Error in fetching data: ${error.message}`);
@@ -125,9 +125,13 @@ function SearchChakBlock() {
             size: 20,
         },
         {
-            accessorKey: 'EAreaVill',
+            accessorKey: 'EAreaVillHnoRange',
             header: 'Area',
             size: 20,
+            Cell: ({ cell }) => {
+                const {EAreaVill, HnoRange } = cell.row.original;
+                return `${EAreaVill} ${HnoRange}`;
+            }
        
         },
         {
