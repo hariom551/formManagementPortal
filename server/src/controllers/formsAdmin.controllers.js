@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { pool } from '../db/database.js';
 
+
 function queryDatabase(sql, params) {
     return new Promise((resolve, reject) => {
         pool.query(sql, params, (error, results) => {
@@ -14,7 +15,6 @@ function queryDatabase(sql, params) {
         });
     });
 }
-
 
 const AddOutForm = asyncHandler(async (req, res) => {
     const {
@@ -119,7 +119,6 @@ const OutFormDetails = asyncHandler(async (req, res) => {
     }
 });
 
-
 const AddIncomForm = asyncHandler(async (req, res) => {
     const {
         VMob1,
@@ -128,7 +127,9 @@ const AddIncomForm = asyncHandler(async (req, res) => {
         VHName,
         VEAddress,
         VHAddress,
-        TotalForms,
+        NFormsKN,
+        NFormsKd, 
+        NFormsU,
         PacketNo,
         ReceivedDate,
         ERemarks,
@@ -136,7 +137,6 @@ const AddIncomForm = asyncHandler(async (req, res) => {
     } = req.body;
 
     try {
-      
         let volunteer = await queryDatabase(
             'SELECT Id FROM volunteer WHERE VMob1 = ?',
             [VMob1]
@@ -144,14 +144,12 @@ const AddIncomForm = asyncHandler(async (req, res) => {
 
         let volunteerId;
         if (volunteer.length > 0) {
-            // Update existing volunteer
             volunteerId = volunteer[0].Id;
             await queryDatabase(
-                `UPDATE volunteer SET VEName = ?, VHName = ?, VEAddress = ?, VHAddress = ? WHERE id = ?`,
+                `UPDATE volunteer SET VEName = ?, VHName = ?, VEAddress = ?, VHAddress = ? WHERE Id = ?`,
                 [VEName, VHName, VEAddress, VHAddress, volunteerId]
             );
         } else {
-            // Insert new volunteer
             const result = await queryDatabase(
                 'INSERT INTO volunteer (VMob1, VMob2, VEName, VHName, VEAddress, VHAddress) VALUES (?, ?, ?, ?, ?, ?)',
                 [VMob1, VMob2, VEName, VHName, VEAddress, VHAddress]
@@ -163,7 +161,6 @@ const AddIncomForm = asyncHandler(async (req, res) => {
 
         if (COList && Array.isArray(COList) && COList.length > 0) {
             const careOfQueries = COList.map(async (co) => {
-                // Check if care_of volunteer already exists
                 let careOfVolunteer = await queryDatabase(
                     'SELECT Id FROM volunteer WHERE VMob1 = ?',
                     [co.VMob1]
@@ -171,22 +168,18 @@ const AddIncomForm = asyncHandler(async (req, res) => {
 
                 let careOfId;
                 if (careOfVolunteer.length > 0) {
-                    // Update existing care_of volunteer
                     careOfId = careOfVolunteer[0].Id;
                     await queryDatabase(
                         `UPDATE volunteer SET VEName = ?, VHName = ? WHERE Id = ?`,
                         [co.VEName, co.VHName, careOfId]
                     );
                 } else {
-                    // Insert new care_of volunteer
                     const careOfResult = await queryDatabase(
                         'INSERT INTO volunteer (VMob1, VEName, VHName, COId) VALUES (?, ?, ?, ?)',
-                        [co.VMob1, co.VEName, co.VHName,volunteerId ]
+                        [co.VMob1, co.VEName, co.VHName, volunteerId]
                     );
                     careOfId = careOfResult.insertId;
                 }
-
-               
                 return careOfId;
             });
 
@@ -199,29 +192,12 @@ const AddIncomForm = asyncHandler(async (req, res) => {
             careOfValues.push(null);
         }
 
-        let careOfFormDetails = [];
-        if (COList && Array.isArray(COList) && COList.length > 0) {
-            careOfFormDetails = COList.reduce((acc, co, index) => {
-                if (index < 3) { 
-                    acc.push(co.NoOfFormsKN || null, co.NoOfFormsKD || null, co.NoOfFormsU || null);
-                }
-                return acc;
-            }, []);
-        }
-
-        while (careOfFormDetails.length < 9) { // Adjusted to fill up to 9
-            careOfFormDetails.push(null);
-        }
-
         await queryDatabase(
             `INSERT INTO incomingform (
-                RefId, PacketNo, ERemarks, ReceivedDate, TotalForms,
-                COID1, COID2, COID3,
-                NFormsKN1, NFormsKd1, NFormsU1,
-                NFormsKN2, NFormsKd2, NFormsU2,
-                NFormsKN3, NFormsKd3, NFormsU3
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [volunteerId, PacketNo, ERemarks, ReceivedDate, TotalForms, ...careOfValues, ...careOfFormDetails]
+                RefId, PacketNo, ERemarks, ReceivedDate, NFormsKN, NFormsKd, NFormsU,
+                COID1, COID2, COID3
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [volunteerId, PacketNo, ERemarks, ReceivedDate, NFormsKN, NFormsKd, NFormsU, ...careOfValues]
         );
 
         res.status(201).json(
@@ -241,7 +217,9 @@ const UpdateIncomForm = asyncHandler(async (req, res) => {
         VHName,
         VEAddress,
         VHAddress,
-        TotalForms,
+        NFormsKN,
+        NFormsKd, 
+        NFormsU,
         PacketNo,
         ReceivedDate,
         ERemarks,
@@ -297,28 +275,14 @@ const UpdateIncomForm = asyncHandler(async (req, res) => {
             careOfValues.push(null);
         }
 
-        let careOfFormDetails = [];
-        if (COList && Array.isArray(COList) && COList.length > 0) {
-            careOfFormDetails = COList.reduce((acc, co, index) => {
-                if (index < 3) { 
-                    acc.push(co.NoOfFormsKN || null, co.NoOfFormsKD || null, co.NoOfFormsU || null);
-                }
-                return acc;
-            }, []);
-        }
-
-        while (careOfFormDetails.length < 9) { // Adjusted to fill up to 9
-            careOfFormDetails.push(null);
-        }
 
         await queryDatabase(
             `UPDATE incomingform SET
-                RefId= ?, ERemarks= ?, ReceivedDate= ?, TotalForms= ?,
+                RefId= ?, ERemarks= ?, ReceivedDate= ?, 
                 COID1= ?, COID2= ?, COID3= ?,
-                NFormsKN1= ?, NFormsKd1= ?, NFormsU1= ?,
-                NFormsKN2= ?, NFormsKd2= ?, NFormsU2= ?,
-                NFormsKN3= ?, NFormsKd3= ?, NFormsU3= ? WHERE PacketNo= ?`,
-            [volunteerId, ERemarks, ReceivedDate, TotalForms, ...careOfValues, ...careOfFormDetails, PacketNo]
+                NFormsKN= ?, NFormsKd= ?, NFormsU= ?
+                WHERE PacketNo= ?`,
+            [volunteerId, ERemarks, ReceivedDate, ...careOfValues, NFormsKN, NFormsKd, NFormsU, PacketNo]
         );
 
         res.status(201).json(
@@ -335,11 +299,10 @@ const incomFormDetails = asyncHandler(async (req, res) => {
     try {
         const incomingForms = await queryDatabase(`
         SELECT v1.Id As IncRefId, v1.VEName AS RName, V1.VHName AS RHName, V1.VMob1 AS RMob1, v1.VEAddress AS RAddress, V1.VHAddress AS RHAddress,
-        i.Id, i.PacketNo, I.TotalForms, 
-        v2.VEName AS C1Name,v2.VHName AS C1HName, V2.VMob1 as C1Mob, i.NFormsKN1, i.NFormsKd1, i.NFormsU1,
-        v3.VEName AS C2Name, v3.VHName AS C2HName, V3.VMob1 as C2Mob, i.NFormsKN2, i.NFormsKd2, i.NFormsU2,
-        v4.VEName AS C3Name, v4.VHName AS C3HName, V4.VMob1 as C3Mob, i.NFormsKN3, i.NFormsKd3, i.NFormsU3,
-        i.ReceivedDate, i.ERemarks
+        i.Id, i.PacketNo, i.NFormsKN,  i.NFormsKd, i.NFormsU, i.ReceivedDate, i.ERemarks,
+        v2.VEName AS C1Name,v2.VHName AS C1HName, V2.VMob1 as C1Mob, 
+        v3.VEName AS C2Name, v3.VHName AS C2HName, V3.VMob1 as C2Mob, 
+        v4.VEName AS C3Name, v4.VHName AS C3HName, V4.VMob1 as C3Mob
         FROM incomingform AS i
         LEFT JOIN volunteer AS v1 ON i.RefId = v1.Id
         LEFT JOIN volunteer AS v2 ON i.COId1 = v2.Id
@@ -381,12 +344,10 @@ const FormsAdminInfo= asyncHandler(async (req, res) => {
     try {
         const result = await queryDatabase(`
         SELECT 
-        (SELECT SUM(TotalForms) FROM incomingform) AS totalIncomingForms,
+        (SELECT SUM(NFormsKN) + sum(NFormsKd) + sum(NFormsU) FROM incomingform) AS totalIncomingForms,
         (SELECT SUM(NoOFForms) FROM outgoingform) AS totalOutgoingForms;
     
         `);
-
-        
 
         if (result.length > 0) {
             return res.json(result[0]); 
@@ -403,7 +364,6 @@ const FormsAdminInfo= asyncHandler(async (req, res) => {
 
 
 })
-
 
 export {
     SearchVMobNo,

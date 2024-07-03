@@ -153,7 +153,6 @@ const allAreaDetails = asyncHandler(async (req, res) => {
 });
 
 
-
 const AddVoter = [
     asyncHandler(async (req, res, next) => {
         try {
@@ -234,14 +233,17 @@ const AddVoter = [
 const getPerseemanDetails = asyncHandler(async (req, res) => {
     const { ChakNo, ECBPanch, EAreaVill } = req.body;
 
+    if (!ChakNo && !ECBPanch && !EAreaVill) {
+        return res.status(400).json({ error: 'At least one of chakNo, ECBPanch, or EAreaVill is required.' });
+    }
+    
     try {
         let query = `
             SELECT CBP.ChakNo, CBP.ECBPanch, AV.EAreaVill, WB.WardNo
             FROM chakblockpanch AS CBP 
             JOIN areavill AS AV ON CBP.Id = AV.CBPId 
             JOIN wardblock AS WB ON WB.Id = CBP.WBId
-            WHERE 1 = 1
-        `;
+            WHERE 1 = 1`;
         
         const params = [];
 

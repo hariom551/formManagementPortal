@@ -36,7 +36,9 @@ function IncomingForms() {
         VHName: '',
         VEAddress: '',
         VHAddress: '',
-        TotalForms: '',
+        NoOfFormsKN: 0,
+        NoOfFormsKD: 0,
+        NoOfFormsU: 0,
         PacketNo: content || '',
         ReceivedDate: today,
         ERemarks: '',
@@ -44,9 +46,6 @@ function IncomingForms() {
             VMob1: '',
             VEName: '',
             VHName: '',
-            NoOfFormsKN: 0,
-            NoOfFormsKD: 0,
-            NoOfFormsU: 0,
         }]
     });
 
@@ -68,8 +67,6 @@ function IncomingForms() {
             }
             const data = await response.json();
             setter(data);
-
-
         } catch (error) {
             console.error('Error fetching suggested mobile numbers:', error);
         }
@@ -84,16 +81,13 @@ function IncomingForms() {
                         'Content-Type': 'application/json'
                     }
                 });
-
                 if (!response.ok) {
                     throw new Error('Failed to fetch IncomingForms details');
                 }
-
                 const data = await response.json();
                 if (!data || !Array.isArray(data) || data.length === 0) {
                     throw new Error('Empty or invalid IncomingForms details data');
                 }
-
                 setIFDetails(data);
 
                 if (content) {
@@ -106,7 +100,9 @@ function IncomingForms() {
                             VHName: IF.RHName,
                             VEAddress: IF.RAddress || '',
                             VHAddress: IF.RHAddress || '',
-                            TotalForms: IF.TotalForms,
+                            NoOfFormsKN: IF.NFormsKN || 0,
+                            NoOfFormsKD: IF.NFormsKd || 0,
+                            NoOfFormsU: IF.NFormsU || 0,
                             PacketNo: IF.PacketNo,
                             ReceivedDate: IF.ReceivedDate.split('T')[0],
                             ERemarks: IF.ERemarks || '',
@@ -115,25 +111,16 @@ function IncomingForms() {
                                     VMob1: IF.C1Mob,
                                     VEName: IF.C1Name,
                                     VHName: IF.C1HName,
-                                    NoOfFormsKN: IF.NFormsKN1 || 0,
-                                    NoOfFormsKD: IF.NFormsKd1 || 0,
-                                    NoOfFormsU: IF.NFormsU1 || 0,
                                 },
                                 IF.C2Name ? {
                                     VMob1: IF.C2Mob,
                                     VEName: IF.C2Name,
                                     VHName: IF.C2HName,
-                                    NoOfFormsKN: IF.NFormsKN2 || 0,
-                                    NoOfFormsKD: IF.NFormsKd2 || 0,
-                                    NoOfFormsU: IF.NFormsU2 || 0,
                                 } : null,
                                 IF.C3Name ? {
                                     VMob1: IF.C3Mob,
                                     VEName: IF.C3Name,
                                     VHName: IF.C3HName,
-                                    NoOfFormsKN: IF.NFormsKN3 || 0,
-                                    NoOfFormsKD: IF.NFormsKd3 || 0,
-                                    NoOfFormsU: IF.NFormsU3 || 0,
                                 } : null
                             ].filter(co => co !== null)
                         });
@@ -162,13 +149,13 @@ function IncomingForms() {
             });
 
             if (result.ok) {
-                window.location.reload();
-                console.log("IncomingForms Added Successfully.");
+                // window.location.reload();
+                toast.success("IncomingForms Added Successfully.");
             } else {
-                console.error("Error in Adding IncomingForms:", result.statusText);
+                toast.error("Error in Adding IncomingForms:", result.statusText);
             }
         } catch (error) {
-            console.error("Error in Adding IncomingForms:", error.message);
+            toast.error("Error in Adding IncomingForms:", error.message);
         }
     };
 
@@ -187,7 +174,7 @@ function IncomingForms() {
                 toast.success("incomingForms Updated successfully.");
                 setTimeout(() => {
                     window.location.href = '/incomingForms';
-                }, 1000);
+                }, 100);
             } else {
                 toast.error("Error in Updating incomingForms:", result.statusText);
             }
@@ -258,6 +245,24 @@ function IncomingForms() {
             size: 20,
         },
         {
+            accessorKey: 'NFormsKN',
+            header: 'InForm Kanpur',
+            size: 5,
+            Footer: () => calculateColumnTotals('NFormsKN')
+        },
+        {
+            accessorKey: 'NFormsKd',
+            header: 'InForm Dehat',
+            size: 5,
+            Footer: () => calculateColumnTotals('NFormsKd')
+        },
+        {
+            accessorKey: 'NFormsU',
+            header: 'InForm Unnao',
+            size: 5,
+            Footer: () => calculateColumnTotals('NFormsU')
+        },
+        {
             accessorKey: 'TotalForms',
             header: 'Total Form',
             size: 4,
@@ -273,24 +278,7 @@ function IncomingForms() {
             header: 'CO1 Mobile',
             size: 10,
         },
-        {
-            accessorKey: 'NFormsKN1',
-            header: 'CO1 InForm Kanpur',
-            size: 5,
-            Footer: () => calculateColumnTotals('NFormsKN1')
-        },
-        {
-            accessorKey: 'NFormsKd1',
-            header: 'CO1 InForm Dehat',
-            size: 5,
-            Footer: () => calculateColumnTotals('NFormsKd1')
-        },
-        {
-            accessorKey: 'NFormsU1',
-            header: 'CO1 InForm Unnao',
-            size: 5,
-            Footer: () => calculateColumnTotals('NFormsU1')
-        },
+
         {
             accessorKey: 'C2Name',
             header: 'CO2 Name',
@@ -302,24 +290,6 @@ function IncomingForms() {
             size: 10,
         },
         {
-            accessorKey: 'NFormsKN2',
-            header: 'CO2 InForm Kanpur',
-            size: 5,
-            Footer: () => calculateColumnTotals('NFormsKN2')
-        },
-        {
-            accessorKey: 'NFormsKd2',
-            header: 'CO2 InForm Dehat',
-            size: 5,
-            Footer: () => calculateColumnTotals('NFormsKd2')
-        },
-        {
-            accessorKey: 'NFormsU2',
-            header: 'CO2 InForm Unnao',
-            size: 5,
-            Footer: () => calculateColumnTotals('NFormsU2')
-        },
-        {
             accessorKey: 'C3Name',
             header: 'CO3 Name',
             size: 15,
@@ -328,23 +298,6 @@ function IncomingForms() {
             accessorKey: 'C3Mob',
             header: 'CO3 Mobile',
             size: 10,
-        },
-        {
-            accessorKey: 'NFormsKN3.',
-            header: 'CO3 InForm Kanpur',
-            size: 5,
-            Footer: () => calculateColumnTotals('NFormsKN3')
-        },
-        {
-            accessorKey: 'NFormsKd3.',
-            header: 'CO3 InForm Dehat',
-            size: 5,
-            Footer: () => calculateColumnTotals('NFormsKd3')
-        },
-        {
-            accessorKey: 'NFormsU3',
-            header: 'CO3 InForm Unnao',
-            size: 5,
         },
         {
             accessorKey: 'ReceivedDate',
@@ -379,11 +332,9 @@ function IncomingForms() {
         let updatedCOList = [...formData.COList];
         if (!checked) {
             updatedCOList.splice(index, 1); // Remove the unchecked item
-        } else if (formData.COList.length < 5) {
+        } else if (formData.COList.length < 3) {
             updatedCOList.splice(index + 1, 0, {
-                VMob1: '', VEName: '', VHName: '', NoOfFormsKN: '',
-                NoOfFormsKD: '',
-                NoOfFormsU: '',
+                VMob1: '', VEName: '', VHName: ''
             });
         }
         setFormData({ ...formData, COList: updatedCOList });
@@ -394,13 +345,7 @@ function IncomingForms() {
         return IFDetails.reduce((sum, row) => sum + (Number(row[key]) || 0), 0);
     };
 
-    const calculateTotalForms = () => {
-        let totalForms = 0;
-        formData.COList.forEach(co => {
-            totalForms += Number(co.NoOfFormsKN) + Number(co.NoOfFormsKD) + Number(co.NoOfFormsU);
-        });
-        return totalForms;
-    };
+
 
     return (
         <main className="bg-gray-100">
@@ -412,13 +357,21 @@ function IncomingForms() {
                 <h1 className="text-3xl font-bold my-4">Incoming Form Info</h1>
                 <Form onSubmit={content ? handleEdit : handleSubmit} className="IncomingForms-form">
                     <Row className="mb-3">
+
                         <div className="col-md-3 mb-3">
                             <Form.Group>
-                                <Form.Label>Mobile Number<sup className='text-red-500'>*</sup></Form.Label>
+                                <Form.Label>Mobile No. 1<sup className='text-red-500'>*</sup></Form.Label>
                                 <Typeahead
                                     id="VMob1"
-                                    selected={formData.VMob1 ? [{ VMob1: formData.VMob1 }] : []}
-                                    onInputChange={(value) => fetchSuggestedMobiles(value, setSuggestedMobiles)}
+                                    // selected={formData.VMob1 ? [{ VMob1: formData.VMob1 }] : []}
+                                    onInputChange={(inputValue) => {
+                                        setFormData((prevDetails) => ({
+                                            ...prevDetails,
+                                            VMob1: inputValue,
+                                        }));
+                                        fetchSuggestedMobiles(inputValue, setSuggestedMobiles)
+                                    }}
+                                    // onInputChange={(value) => fetchSuggestedMobiles(value, setSuggestedMobiles)}
                                     onChange={(selected) => {
                                         if (selected.length > 0) {
                                             const [choice] = selected;
@@ -431,10 +384,15 @@ function IncomingForms() {
                                                 VEAddress: choice.VEAddress || '',
                                                 VHAddress: choice.VHAddress || '',
                                             }));
+                                        } else {
+                                            setFormData((prevDetails) => ({
+                                                ...prevDetails,
+                                                EAreaVill: '', // Reset if cleared
+                                            }));
                                         }
                                     }}
                                     options={suggestedMobiles}
-                                    placeholder="Mobile Number"
+                                    placeholder="Mobile Number 1"
                                     labelKey="VMob1"
                                     defaultInputValue={formData.VMob1}
                                     renderMenuItemChildren={(option) => (
@@ -477,12 +435,63 @@ function IncomingForms() {
                         <div className="col-md-5 mb-3">
                             <Form.Group >
                                 <Form.Label>Address (Hindi)<sup className='text-red-500'>*</sup></Form.Label>
-                                <Form.Control type="text" placeholder="Address (Hindi)" name="VHAddress" value={formData.VHAddress} onChange={handleChange} />
+                                <Form.Control type="text" placeholder="Address (Hindi)" name="VHAddress"
+                                    value={formData.VHAddress}
+                                    onChange={handleChange} />
                             </Form.Group>
                         </div>
                     </Row>
 
+
                     <Row className="mb-3">
+                        <div className="col-md-3 mb-3">
+                            <Form.Group>
+                                <Form.Label>No. of Forms (Kanpur) <sup className='text-red-500'>*</sup></Form.Label>
+                                <Form.Control
+                                    type="number"
+                                    placeholder={`No. of Forms (Kanpur)`}
+                                    name="NoOfFormsKN"
+                                    value={formData.NoOfFormsKN}
+                                    onChange={handleChange}
+                                />
+                            </Form.Group>
+                        </div>
+                        <div className="col-md-3 mb-3">
+                            <Form.Group>
+                                <Form.Label>No. of Forms (Dehat)<sup className='text-red-500'>*</sup></Form.Label>
+                                <Form.Control
+                                    type="number"
+                                    placeholder="No. of Forms (Dehat)"
+                                    name="NoOfFormsKD"
+                                    value={formData.NoOfFormsKD}
+                                    onChange={handleChange}
+                                />
+                            </Form.Group>
+                        </div>
+                        <div className="col-md-3 mb-3">
+                            <Form.Group>
+                                <Form.Label>No. of Forms (Unnao)<sup className='text-red-500'>*</sup></Form.Label>
+                                <Form.Control type="number"
+                                    placeholder="No. of Forms (Unnao)"
+                                    name="NoOfFormsU"
+                                    value={formData.NoOfFormsU}
+                                    onChange={handleChange}
+                                />
+                            </Form.Group>
+                        </div>
+
+                        <div className="col-md-2 mb-3">
+                            <Form.Group>
+                                <Form.Label>Total Forms<sup className='text-red-500'>*</sup></Form.Label>
+                                <Form.Control type="number" placeholder="Total Forms" name="" value={Number(formData.NoOfFormsKN) + Number(formData.NoOfFormsKD) + Number(formData.NoOfFormsU)} readOnly />
+                            </Form.Group>
+                        </div>
+                    </Row>
+
+
+                    <Row className="mb-3">
+
+
 
                         <div className="col-md-5 mb-3">
                             <Form.Group >
@@ -505,12 +514,7 @@ function IncomingForms() {
                             </Form.Group>
                         </div>
 
-                        <div className="col-md-2 mb-3">
-                            <Form.Group>
-                                <Form.Label>Total Forms</Form.Label>
-                                <Form.Control type="number" name="TotalForms" value={formData.TotalForms = calculateTotalForms()} onChange={handleChange} readOnly />
-                            </Form.Group>
-                        </div>
+
                     </Row>
 
                     {formData.COList.map((e, index) => (
@@ -521,8 +525,15 @@ function IncomingForms() {
                                         <Form.Label>Care Of Mobile {index + 1}</Form.Label>
                                         <Typeahead
                                             id={`COList[${index}].VMob1`}
-                                            selected={formData.COList[index].VMob1 ? [{ VMob1: formData.COList[index].VMob1 }] : []}
-                                            onInputChange={(input) => fetchSuggestedMobiles(input, setSuggestedCareOfMobiles)}
+                                            onInputChange={(inputValue) => {
+                                                const updatedCOList = [...formData.COList];
+                                                updatedCOList[index].VMob1 = inputValue;
+                                                setFormData((prevDetails) => ({
+                                                    ...prevDetails,
+                                                    COList: updatedCOList,
+                                                }));
+                                                fetchSuggestedMobiles(inputValue, setSuggestedCareOfMobiles);
+                                            }}
                                             onChange={(selected) => {
                                                 if (selected.length > 0) {
                                                     const [choice] = selected;
@@ -534,6 +545,11 @@ function IncomingForms() {
                                                         VHName: choice.VHName,
                                                     };
                                                     setFormData({ ...formData, COList: updatedCOList });
+                                                }else{
+                                                    setFormData((prevDetails)=>({
+                                                        ...prevDetails,
+                                                        COList: updatedCOList,
+                                                    }))
                                                 }
                                             }}
                                             options={suggestedCareOfMobiles}
@@ -545,9 +561,7 @@ function IncomingForms() {
                                                 </div>
                                             )}
                                         />
-
                                     </Form.Group>
-
                                 </div>
                                 <div className="col-md-3 mb-3">
                                     <Form.Group>
@@ -559,7 +573,6 @@ function IncomingForms() {
                                             value={formData.COList[index].VEName}
                                             onChange={(e) => handleCareOfChange(e, index)}
                                             required
-
                                         />
                                     </Form.Group>
                                 </div>
@@ -572,56 +585,9 @@ function IncomingForms() {
                                             name="VHName"
                                             value={formData.COList[index].VHName}
                                             onChange={(e) => handleCareOfChange(e, index)}
-
                                         />
                                     </Form.Group>
                                 </div>
-                            </Row>
-
-                            <Row className="mb-3">
-                                <div className="col-md-3 mb-3">
-                                    <Form.Group>
-                                        <Form.Label>No. of Forms (Kanpur) {index + 1}<sup className='text-red-500'>*</sup></Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            placeholder={`No. of Forms (Kanpur) ${index + 1}`}
-                                            name="NoOfFormsKN"
-                                            value={e.NoOfFormsKN}
-                                            onChange={(event) => handleCareOfChange(event, index)}
-                                        />
-                                    </Form.Group>
-                                </div>
-                                <div className="col-md-3 mb-3">
-                                    <Form.Group>
-                                        <Form.Label>No. of Forms (Dehat)<sup className='text-red-500'>*</sup></Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            placeholder="No. of Forms"
-                                            name="NoOfFormsKD"
-                                            value={e.NoOfFormsKD}
-                                            onChange={(event) => handleCareOfChange(event, index)}
-                                        />
-                                    </Form.Group>
-                                </div>
-                                <div className="col-md-3 mb-3">
-                                    <Form.Group>
-                                        <Form.Label>No. of Forms (Unnao)<sup className='text-red-500'>*</sup></Form.Label>
-                                        <Form.Control type="number"
-                                            placeholder="No. of Forms"
-                                            name="NoOfFormsU"
-                                            value={e.NoOfFormsU}
-                                            onChange={(event) => handleCareOfChange(event, index)}
-                                        />
-                                    </Form.Group>
-                                </div>
-
-                                <div className="col-md-2 mb-3">
-                                    <Form.Group>
-                                        <Form.Label>Total Forms<sup className='text-red-500'>*</sup></Form.Label>
-                                        <Form.Control type="number" placeholder="Total Forms" name="" value={Number(e.NoOfFormsKN) + Number(e.NoOfFormsKD) + Number(e.NoOfFormsU)} readOnly />
-                                    </Form.Group>
-                                </div>
-
                                 {index < 2 && (
                                     <div className="col-md-2 mb-3">
                                         <Form.Group>
@@ -640,8 +606,9 @@ function IncomingForms() {
                         </div>
                     ))}
 
+
                     <Button variant="primary" type="submit">
-                    {content ? 'Update' : 'Submit'}
+                        {content ? 'Update' : 'Submit'}
                     </Button>
                 </Form>
 
