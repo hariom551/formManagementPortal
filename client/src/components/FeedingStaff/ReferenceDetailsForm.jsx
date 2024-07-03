@@ -110,7 +110,6 @@ function ReferenceDetailsForm({
                 throw new Error('Selected packet details not found');
             }
 
-
             const mappedCOList = [
                 {
                     VMob1: selectedDetails.C1Mob,

@@ -7,7 +7,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import Select from 'react-select';
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 
-
 function VoterList() {
     const [votersDetails, setVotersDetails] = useState([]);
     const [formData, setFormData] = useState({ WBId: undefined });
@@ -88,6 +87,7 @@ function VoterList() {
                 const image = cell.getValue();
                 if (!image) return 'N/A';
                 const imageUrl = `/public/photo/${image}`;
+                console.log(`Rendering photo: ${imageUrl}`);
                 return <img src={imageUrl} alt="voter" style={{ width: '50px', height: '50px' }} />;
             }
         },
