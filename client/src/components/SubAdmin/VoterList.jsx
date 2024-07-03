@@ -86,11 +86,12 @@ function VoterList() {
             Cell: ({ cell }) => {
                 const image = cell.getValue();
                 if (!image) return 'N/A';
-                const imageUrl = `/public/photo/${image}`;
-                console.log(`Rendering photo: ${imageUrl}`);
+                const imageUrl = `http://localhost:3000/public/photo/${image}`;
+              
                 return <img src={imageUrl} alt="voter" style={{ width: '50px', height: '50px' }} />;
             }
         },
+        
         {
             accessorKey: 'Degree',
             header: 'Degree',
@@ -99,7 +100,7 @@ function VoterList() {
                 const degreeUrl = cell.getValue();
                 if (!degreeUrl) return 'N/A';
                 const imageUrl = `/public/Degree/${degreeUrl}`;
-                console.log(`Rendering degree: ${imageUrl}`);
+              
                 return <img src={imageUrl} alt="degree" style={{ width: '50px', height: '50px' }} />;
             }
         },
@@ -111,7 +112,6 @@ function VoterList() {
                 const idProofUrl = cell.getValue();
                 if (!idProofUrl) return 'N/A';
                 const imageUrl = `/public/IdProof/${idProofUrl}`;
-                console.log(`Rendering id proof: ${imageUrl}`);
                 return <img src={imageUrl} alt="id proof" style={{ width: '50px', height: '50px' }} />;
             }
         }

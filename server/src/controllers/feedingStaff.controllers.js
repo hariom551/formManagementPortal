@@ -51,14 +51,14 @@ const searchCaste = asyncHandler(async (req, res) => {
 
 const searchAreaVill = asyncHandler(async (req, res) => {
     const { query } = req.body;
-    
+
     if (!query) {
         return res.status(400).json({ error: 'Query parameter is required' });
     }
 
     try {
         const results = await queryDatabase(
-            `SELECT DISTINCT EAreaVill, Id AS AreaId FROM areavill WHERE EAreaVill LIKE ?`, 
+            `SELECT DISTINCT EAreaVill, Id AS AreaId FROM areavill WHERE EAreaVill LIKE ?`,
             [`%${query}%`]
         );
         return res.json(results);
@@ -90,7 +90,7 @@ const allAreaDetails = asyncHandler(async (req, res) => {
             LEFT JOIN vidhansabha AS V ON V.ID = W.VSId 
             LEFT JOIN council AS cc ON cc.Id = V.counId 
             LEFT JOIN tehsillist AS T ON T.ID = cc.TehId 
-            WHERE A.EAreaVill = ?`, 
+            WHERE A.EAreaVill = ?`,
             [EAreaVill]
         );
 
@@ -149,6 +149,54 @@ const allAreaDetails = asyncHandler(async (req, res) => {
     } catch (error) {
         console.error('Database query error', error);
         return res.status(500).send('A database error occurred.');
+    }
+});
+
+const SearchPacketNo = asyncHandler(async (req, res) => {
+    const { query } = req.body;
+
+    if (!query) {
+        return res.status(400).json({ error: 'Query parameter is required' });
+    }
+    try {
+        const results = await queryDatabase(
+            `SELECT DISTINCT PacketNo FROM incomingform WHERE PacketNo LIKE ? LIMIT 10 `,
+            [`%${query}%`]
+        );
+        return res.json(results);
+
+
+        // res.status(200).json(new ApiResponse(200, incomingForms, "Fetched all incoming forms successfully"));
+    } catch (error) {
+        console.error('Error in fetching :', error);
+        return res.status(error.statusCode || 500).json(new ApiResponse(error.statusCode || 500, null, error.message || "Internal Server Error"));
+    }
+});
+
+const ReferenceDetails = asyncHandler(async (req, res) => {
+    const {PKT}= req.body;
+
+    if (!PKT) {
+        return res.status(400).json({ error: 'PKT parameter is required' });
+    }
+
+    try {
+        const ReferenceDetails = await queryDatabase(`
+        SELECT v1.Id As IncRefId, v1.VEName AS RName, V1.VHName AS RHName, V1.VMob1 AS RMob1, v1.VEAddress AS RAddress, V1.VHAddress AS RHAddress,
+        v2.VEName AS C1Name,v2.VHName AS C1HName, V2.VMob1 as C1Mob, 
+        v3.VEName AS C2Name, v3.VHName AS C2HName, V3.VMob1 as C2Mob, 
+        v4.VEName AS C3Name, v4.VHName AS C3HName, V4.VMob1 as C3Mob
+        FROM incomingform AS i
+        LEFT JOIN volunteer AS v1 ON i.RefId = v1.Id
+        LEFT JOIN volunteer AS v2 ON i.COId1 = v2.Id
+        LEFT JOIN volunteer AS v3 ON i.COId2 = v3.Id
+        LEFT JOIN volunteer AS v4 ON i.COId3 = v4.Id
+        WHERE i.PacketNo= ?`,[PKT]);
+        return res.json(ReferenceDetails);
+        // res.status(200).json(new ApiResponse(200, incomingForms, "Fetched all incoming forms successfully"));
+    } catch (error) {
+        console.error('Error in fetching incoming forms:', error);
+        return res.status(error.statusCode || 500).json(new ApiResponse(error.statusCode || 500, null, error.message || "Internal Server Error"));
     }
 });
 
@@ -236,7 +284,7 @@ const getPerseemanDetails = asyncHandler(async (req, res) => {
     if (!ChakNo && !ECBPanch && !EAreaVill) {
         return res.status(400).json({ error: 'At least one of chakNo, ECBPanch, or EAreaVill is required.' });
     }
-    
+
     try {
         let query = `
             SELECT CBP.ChakNo, CBP.ECBPanch, AV.EAreaVill, WB.WardNo
@@ -244,7 +292,7 @@ const getPerseemanDetails = asyncHandler(async (req, res) => {
             JOIN areavill AS AV ON CBP.Id = AV.CBPId 
             JOIN wardblock AS WB ON WB.Id = CBP.WBId
             WHERE 1 = 1`;
-        
+
         const params = [];
 
         if (EAreaVill) {
@@ -269,20 +317,22 @@ const getPerseemanDetails = asyncHandler(async (req, res) => {
     }
 });
 
-const ChakNoBlock = asyncHandler(async(req, res)=>{
-    try{
-        const result= await queryDatabase('select ECBPanch, ChakNo FROM chakblockpanch')
-     
+const ChakNoBlock = asyncHandler(async (req, res) => {
+    try {
+        const result = await queryDatabase('select ECBPanch, ChakNo FROM chakblockpanch')
+
         return res.json(result);
 
     }
-    catch(error){
+    catch (error) {
         return res.status(500).send('A database error occured ok');
     }
 })
 
 
-export { searchSurname, searchCaste, 
-    searchAreaVill, allAreaDetails, 
-    AddVoter, 
-    getPerseemanDetails, ChakNoBlock };
+export {
+    SearchPacketNo, ReferenceDetails, searchSurname, searchCaste,
+    searchAreaVill, allAreaDetails,
+    AddVoter,
+    getPerseemanDetails, ChakNoBlock
+};

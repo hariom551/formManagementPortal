@@ -2,9 +2,14 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
-
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const app = express();
+
+// Get the directory name of the current module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
@@ -21,6 +26,9 @@ app.use(session({
     resave: false,
     saveUninitialized: true
 }));
+
+// Serve static files from the "public" directory
+app.use('/public', express.static(path.join(__dirname, '..', 'Public')));
 
 // Your API routes here
 import userRouter from './routes/user.routes.js';
