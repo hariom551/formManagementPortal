@@ -179,7 +179,6 @@ const ReferenceDetails = asyncHandler(async (req, res) => {
     if (!PKT) {
         return res.status(400).json({ error: 'PKT parameter is required' });
     }
-
     try {
         const ReferenceDetails = await queryDatabase(`
         SELECT v1.Id As IncRefId, v1.VEName AS RName, V1.VHName AS RHName, V1.VMob1 AS RMob1, v1.VEAddress AS RAddress, V1.VHAddress AS RHAddress,
