@@ -359,7 +359,7 @@ const AddWardBlock = asyncHandler(async (req, res) => {
 const WardBlockDetails = asyncHandler(async (req, res) => {
 
     try {
-        const results = await queryDatabase('SELECT wardblock.*, vidhansabha.EVidhanSabha FROM wardblock INNER JOIN vidhansabha ON vidhansabha.Id = wardblock.VSId');
+        const results = await queryDatabase('SELECT WB.Id, WB.VSId, WB.WardNo, WB.EWardBlock, WB.HWardBlock, vidhansabha.EVidhanSabha FROM wardblock AS WB INNER JOIN vidhansabha ON vidhansabha.Id = WB.VSId ORDER BY WB.WardNo ');
 
         return res.json(results); // Should correctly return the results array
     } catch (error) {
