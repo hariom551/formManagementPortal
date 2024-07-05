@@ -1,11 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Form, Row } from 'react-bootstrap';
-import { Box } from '@mui/material';
+import { Box, Button as MUIButton } from '@mui/material';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { mkConfig, generateCsv, download } from 'export-to-csv';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
 import FormsAdminInfo from './FormsAdminInfo';
 import { validateFormsAdmin } from '../../Validation/formsAdminValidation';
 import { ToastContainer, toast } from 'react-toastify';
@@ -119,7 +122,7 @@ function OutgoingForms() {
     
             if (result.ok) {
                 toast.success("OutgoingForms Added Successfully.");
-                window.location.reload();
+                // window.location.reload();
                 // Reset the form data while preserving visibility of VMob1 and CMob1
                 setFormData({
                     ...initialFormData,
@@ -135,6 +138,9 @@ function OutgoingForms() {
     };
     
     
+    const calculateColumnTotals = (key) => {
+        return OFDetails.reduce((sum, row) => sum + (Number(row[key]) || 0), 0);
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -143,19 +149,6 @@ function OutgoingForms() {
         setErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
     };
 
-    const handleExportData = () => {
-        const csvConfig = mkConfig({
-            fieldSeparator: ',',
-            decimalSeparator: '.',
-            useKeysAsHeaders: true,
-        });
-        const csv = generateCsv(csvConfig)(OFDetails);
-        download(csvConfig)(csv);
-    };
-
-    const calculateColumnTotals = (key) => {
-        return OFDetails.reduce((sum, row) => sum + (Number(row[key]) || 0), 0);
-    };
 
     const columns = useMemo(() => [
         {
@@ -168,7 +161,7 @@ function OutgoingForms() {
         },
         {
             accessorKey: 'RName',
-            header: 'Name ',
+            header: 'Name',
             size: 15,
         },
         {
@@ -209,10 +202,82 @@ function OutgoingForms() {
         },
     ], [OFDetails]);
 
+    const handleExport = (rows, format) => {
+        const exportData = rows.map((row, index) => ({
+          "S.No": index + 1,
+          "Name": row.original.RName,
+          "Mobile": row.original.RMob1,
+          "Address": row.original.RAddress,
+          "CO1 Name": row.original.C1Name,
+          "CO1 Mobile": row.original.C1Mob,
+          "Sending Date": row.original.SendingDate,
+          "Remarks": row.original.ERemark,
+          "Sending Date": row.original.SendingDate,
+        }));
+    
+        if (format === 'csv') {
+          const csv = generateCsv(csvConfig)(exportData);
+          download(csvConfig)(csv);
+        } else if (format === 'pdf') {
+          const doc = new jsPDF();
+          const tableData = exportData.map(row => Object.values(row));
+          const tableHeaders = ["S.No", "Name", "Mobile", "Address", "CO1 Name", "CO1 Mobile", "Sending Date" , "Remarks"];
+          autoTable(doc, {
+            head: [tableHeaders],
+            body: tableData,
+          });
+          doc.save('OutgoingForm.pdf');
+        }
+      };
+
+
+    const csvConfig = mkConfig({
+        fieldSeparator: ',',
+        decimalSeparator: '.',
+        useKeysAsHeaders: true,
+    });
+    
     const table = useMaterialReactTable({
         columns,
         data: OFDetails,
+        // enableRowSelection: true,
+        columnFilterDisplayMode: 'popover',
+        paginationDisplayMode: 'pages',
+        positionToolbarAlertBanner: 'bottom',
+        muiTableFooterCellProps: {
+            sx: {
+                fontWeight: 'bold',
+                color:'black',
+                fontSize: '15px'
+            },
+        },
+        renderTopToolbarCustomActions: ({ table }) => (
+            <Box
+                sx={{
+                    display: 'flex',
+                    gap: '16px',
+                    padding: '8px',
+                    flexWrap: 'wrap',
+                }}
+            >
+                <MUIButton
+                    disabled={table.getPrePaginationRowModel().rows.length === 0}
+                    onClick={() => handleExport(table.getPrePaginationRowModel().rows, 'csv')}
+                    startIcon={<FileDownloadIcon />}
+                >
+                    Export All Data (CSV)
+                </MUIButton>
+                <MUIButton
+                    disabled={table.getPrePaginationRowModel().rows.length === 0}
+                    onClick={() => handleExport(table.getPrePaginationRowModel().rows, 'pdf')}
+                    startIcon={<FileDownloadIcon />}
+                >
+                    Export All Data (PDF)
+                </MUIButton>
+            </Box>
+        ),
     });
+    
 
     return (
         <main className="bg-gray-100">
@@ -229,6 +294,7 @@ function OutgoingForms() {
                                 <Form.Label>Mobile Number<sup className='text-red-500'>*</sup></Form.Label>
                                 <Typeahead
                                     id="VMob1"
+                                    selected={formData.VMob1 ? [{ VMob1: formData.VMob1 }] : []}
                                     name="VMob1"
                                     onInputChange={(value) => {fetchSuggestedMobiles(value, setSuggestedMobiles);
                                         const error = validateFormsAdmin("VMob1", value);
@@ -318,10 +384,11 @@ function OutgoingForms() {
                     <div className="row mb-3">
                         <div className="col-md-3 mb-3">
                             <Form.Group>
-                                <Form.Label>Care Of Mobile<sup className='text-red-500'>*</sup></Form.Label>
+                                <Form.Label>Care Of Mobile</Form.Label>
                                 <Typeahead
                                     id="CMob1"
                                     name="CMob1"
+                                    selected={formData.CMob1 ? [{ VMob1: formData.VMob1 }] : []}
                                     onInputChange={(value) => {
                                         fetchSuggestedMobiles(value, setSuggestedCareOfMobiles);
                                         const error = validateFormsAdmin("CMob1", value);
@@ -354,7 +421,7 @@ function OutgoingForms() {
                         </div>
                         <div className="col-md-3 mb-3">
                             <Form.Group>
-                                <Form.Label>Careof (English)<sup className='text-red-500'>*</sup></Form.Label>
+                                <Form.Label>Careof (English)</Form.Label>
                                 <Form.Control type="text"
                                     placeholder="Careof (English)"
                                     id="CEName"
@@ -364,7 +431,7 @@ function OutgoingForms() {
                         </div>
                         <div className="col-md-3 mb-3">
                             <Form.Group>
-                                <Form.Label>Careof (Hindi)<sup className='text-red-500'>*</sup></Form.Label>
+                                <Form.Label>Careof (Hindi)</Form.Label>
                                 <Form.Control type="text" placeholder="Careof (Hindi)" id="CHName" name="CHName" value={formData.CHName} onChange={handleChange} />
                             </Form.Group>
                             {errors.CHName && <div className="text-danger">{errors.CHName}</div>}
@@ -402,26 +469,11 @@ function OutgoingForms() {
 
                 <hr className="my-4" />
                 <h4 className="container mt-3 text-xl font-bold mb-3">OutgoingForms List</h4>
-                <div className="overflow-x-auto">
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            gap: '16px',
-                            padding: '8px',
-                            flexWrap: 'wrap',
-                        }}
-                    >
-                        <Button
-                            onClick={handleExportData}
-                            startIcon={<FileDownloadIcon />}
-                        >
-                            Export Data
-                        </Button>
-                    </Box>
+              
 
                     <MaterialReactTable table={table} />
                 </div>
-            </div>
+            
         </main>
     );
 }

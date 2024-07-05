@@ -8,7 +8,6 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { mkConfig, generateCsv, download } from 'export-to-csv';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -182,7 +181,7 @@ function PollingStationList() {
     {
       accessorKey: 'Serial No',
       header: 'S.No',
-      size: 50,
+      size: 5,
       Cell: ({ row }) => row.index + 1,
     },
     {

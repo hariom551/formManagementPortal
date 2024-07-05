@@ -3,7 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import {pool} from '../db/database.js';
-import path from 'path';
+
 
 function queryDatabase(sql, params) {
     return new Promise((resolve, reject) => {
@@ -17,9 +17,8 @@ function queryDatabase(sql, params) {
     });
 }
 
-
-
 const voterList = asyncHandler(async (req, res) => {
+
     const { WBId } = req.body;
 
     if (!WBId) {
@@ -37,20 +36,6 @@ const voterList = asyncHandler(async (req, res) => {
             WHERE WBId = ?`, 
             [WBId]
         );
-
-        // const publicFolderPath = 'C:\\Hariom Nathani\\Swapnil goverment project\\Swapnil-Project-main\\server\\public';
-
-    
-        // const constructFileUrl = (fileName, folder) => {
-        //     return fileName ? path.join(publicFolderPath, folder, fileName) : null;
-        // };
-
-        // const formattedResults = results.map(voter => ({
-        //     ...voter,
-        //     ImageUrl: constructFileUrl(voter.Image, 'photo'),
-        //     DegreeUrl: constructFileUrl(voter.Degree, 'Degree'),
-        //     IdProofUrl: constructFileUrl(voter.IdProof, 'IdProof')
-        // }));
 
         return res.json(results);
     } catch (error) {
