@@ -241,14 +241,14 @@ const AddVoter = [
             }
 
             const query = `INSERT INTO voterlist (
-                RegNo, PacketNo, IncRefId, EFName, HFName,
+                RegNo, PacketNo, EFName, HFName,
                 ELName, HLName, RType, ERFName, HRFName, 
                 ERLName, HRLName, CasteId, Qualification, Occupation, 
                 Age, DOB, Sex, MNo, MNo2,
                 AadharNo, VIdNo, GCYear, AreaId, TehId, 
                 CounId, VSId, WBId, ChkBlkId, HNo,
                 Landmark, Image, IdProof, Degree)
-                VALUES (?, ?, ?, ?, ?, 
+                VALUES (?, ?, ?, ?, 
                 ?, ?, ?, ?, ?,
                 ?, ?, ?, ?, ?,
                 ?, ?, ?, ?, ?,
@@ -257,7 +257,7 @@ const AddVoter = [
                 ?, ?, ?, ?)`;
 
             const values = [
-                req.regNo, referenceDetails.PacketNo, referenceDetails.IncRefId, voterDetails.EFName, voterDetails.HFName,
+                req.regNo, referenceDetails.PacketNo, voterDetails.EFName, voterDetails.HFName,
                 voterDetails.ELName, voterDetails.HLName, voterDetails.RType, voterDetails.ERFName, voterDetails.HRFName,
                 voterDetails.ERLName, voterDetails.HRLName, voterDetails.CasteId, voterDetails.Qualification, voterDetails.Occupation,
                 voterDetails.Age, voterDetails.DOB, voterDetails.Sex, voterDetails.MNo, voterDetails.MNo2,

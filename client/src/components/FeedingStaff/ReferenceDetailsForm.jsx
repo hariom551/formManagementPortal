@@ -2,15 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Form, Row } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { validateReferenceDetails } from '../../Validation/refrenceDetailsValidation';
+import { validateVoterDetails } from '../../Validation/voterDetailsValidation';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 
-function ReferenceDetailsForm({ referenceDetails, setReferenceDetails }) {
+function ReferenceDetailsForm({ referenceDetails, setReferenceDetails, errors, setErrors }) {
     const [packetOptions, setPacketOptions] = useState([]);
-    const [errors, setErrors] = useState({});
-
-   
     const fetchPacketOptions = async (inputValue) => {
         try {
             const response = await fetch('/api/v1/feedingStaff/SearchPacketNo', {
@@ -63,9 +60,8 @@ function ReferenceDetailsForm({ referenceDetails, setReferenceDetails }) {
                 { VMob1: data[0].C1Mob || '', VEName: data[0].C1Name || '', VHName: data[0].C1HName || '' },
                 { VMob1: data[0].C2Mob || '', VEName: data[0].C2Name || '', VHName: data[0].C2HName || '' },
                 { VMob1: data[0].C3Mob || '', VEName: data[0].C3Name || '', VHName: data[0].C3HName || '' },
-            ].filter(co => co.VMob1 || co.VEName || co.VHName); // Remove empty CO entries
+            ].filter(co => co.VMob1 || co.VEName || co.VHName); 
 
-            // Update referenceDetails state
             setReferenceDetails({
                 ...referenceDetails,
                 PacketNo: selectedOption,
@@ -92,13 +88,17 @@ function ReferenceDetailsForm({ referenceDetails, setReferenceDetails }) {
             ...prevDetails,
             [name]: value,
         }));
-
-        const error = validateReferenceDetails(name, value);
+    
+        const error = validateVoterDetails(name, value);
         setErrors(prevErrors => ({
             ...prevErrors,
-            [name]: error,
+            referenceDetails: {
+                ...prevErrors.referenceDetails,
+                [name]: error,
+            },
         }));
     };
+    
 
     const handleCareOfChange = (event, index) => {
         const { name, value } = event.target;
@@ -145,11 +145,20 @@ function ReferenceDetailsForm({ referenceDetails, setReferenceDetails }) {
                 <div className="row mt-3">
                     <div className="col-md-3 flex-col gap-2 flex">
                         <Form.Group>
-                            <Form.Label>Packet No.</Form.Label>
+                            <Form.Label>Packet No.<sup className='text-red-500'>*</sup></Form.Label>
                             <Typeahead
-                                id="packetTypeahead"
+                                id="PacketNo"
                                 name="PacketNo"
-                                onInputChange={(value) => fetchPacketOptions(value)}
+                                onInputChange={(value) => {fetchPacketOptions(value);
+                                    const error = validateVoterDetails("PacketNo", value);
+                                    setErrors(prevErrors => ({
+                                        ...prevErrors,
+                                        referenceDetails: {
+                                            ...prevErrors.referenceDetails,
+                                            PacketNo: error,
+                                        },
+                                    }));
+                                    }}
                                 onChange={(selected) => {
                                     if (selected.length > 0) {
                                         const { value } = selected[0];
@@ -158,6 +167,16 @@ function ReferenceDetailsForm({ referenceDetails, setReferenceDetails }) {
                                             PacketNo: value,
                                         }));
                                         fetchRefrenceDetails(value);
+                                        const error = validateVoterDetails("PacketNo", value);
+                                        setErrors(prevErrors => ({
+                                            ...prevErrors,
+                                            referenceDetails: {
+                                                ...prevErrors.referenceDetails,
+                                                PacketNo: error,
+                                            },
+                                        }));
+                                        
+
                                     } else {
                                         setReferenceDetails(prevDetails => ({
                                             ...prevDetails,
@@ -171,7 +190,7 @@ function ReferenceDetailsForm({ referenceDetails, setReferenceDetails }) {
                                 // labelKey="PacketNo"
                             // selected={packetOptions.filter(option => option.value === referenceDetails.PacketNo)}
                             />
-                            {errors.PacketNo && <div className="text-danger">{errors.PacketNo}</div>}
+                            {errors.PacketNo && <div className="text-danger mt-1 text-[0.8rem]">{errors.PacketNo}</div>}
                         </Form.Group>
                     </div>
 
@@ -187,8 +206,9 @@ function ReferenceDetailsForm({ referenceDetails, setReferenceDetails }) {
                                 value={referenceDetails.VMob1 || ''}
                                 onChange={handleChange}
                                 placeholder='Enter Mobile 1'
+                                readOnly
                             />
-                            {errors.VMob1 && <div className="text-danger">{errors.VMob1}</div>}
+                  
                         </Form.Group>
                     </div>
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
@@ -201,6 +221,7 @@ function ReferenceDetailsForm({ referenceDetails, setReferenceDetails }) {
                                 value={referenceDetails.VHName || ''}
                                 onChange={handleChange}
                                 placeholder='Enter Volunteer Name'
+                                readOnly
                             />
                         </Form.Group>
                     </div>
@@ -214,6 +235,7 @@ function ReferenceDetailsForm({ referenceDetails, setReferenceDetails }) {
                                 value={referenceDetails.VEName || ''}
                                 onChange={handleChange}
                                 placeholder='Enter Volunteer Name'
+                                readOnly
                             />
                         </Form.Group>
                     </div>
@@ -227,6 +249,7 @@ function ReferenceDetailsForm({ referenceDetails, setReferenceDetails }) {
                                 value={referenceDetails.VMob2 || ''}
                                 onChange={handleChange}
                                 placeholder='Enter Mobile 2'
+                                readOnly
                             />
                         </Form.Group>
                     </div>
@@ -242,6 +265,7 @@ function ReferenceDetailsForm({ referenceDetails, setReferenceDetails }) {
                                 value={referenceDetails.VEAddress || ''}
                                 onChange={handleChange}
                                 placeholder='Enter Address'
+                                readOnly
                             />
                         </Form.Group>
                     </div>
@@ -255,6 +279,7 @@ function ReferenceDetailsForm({ referenceDetails, setReferenceDetails }) {
                                 value={referenceDetails.VHAddress || ''}
                                 onChange={handleChange}
                                 placeholder='Enter Address'
+                                readOnly
                             />
                         </Form.Group>
                     </div>
@@ -273,6 +298,7 @@ function ReferenceDetailsForm({ referenceDetails, setReferenceDetails }) {
                                         name="VMob1"
                                         value={e.VMob1 || ''}
                                         onChange={(event) => handleCareOfChange(event, index)}
+                                        readOnly
                                     />
                                 </Form.Group>
                             </div>
@@ -286,6 +312,7 @@ function ReferenceDetailsForm({ referenceDetails, setReferenceDetails }) {
                                         name="VEName"
                                         value={e.VEName || ''}
                                         onChange={(event) => handleCareOfChange(event, index)}
+                                        readOnly
                                     />
                                 </Form.Group>
                             </div>
@@ -299,6 +326,7 @@ function ReferenceDetailsForm({ referenceDetails, setReferenceDetails }) {
                                         name="VHName"
                                         value={e.VHName || ''}
                                         onChange={(event) => handleCareOfChange(event, index)}
+                                        readOnly
                                     />
                                 </Form.Group>
                             </div>
@@ -313,6 +341,7 @@ function ReferenceDetailsForm({ referenceDetails, setReferenceDetails }) {
                                             className='w-6 h-6'
                                             checked={referenceDetails.COList.length > index + 1}
                                             onChange={(event) => handleCareOfCheck(index + 1, event)}
+                                            readOnly
                                         />
                                     </Form.Group>
                                 </div>

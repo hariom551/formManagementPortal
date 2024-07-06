@@ -8,7 +8,8 @@ import AddressInformationForm from './AddressInformationForm.jsx';
 import VoterDocs from './VoterDocs.jsx';
 import { Occupation } from '../Pages/Constaint.jsx';
 import { validateVoterDetails } from '../../Validation/voterDetailsValidation.js';
-import { validateReferenceDetails } from '../../Validation/refrenceDetailsValidation.js';
+
+
 function AddVoter() {
     const [referenceDetails, setReferenceDetails] = useState({
         PacketNo: '',
@@ -20,11 +21,7 @@ function AddVoter() {
         VEAddress: '',
         VHAddress: '',
         COList: [
-            {
-                VMob1: '',
-                VEName: '',
-                VHName: '',
-            },
+            { VMob1: '', VEName: '', VHName: '' }
         ],
     });
 
@@ -57,7 +54,7 @@ function AddVoter() {
         EAreaVill: '',
         TehId: '',
         EName: '',
-        counId: '',
+        CounId: '',
         ECouncil: '',
         VSId: '',
         EVidhanSabha: '',
@@ -80,14 +77,14 @@ function AddVoter() {
         referenceDetails: {},
         voterDetails: {},
         addressDetail: {},
+        voterDocs: {},
     });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const voterDetailErrors = {};
-        const referenceDetailsErrors = {};
 
         // Validate voter details
+        const voterDetailErrors = {};
         Object.keys(voterDetails).forEach((field) => {
             const error = validateVoterDetails(field, voterDetails[field]);
             if (error) {
@@ -95,163 +92,170 @@ function AddVoter() {
             }
         });
 
-        if (Object.keys(voterDetailErrors).length > 0) {
-            setErrors(prevErrors => ({
-                ...prevErrors,
+        // Validate reference details
+        const referenceDetailsErrors = {};
+        Object.keys(referenceDetails).forEach((field) => {
+            const error = validateVoterDetails(field, referenceDetails[field]);
+            if (error) {
+                referenceDetailsErrors[field] = error;
+            }
+        });
+
+        const addressDetailError = {};
+        Object.keys(addressDetail).forEach((field)=>{
+            const error = validateVoterDetails(field, addressDetail[field]);
+            if (error){
+                addressDetailError[field]= error;
+            }
+        });
+
+
+        if (Object.keys(addressDetailError).length > 0 || Object.keys(voterDetailErrors).length > 0 || Object.keys(referenceDetailsErrors).length > 0) {
+            setErrors({
+                ...errors,
                 voterDetails: voterDetailErrors,
-            }));
+                referenceDetails: referenceDetailsErrors,
+                addressDetail: addressDetailError,
+            });
+            toast.error('Please fix the errors in the form.');
+            return;
         }
-            Object.keys(referenceDetails).forEach((field) => {
-                const error = validateReferenceDetails(field, referenceDetails[field]);
-                if (error) {
-                    referenceDetailsErrors[field] = error;
+
+        try {
+            const formData = new FormData();
+            formData.append('referenceDetails', JSON.stringify({
+                IncRefId: referenceDetails.IncRefId,
+                PacketNo: referenceDetails.PacketNo,
+            }));
+            formData.append('voterDetails', JSON.stringify(voterDetails));
+            formData.append('addressDetail', JSON.stringify(addressDetail));
+
+            Object.keys(voterDocs).forEach(key => {
+                if (voterDocs[key].file) {
+                    formData.append(key, voterDocs[key].file);
                 }
             });
 
-            if (Object.keys(referenceDetailsErrors).length > 0) {
-                setErrors(prevErrors => ({
-                    ...prevErrors,
-                    referenceDetails: referenceDetailsErrors,
-                }));
-                toast.error('Please fix the errors in the form.');
-                return;
+            const response = await fetch('/api/v1/feedingStaff/addVoter', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to create voter');
             }
 
-            try {
-                const formData = new FormData();
+            const data = await response.json();
+            toast.success('Voter created successfully!');
+            // Reset forms after successful submission
+            setReferenceDetails({
+                PacketNo: '',
+                IncRefId: '',
+                VMob1: '',
+                VMob2: '',
+                VEName: '',
+                VHName: '',
+                VEAddress: '',
+                VHAddress: '',
+                COList: [
+                    { VMob1: '', VEName: '', VHName: '' }
+                ],
+            });
+            setVoterDetails({
+                EFName: '',
+                HFName: '',
+                ELName: '',
+                HLName: '',
+                RType: '',
+                ERFName: '',
+                HRFName: '',
+                ERLName: '',
+                HRLName: '',
+                CasteId: '',
+                ECaste: '',
+                Qualification: '',
+                Occupation: Occupation ? '' : 'NA',
+                Age: '',
+                DOB: '',
+                Sex: '',
+                MNo: '',
+                MNo2: '',
+                AadharNo: '',
+                VIdNo: '',
+                GCYear: '',
+            });
+            setAddressDetail({
+                AreaId: '',
+                EAreaVill: '',
+                TehId: '',
+                EName: '',
+                CounId: '',
+                ECouncil: '',
+                VSId: '',
+                EVidhanSabha: '',
+                WBId: '',
+                EWardBlock: '',
+                ChkBlkId: '',
+                ECBPanch: '',
+                HNo: '',
+                Landmark: '',
+            });
+            setVoterDocs({
+                Image: '',
+                IdProof: '',
+                Degree: '',
+                VImage: '',
+            });
+            setErrors({
+                referenceDetails: {},
+                voterDetails: {},
+                addressDetail: {},
+                voterDocs: {},
+            });
 
-                formData.append('referenceDetails', JSON.stringify({
-                    IncRefId: referenceDetails.IncRefId,
-                    PacketNo: referenceDetails.PacketNo,
-                }));
-                formData.append('voterDetails', JSON.stringify(voterDetails));
-                formData.append('addressDetail', JSON.stringify(addressDetail));
+        } catch (error) {
+            toast.error('Error creating voter.');
+        }
+    };
 
-                Object.keys(voterDocs).forEach(key => {
-                    if (voterDocs[key].file) {
-                        formData.append(key, voterDocs[key].file);
-                    }
-                });
+    return (
+        <main className="bg-gray-100">
+            <ToastContainer />
+            <div className="container py-4 text-black">
+                <Form onSubmit={handleSubmit} className="Council-form">
+                    <ReferenceDetailsForm
+                        referenceDetails={referenceDetails}
+                        setReferenceDetails={setReferenceDetails}
+                        errors={errors.referenceDetails}
+                        setErrors={setErrors}
+                    />
 
-                const response = await fetch('/api/v1/feedingStaff/addVoter', {
-                    method: 'POST',
-                    body: formData,
-                });
+                    <VoterDetailsForm
+                        voterDetails={voterDetails}
+                        setVoterDetails={setVoterDetails}
+                        errors={errors.voterDetails}
+                        setErrors={setErrors}
+                    />
 
-                if (!response.ok) {
-                    throw new Error('Failed to create voter');
-                }
+                    <AddressInformationForm
+                        addressDetail={addressDetail}
+                        setAddressDetail={setAddressDetail}
+                        errors={errors.addressDetail}
+                        setErrors={setErrors}
+                    />
 
-                const data = await response.json();
-                toast.success('Voter created successfully!');
-                // window.location.reload();
-                // Reset forms after successful submission
-                setReferenceDetails({
-                    PacketNo: '',
-                    IncRefId: '',
-                    VMob1: '',
-                    VMob2: '',
-                    VEName: '',
-                    VHName: '',
-                    VEAddress: '',
-                    VHAddress: '',
-                    COList: [
-                        {
-                            VMob1: '',
-                            VEName: '',
-                            VHName: '',
-                        },
-                    ],
-                });
-                setVoterDetails({
-                    EFName: '',
-                    HFName: '',
-                    ELName: '',
-                    HLName: '',
-                    RType: '',
-                    ERFName: '',
-                    HRFName: '',
-                    ERLName: '',
-                    HRLName: '',
-                    CasteId: '',
-                    ECaste: '',
-                    Qualification: '',
-                    Occupation: Occupation ? '' : 'NA',
-                    Age: '',
-                    DOB: '',
-                    Sex: '',
-                    MNo: '',
-                    MNo2: '',
-                    AadharNo: '',
-                    VIdNo: '',
-                    GCYear: '',
-                });
-                setAddressDetail({
-                    AreaId: '',
-                    EAreaVill: '',
-                    TehId: '',
-                    EName: '',
-                    CounId: '',
-                    ECouncil: '',
-                    VSId: '',
-                    EVidhanSabha: '',
-                    WBId: '',
-                    EWardBlock: '',
-                    ChkBlkId: '',
-                    ECBPanch: '',
-                    HNo: '',
-                    Landmark: '',
-                });
-                setVoterDocs({
-                    Image: '',
-                    IdProof: '',
-                    Degree: '',
-                    VImage: '',
-                });
-                setErrors({
-                    referenceDetails: {},
-                    voterDetails: {},
-                    addressDetail: {},
-                });
+                    <VoterDocs
+                        voterDocs={voterDocs}
+                        setVoterDocs={setVoterDocs}
+                        errors={errors.voterDocs}
+                        setErrors={setErrors}
+                    />
 
-            } catch (error) {
-                toast.error('Error creating voter.');
-            }
-        };
+                    <Button type="submit" className="mt-4">Submit</Button>
+                </Form>
+            </div>
+        </main>
+    );
+}
 
-        return (
-            <main className="bg-gray-100">
-                <ToastContainer />
-                <div className="container py-4 text-black">
-                    <Form onSubmit={handleSubmit} className="Council-form">
-                        <ReferenceDetailsForm
-                            referenceDetails={referenceDetails}
-                            setReferenceDetails={setReferenceDetails}
-
-                        />
-
-                        <VoterDetailsForm
-                            voterDetails={voterDetails}
-                            setVoterDetails={setVoterDetails}
-
-                        />
-
-                        <AddressInformationForm
-                            addressDetail={addressDetail}
-                            setAddressDetail={setAddressDetail}
-
-                        />
-
-                        <VoterDocs
-                            voterDocs={voterDocs}
-                            setVoterDocs={setVoterDocs}
-                        />
-
-                        <Button type="submit" className="mt-4">Submit</Button>
-                    </Form>
-                </div>
-            </main>
-        );
-    }
-
-    export default AddVoter;
+export default AddVoter;

@@ -3,7 +3,7 @@ import { Form } from 'react-bootstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 
-function AddressInformationForm({ addressDetail, setAddressDetail }) {
+function AddressInformationForm({ addressDetail, setAddressDetail, errors, setErrors }) {
   const [AreaVillOptions, setAreaVillOptions] = useState([]);
   const [AreaFullDetails, setAreaFullDetails] = useState([]);
   const [tehsilOption, setTehsilOption] = useState([]);
