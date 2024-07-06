@@ -99,7 +99,7 @@ function VoterList() {
             Cell: ({ cell }) => {
                 const degreeUrl = cell.getValue();
                 if (!degreeUrl) return 'N/A';
-                const imageUrl = `/public/Degree/${degreeUrl}`;
+                const imageUrl = `http://localhost:3000/public/Degree/${degreeUrl}`;
               
                 return <img src={imageUrl} alt="degree" style={{ width: '50px', height: '50px' }} />;
             }
@@ -111,7 +111,7 @@ function VoterList() {
             Cell: ({ cell }) => {
                 const idProofUrl = cell.getValue();
                 if (!idProofUrl) return 'N/A';
-                const imageUrl = `/public/IdProof/${idProofUrl}`;
+                const imageUrl = `http://localhost:3000/public/IdProof/${idProofUrl}`;
                 return <img src={imageUrl} alt="id proof" style={{ width: '50px', height: '50px' }} />;
             }
         }
