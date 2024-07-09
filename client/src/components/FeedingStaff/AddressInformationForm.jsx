@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form } from 'react-bootstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
+import { validateVoterDetails } from '../../Validation/voterDetailsValidation';
 
 function AddressInformationForm({ addressDetail, setAddressDetail, errors, setErrors }) {
   const [AreaVillOptions, setAreaVillOptions] = useState([]);
@@ -56,6 +57,8 @@ function AddressInformationForm({ addressDetail, setAddressDetail, errors, setEr
         setCBOption(uniqueCBFiltered);
       }
     }
+
+
   };
 
   const fetchAreaVillOptions = async (input) => {

@@ -70,7 +70,7 @@ function AddVoter() {
         Image: '',
         IdProof: '',
         Degree: '',
-        VImage: '',
+   
     });
 
     const [errors, setErrors] = useState({
@@ -204,7 +204,7 @@ function AddVoter() {
                 Image: '',
                 IdProof: '',
                 Degree: '',
-                VImage: '',
+                
             });
             setErrors({
                 referenceDetails: {},

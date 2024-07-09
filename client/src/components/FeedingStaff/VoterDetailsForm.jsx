@@ -1,5 +1,3 @@
-// src/components/VoterDetailsForm.jsx
-
 import React, { useState, useEffect } from 'react';
 import { Form } from 'react-bootstrap';
 import { Relation, Occupation } from '../Pages/Constaint.jsx';
