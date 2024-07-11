@@ -1,5 +1,3 @@
-// src/components/VoterDetailsForm.jsx
-
 import React, { useState, useEffect } from 'react';
 import { Form } from 'react-bootstrap';
 import { Relation, Occupation } from '../Pages/Constaint.jsx';
@@ -7,8 +5,9 @@ import { Typeahead } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import { validateVoterDetails } from '../../Validation/voterDetailsValidation.js';
 
-function VoterDetailsForm({ voterDetails, setVoterDetails }) {
-    const [errors, setErrors] = useState({});
+function VoterDetailsForm({ voterDetails, setVoterDetails, errors, setErrors }) {
+
+
     const [surnameOptions, setSurnameOptions] = useState([]);
     const [relativeSurnameOptions, setRelativeSurnameOptions] = useState([]);
     const [casteOptions, setCasteOptions] = useState([]);
@@ -87,11 +86,12 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
         const error = validateVoterDetails(name, value);
         setErrors(prevErrors => ({
             ...prevErrors,
-            [name]: error,
+            voterDetails: {
+                ...prevErrors.voterDetails,
+                [name]: error,
+            }
         }));
     };
-
-
 
 
     return (
@@ -108,7 +108,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                 <div className="row mt-5">
                     <div className="col-md-3 mt-1">
                         <Form.Group>
-                            <Form.Label>First Name (English)</Form.Label>
+                            <Form.Label>First Name (English)<sup className='text-red-500'>*</sup></Form.Label>
                             <Form.Control
                                 className='px-2'
                                 type="text"
@@ -124,7 +124,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                     </div>
                     <div className="col-md-3 mt-1">
                         <Form.Group>
-                            <Form.Label>First Name (Hindi)</Form.Label>
+                            <Form.Label>First Name (Hindi)<sup className='text-red-500'>*</sup></Form.Label>
                             <Form.Control
                                 type="text"
                                 className='px-2'
@@ -133,11 +133,12 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 onChange={handleChange}
                                 placeholder="First Name (Hindi)"
                             />
+                            {errors.HFName && <div className="text-danger mt-1 text-[0.8rem]">{errors.HFName}</div>}
                         </Form.Group>
                     </div>
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
-                            <Form.Label>Last Name (English)</Form.Label>
+                            <Form.Label>Last Name (English)<sup className='text-red-500'>*</sup></Form.Label>
                             <Typeahead
                                 id="last-name-english"
                                 name="ELName"
@@ -161,7 +162,10 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
 
                                     setErrors(prevErrors => ({
                                         ...prevErrors,
-                                        ELName: error,
+                                        voterDetails: {
+                                            ...prevErrors.voterDetails,
+                                            ELName: error,
+                                        },
                                     }));
                                 }}
                                 options={surnameOptions}
@@ -173,13 +177,13 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                     </div>
                                 )}
                             />
-                            {errors.ELName && <div className="text-danger mt-1">{errors.ELName}</div>}
+                            {errors.ELName && <div className="text-danger mt-1 text-[0.8rem]">{errors.ELName}</div>}
                         </Form.Group>
                     </div>
 
                     <div className="col-md-3 mt-1">
                         <Form.Group>
-                            <Form.Label>Last Name (Hindi)</Form.Label>
+                            <Form.Label>Last Name (Hindi)<sup className='text-red-500'>*</sup></Form.Label>
                             <Form.Control
                                 type="text"
                                 className='px-2'
@@ -188,6 +192,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 onChange={handleChange}
                                 placeholder="Last Name (Hindi)"
                             />
+                            {errors.HLName && <div className="text-danger mt-1 text-[0.8rem]">{errors.HLName}</div>}
                         </Form.Group>
                     </div>
                 </div>
@@ -195,7 +200,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                 <div className="row mt-3">
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
-                            <Form.Label>Relation</Form.Label>
+                            <Form.Label>Relation<sup className='text-red-500'>*</sup></Form.Label>
                             <Form.Control
                                 as="select"
                                 className='form-select px-2'
@@ -215,7 +220,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
 
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
-                            <Form.Label>Rel. First Name (English)</Form.Label>
+                            <Form.Label>Rel. First Name (English)<sup className='text-red-500'>*</sup></Form.Label>
                             <Form.Control
                                 type="text"
                                 className='px-2'
@@ -225,12 +230,12 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 placeholder="Rel. First Name (English)"
 
                             />
-                            {errors.ERFName && <div className="text-danger">{errors.ERFName}</div>}
+                            {errors.ERFName && <div className="text-danger text-[0.8rem]">{errors.ERFName}</div>}
                         </Form.Group>
                     </div>
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
-                            <Form.Label>Rel. First Name (Hindi)</Form.Label>
+                            <Form.Label>Rel. First Name (Hindi)<sup className='text-red-500'>*</sup></Form.Label>
                             <Form.Control
                                 type="text"
                                 className='px-2'
@@ -239,12 +244,13 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 onChange={handleChange}
                                 placeholder="Rel. First Name (Hindi)"
                             />
+                            {errors.HRFName && <div className="text-danger mt-1 text-[0.8rem]">{errors.HRFName}</div>}
                         </Form.Group>
                     </div>
 
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
-                            <Form.Label>Rel. Last Name (English)</Form.Label>
+                            <Form.Label>Rel. Last Name (English)<sup className='text-red-500'>*</sup></Form.Label>
                             <Typeahead
                                 id="rel-last-name-english"
                                 onInputChange={(value) => fetchSurnameOptions(value, setRelativeSurnameOptions)}
@@ -256,6 +262,15 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                             ERLName: choice.ESurname,
                                         }));
                                     }
+                                    const error = validateVoterDetails("ERLName", selected.length > 0 ? selected[0].ERLName : "");
+
+                                    setErrors(prevErrors => ({
+                                        ...prevErrors,
+                                        voterDetails: {
+                                            ...prevErrors.voterDetails,
+                                            ERLName: error,
+                                        },
+                                    }));
                                 }}
                                 options={relativeSurnameOptions}
                                 placeholder='Rel. Last Name (English)'
@@ -267,6 +282,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                     </div>
                                 )}
                             />
+                            {errors.ERLName && <div className="text-danger mt-1 text-[0.8rem]">{errors.ERLName}</div>}
                         </Form.Group>
                     </div>
                 </div>
@@ -274,7 +290,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                 <div className="row mt-3">
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
-                            <Form.Label>Rel. Last Name (Hindi)</Form.Label>
+                            <Form.Label>Rel. Last Name (Hindi)<sup className='text-red-500'>*</sup></Form.Label>
                             <Form.Control
                                 type="text"
                                 className='px-2'
@@ -286,31 +302,33 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 }))}
                                 placeholder="Rel. Last Name (Hindi)"
                             />
+                            {errors.HRLName && <div className="text-danger mt-1 text-[0.8rem]">{errors.HRLName}</div>}
                         </Form.Group>
                     </div>
 
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
-                            <Form.Label>Caste</Form.Label>
+                            <Form.Label>Caste<sup className='text-red-500'>*</sup></Form.Label>
                             <Form.Control
                                 as="select"
                                 className='form-select px-2'
                                 name="CasteId"
                                 value={voterDetails.CasteId}
                                 onChange={handleChange}
-
                             >
+
                                 <option value="">--Select Caste--</option>
                                 {casteOptions.map((caste) => (
                                     <option key={caste.CasteId} value={caste.CasteId}>{caste.ECaste}</option>
                                 ))}
                             </Form.Control>
+                            {errors.CasteId && <div className="text-danger mt-1 text-[0.8rem]">{errors.CasteId}</div>}
                         </Form.Group>
                     </div>
 
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
-                            <Form.Label>Qualification</Form.Label>
+                            <Form.Label>Qualification<sup className='text-red-500'>*</sup></Form.Label>
                             <Form.Control
                                 as="select"
                                 className="form-select px-2"
@@ -329,7 +347,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
 
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
-                            <Form.Label>Occupation</Form.Label>
+                            <Form.Label>Occupation<sup className='text-red-500'>*</sup></Form.Label>
                             <Form.Control
                                 as="select"
                                 className='form-select px-2'
@@ -351,7 +369,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                 <div className="row mt-3">
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
-                            <Form.Label>Age</Form.Label>
+                            <Form.Label>Age<sup className='text-red-500'>*</sup></Form.Label>
                             <Form.Control
                                 type="number"
                                 name="Age"
@@ -367,7 +385,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
 
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
-                            <Form.Label>DOB</Form.Label>
+                            <Form.Label>DOB<sup className='text-red-500'>*</sup></Form.Label>
                             <Form.Control
                                 type="date"
                                 name="DOB"
@@ -384,7 +402,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
 
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
-                            <Form.Label>Gender</Form.Label>
+                            <Form.Label>Gender<sup className='text-red-500'>*</sup></Form.Label>
                             <Form.Control
                                 as="select"
                                 className='form-select px-2'
@@ -404,7 +422,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
 
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
-                            <Form.Label>Mobile No</Form.Label>
+                            <Form.Label>Mobile No<sup className='text-red-500'>*</sup></Form.Label>
                             <Form.Control
                                 type="text"
                                 className='px-2'
@@ -414,7 +432,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 placeholder="Mobile No"
 
                             />
-                            {errors.MNo && <div className="text-danger">{errors.MNo}</div>}
+                            {errors.MNo && <div className="text-danger text-[0.8rem]">{errors.MNo}</div>}
                         </Form.Group>
                     </div>
                 </div>
@@ -431,7 +449,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 onChange={handleChange}
                                 placeholder="Mobile No 2"
                             />
-                            {errors.MNo2 && <div className="text-danger">{errors.MNo2}</div>}
+                            {errors.MNo2 && <div className="text-danger text-[0.8rem]">{errors.MNo2}</div>}
                         </Form.Group>
                     </div>
 
@@ -448,7 +466,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 onChange={handleChange}
                                 placeholder="Aadhar No"
                             />
-                            {errors.AadharNo && <div className="text-danger">{errors.AadharNo}</div>}
+                            {errors.AadharNo && <div className="text-danger text-[0.8rem]">{errors.AadharNo}</div>}
                         </Form.Group>
                     </div>
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
@@ -462,13 +480,14 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 onChange={handleChange}
                                 placeholder="VoterId"
                             />
+                                {errors.VIdNo && <div className="text-danger text-[0.8rem]">{errors.VIdNo}</div>}
                         </Form.Group>
                     </div>
                     <div className="col-md-3 flex-col gap-2 flex mt-1">
                         <Form.Group>
-                            <Form.Label>Graduate Comp Year</Form.Label>
+                            <Form.Label>Graduate Comp Year<sup className='text-red-500'>*</sup></Form.Label>
                             <Form.Control
-                                type="text"
+                                type="number"
                                 className='px-2'
                                 name="GCYear"
                                 value={voterDetails.GCYear}
@@ -476,7 +495,7 @@ function VoterDetailsForm({ voterDetails, setVoterDetails }) {
                                 placeholder="Graduate Comp Year"
 
                             />
-                            {errors.GCYear && <div className="text-danger">{errors.GCYear}</div>}
+                            {errors.GCYear && <div className="text-danger text-[0.8rem]">{errors.GCYear}</div>}
                         </Form.Group>
                     </div>
                 </div>
