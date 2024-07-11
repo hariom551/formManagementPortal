@@ -212,7 +212,7 @@ function OutgoingForms() {
           "CO1 Mobile": row.original.C1Mob,
           "Sending Date": row.original.SendingDate,
           "Remarks": row.original.ERemark,
-          "Sending Date": row.original.SendingDate,
+        
         }));
     
         if (format === 'csv') {

@@ -17,6 +17,14 @@ function queryDatabase(sql, params) {
     });
 }
 
+// SELECT U.name, U.mobile1, COUNT(U.userid) AS user_count
+// FROM voterlist
+// INNER JOIN usersadminformsdata AS U ON voterlist.SBy = U.userid
+// WHERE voterlist.SDate > '2017-07-01' 
+// GROUP BY U.userid, U.name, U.mobile1;
+
+
+
 const voterList = asyncHandler(async (req, res) => {
 
     const { WBId } = req.body;
