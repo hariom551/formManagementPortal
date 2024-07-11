@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
+console.log('Vite proxy configuration loaded');
+
 export default defineConfig({
   plugins: [react()],
   server: {
@@ -11,8 +12,11 @@ export default defineConfig({
       '/api': {
         target: 'https://formmanagementportal-server.onrender.com/',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      }
-    }
-  }
+        rewrite: (path) => {
+          console.log('Rewriting path:', path);
+          return path.replace(/^\/api/, '');
+        },
+      },
+    },
+  },
 })
