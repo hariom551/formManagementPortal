@@ -10,6 +10,7 @@ EXPOSE 5173
 # Build the React app
 # RUN npm run build
 
+
 # # Use an official nginx image to serve the build
 
 # FROM nginx:alpine
