@@ -4,8 +4,8 @@ import {app} from './app.js'
 // const path = require('path'); 
 dotenv.config();
 
-app.get('/', (req, res) => {
-    res.send('Welcome Hariom');
+app.get('/mlc', (req, res) => {
+    res.send('Welcome MLC');
 });
 
 app.listen(process.env.PORT || 8000, () => {

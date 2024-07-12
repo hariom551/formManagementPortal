@@ -10,7 +10,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'https://form-management-portal-server.vercel.app',
+        target: 'https://form-management-portal-server.vercel.app/',
         changeOrigin: true,
         rewrite: (path) => {
           console.log('Rewriting path:', path);
