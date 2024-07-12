@@ -4,7 +4,9 @@ import {app} from './app.js'
 // const path = require('path'); 
 dotenv.config();
 
-
+app.get('/', (req, res) => {
+    res.send('Welcome Hariom');
+});
 
 app.listen(process.env.PORT || 8000, () => {
     console.log(`Server running on port ${process.env.PORT}`);
