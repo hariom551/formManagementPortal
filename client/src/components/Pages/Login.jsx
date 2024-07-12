@@ -32,7 +32,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      const result = await fetch("https://form-management-portal-server.vercel.app/api/v1/users/login", {
+      const result = await fetch("/api/v1/users/login", {
         method: 'post',
         body: JSON.stringify({ userid: userId, password }),
         headers: {
