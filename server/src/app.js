@@ -12,8 +12,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,
-    methods: "GET, POST, PUT, DELETE, PATCH, HEAD",
+    origin: "https://form-management-portal.vercel.app",
+    methods: ["GET", "POST", "PUT","DELETE", "PATCH", "HEAD"],
     credentials: true
 }));
 
