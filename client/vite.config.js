@@ -10,7 +10,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'https://formmanagementportal-server.onrender.com/',
+        target: 'https://form-management-portal-server-4u3thu9mq-hariom551s-projects.vercel.app/',
         changeOrigin: true,
         rewrite: (path) => {
           console.log('Rewriting path:', path);
