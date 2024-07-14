@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://form-management-portal-server.vercel.app/',
+        target: 'https://formmanagementportal-server.onrender.com',
         // target: 'http://localhost:3000/',
         changeOrigin: true,
         rewrite: (path) => {

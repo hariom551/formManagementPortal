@@ -11,27 +11,15 @@ const __dirname = dirname(__filename);
 const app = express();
 
 import dotenv from "dotenv";
-
 dotenv.config();
+
 // CORS configuration
-// const corsOptions = {
-//   origin: "*", // Replace with your actual frontend origin or process.env.CORS_ORIGIN
-//   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"],
-//   allowedHeaders: ["Content-Type"],
-//   credentials: true
-// };
-
-// app.use(cors(corsOptions));
-
-app.use(
-    cors({
-        origin: process.env.CORS_ORIGIN,
-        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"],
-        allowedHeaders: ["Content-Type"],
-        credentials: true
-
-    })
-);
+app.use(cors({
+    origin: process.env.CORS_ORIGIN,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"],
+    allowedHeaders: ["Content-Type"],
+    credentials: true
+}));
 
 // Body parsing middleware
 app.use(express.json({ limit: "16kb" }));
@@ -56,7 +44,7 @@ import formsAdminRouter from './routes/formsAdmin.routes.js';
 import adminRouter from './routes/admin.routes.js';
 import subAdminRouter from './routes/subAdmin.routes.js';
 import qualityStaffRouter from './routes/qualityStaff.routes.js';
-import feedingStaffRouter from './routes/feedingStaff.js'; // Adjust the path if needed
+import feedingStaffRouter from './routes/feedingStaff.js';
 
 // Mounting routers
 app.use("/api/v1/users", userRouter);
