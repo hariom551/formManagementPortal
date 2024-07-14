@@ -13,12 +13,9 @@ const __dirname = path.dirname(__filename);
 
 // CORS configuration
 const corsOptions = {
-    // CORS_ORIGIN=,http://localhost:3000
-
-    origin: ["https://form-management-portal-whgo.vercel.app"],
-    // origin: process.env.CORS_ORIGIN,
+    origin: process.env.CORS_ORIGIN,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"],
-    // allowedHeaders: ["Content-Type"],
+    allowedHeaders: ["Content-Type"],
     credentials: true
 };
 
