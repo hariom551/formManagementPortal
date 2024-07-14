@@ -111,7 +111,8 @@ ReactDOM.render(
   <React.StrictMode>
     <Router>
       <Routes>
-        <Route path="/" element={<Login />} />
+        {/* <Route path="/" element={<Login />} /> */}
+        <Route path="/" element={<Tehsil />} />
         <Route element={<Layout />}>
           {getRoutesForRole(userRole)}
         </Route>
