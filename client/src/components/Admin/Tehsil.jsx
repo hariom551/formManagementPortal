@@ -25,7 +25,7 @@ function Tehsil() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/v1/admin/tehsilDetails', {
+        const response = await fetch('https://formmanagementportal-server.onrender.com/api/v1/admin/tehsilDetails', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'
@@ -61,7 +61,7 @@ function Tehsil() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const result = await fetch("/api/v1/admin/addTehsil", {
+      const result = await fetch("https://formmanagementportal-server.onrender.com/api/v1/admin/addTehsil", {
         method: 'POST',
         body: JSON.stringify(formData),
         headers: {
@@ -99,7 +99,7 @@ function Tehsil() {
     // console.log(requestBody);
 
     try {
-      const result = await fetch("/api/v1/admin/updateTehsilDetail", {
+      const result = await fetch("https://formmanagementportal-server.onrender.com/api/v1/admin/updateTehsilDetail", {
         method: 'POST',
         body: JSON.stringify(requestBody),
         headers: {
@@ -131,7 +131,7 @@ function Tehsil() {
   
 
     try {
-      let result = await fetch("/api/v1/Admin/deleteTehsilDetail", {
+      let result = await fetch("https://formmanagementportal-server.onrender.com/api/v1/Admin/deleteTehsilDetail", {
         method: 'POST',
         body: JSON.stringify({Id}),
         headers: {
