@@ -62,7 +62,7 @@ function ChakBlock() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/v1/admin/chakBlockDetails', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/chakBlockDetails`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'
@@ -97,7 +97,7 @@ function ChakBlock() {
     e.preventDefault();
 
     try {
-      const result = await fetch("/api/v1/admin/addChakBlock", {
+      const result = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/addChakBlock`, {
         method: 'POST',
         body: JSON.stringify(formData),
         headers: {
@@ -125,7 +125,7 @@ function ChakBlock() {
    console.log(formData);
 
     try {
-      const result = await fetch("/api/v1/admin/updatechakBlockDetail", {
+      const result = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/updatechakBlockDetail`, {
         method: 'POST',
         body: JSON.stringify(formData),
         headers: {
@@ -161,7 +161,7 @@ function ChakBlock() {
 
 
     try {
-      let result = await fetch("/api/v1/Admin/deleteChakBlockDetail", {
+      let result = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/Admin/deleteChakBlockDetail`, {
         method: 'POST',
         body: JSON.stringify({ Id }),
         headers: {

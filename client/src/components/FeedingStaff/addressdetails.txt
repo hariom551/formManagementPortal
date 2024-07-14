@@ -24,7 +24,7 @@ function AddressInformationForm({ addressDetail, setAddressDetail }) {
 
   const fetchAreaVillOptions = async (input) => {
     try {
-      const response = await fetch('/api/v1/feedingStaff/searchAreaVill', {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/feedingStaff/searchAreaVill`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

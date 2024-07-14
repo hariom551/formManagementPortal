@@ -136,7 +136,7 @@ function AddVoter() {
                 }
             });
 
-            const response = await fetch('/api/v1/feedingStaff/addVoter', {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/feedingStaff/addVoter`, {
                 method: 'POST',
                 body: formData,
             });

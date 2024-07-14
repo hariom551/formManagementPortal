@@ -10,7 +10,7 @@ function ReferenceDetailsForm({ referenceDetails, setReferenceDetails, errors, s
     const [packetOptions, setPacketOptions] = useState([]);
     const fetchPacketOptions = async (inputValue) => {
         try {
-            const response = await fetch('/api/v1/feedingStaff/SearchPacketNo', {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/feedingStaff/SearchPacketNo`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -36,7 +36,7 @@ function ReferenceDetailsForm({ referenceDetails, setReferenceDetails, errors, s
 
     const fetchRefrenceDetails = async (selectedOption) => {
         try {
-            const response = await fetch('/api/v1/feedingStaff/ReferenceDetails', {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/feedingStaff/ReferenceDetails`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -14,10 +14,10 @@ function VoterDocs({ voterDocs, setVoterDocs }) {
             ...prevDetails,
             [name]: {
               file,
-              dataUrl: reader.result, 
+              dataUrl: reader.result,
             },
           };
-        
+
           return newDetails;
         });
       };

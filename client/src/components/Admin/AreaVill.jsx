@@ -34,7 +34,7 @@ function AreaVill() {
   useEffect(() => {
     const fetchWBOptions = async () => {
       try {
-        const response = await fetch('/api/v1/admin/wardBlockDetails', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/wardBlockDetails`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'
@@ -60,7 +60,7 @@ function AreaVill() {
 
   const fetchCBOptions = async (wbId) => {
     try {
-      const response = await fetch(`/api/v1/admin/chakBlockDetails`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/chakBlockDetails`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -88,7 +88,7 @@ function AreaVill() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/v1/admin/AreaVillDetails', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/AreaVillDetails`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'
@@ -146,7 +146,7 @@ function AreaVill() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const result = await fetch("/api/v1/admin/addAreaVill", {
+      const result = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/addAreaVill`, {
         method: 'POST',
         body: JSON.stringify(formData),
         headers: {
@@ -179,7 +179,7 @@ function AreaVill() {
 
   const handleDelete = async (Id) => {
     try {
-      const response = await fetch("/api/v1/Admin/deleteAreaVillDetail", {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/Admin/deleteAreaVillDetail`, {
         method: 'POST',
         body: JSON.stringify({ Id }),
         headers: {
@@ -204,7 +204,7 @@ function AreaVill() {
     e.preventDefault();
 
     try {
-      const result = await fetch("/api/v1/admin/updateAreaVillDetail", {
+      const result = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/updateAreaVillDetail`, {
         method: 'POST',
         body: JSON.stringify(formData),
         headers: {
