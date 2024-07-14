@@ -9,11 +9,12 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'https://form-management-portal-server.vercel.app/',
+        // target: 'http://localhost:3000/',
         changeOrigin: true,
-        // rewrite: (path) => {
-        //   console.log('Rewriting path:', path);
-        //   return path.replace(/^\/api/, '');
-        // },
+        rewrite: (path) => {
+          console.log('Rewriting path:', path);
+          return path.replace(/^\/api/, '');
+        },
       },
     },
   },

@@ -10,15 +10,24 @@ const __dirname = dirname(__filename);
 
 const app = express();
 
-// CORS configuration
-const corsOptions = {
-  origin: "*", // Replace with your actual frontend origin or process.env.CORS_ORIGIN
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"],
-  allowedHeaders: ["Content-Type"],
-  credentials: true
-};
+import dotenv from "dotenv";
 
-app.use(cors(corsOptions));
+dotenv.config();
+// CORS configuration
+// const corsOptions = {
+//   origin: "*", // Replace with your actual frontend origin or process.env.CORS_ORIGIN
+//   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"],
+//   allowedHeaders: ["Content-Type"],
+//   credentials: true
+// };
+
+// app.use(cors(corsOptions));
+
+app.use(
+    cors({
+        origin: process.env.CORS_ORIGIN,
+    })
+);
 
 // Body parsing middleware
 app.use(express.json({ limit: "16kb" }));
