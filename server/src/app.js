@@ -26,6 +26,10 @@ dotenv.config();
 app.use(
     cors({
         origin: process.env.CORS_ORIGIN,
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"],
+        allowedHeaders: ["Content-Type"],
+        credentials: true
+
     })
 );
 
@@ -38,9 +42,9 @@ app.use(cookieParser());
 
 // Session middleware
 app.use(session({
-  secret: 'your-very-secure-secret', // Replace with a strong secret
-  resave: false,
-  saveUninitialized: true
+    secret: 'your-very-secure-secret', // Replace with a strong secret
+    resave: false,
+    saveUninitialized: true
 }));
 
 // Serving static files
