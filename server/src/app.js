@@ -2,63 +2,50 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
-import path from 'path';
+import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 
-// Get the directory name of the current module
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 // CORS configuration
-// const corsOptions = {
-//     // CORS_ORIGIN=,http://localhost:3000
+const corsOptions = {
+  origin: "*", // Replace with your actual frontend origin or process.env.CORS_ORIGIN
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"],
+  allowedHeaders: ["Content-Type"],
+  credentials: true
+};
 
-//     origin: ["https://form-management-portal-whgo.vercel.app"],
-//     // origin: process.env.CORS_ORIGIN,
-//     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"],
-//     // allowedHeaders: ["Content-Type"],
-//     credentials: true
-// };
+app.use(cors(corsOptions));
 
-app.use(cors(
-    {
-      
-    
-        origin: ["https://form-management-portal-whgo.vercel.app"],
-        // origin: process.env.CORS_ORIGIN,
-        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"],
-        allowedHeaders: ["Content-Type"],
-        credentials: true
-    }
-
-));
-
-// Handle preflight OPTIONS requests
-// app.options('*', cors(corsOptions));
-
+// Body parsing middleware
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
+
+// Cookie parser middleware
 app.use(cookieParser());
 
+// Session middleware
 app.use(session({
-    secret: 'your-very-secure-secret',
-    resave: false,
-    saveUninitialized: true
+  secret: 'your-very-secure-secret', // Replace with a strong secret
+  resave: false,
+  saveUninitialized: true
 }));
 
-// Serve static files from the "public" directory
+// Serving static files
 app.use('/public', express.static(path.join(__dirname, '..', 'Public')));
 
-// Your API routes here
+// Routes
 import userRouter from './routes/user.routes.js';
 import formsAdminRouter from './routes/formsAdmin.routes.js';
 import adminRouter from './routes/admin.routes.js';
 import subAdminRouter from './routes/subAdmin.routes.js';
 import qualityStaffRouter from './routes/qualityStaff.routes.js';
-// import feedingStaffRouter from './routes/feedingStaff.routes.js';
-import feedingStaffRouter from './routes/feedingStaff.js'
+import feedingStaffRouter from './routes/feedingStaff.js'; // Adjust the path if needed
+
+// Mounting routers
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/formsAdmin", formsAdminRouter);
 app.use("/api/v1/admin", adminRouter);
