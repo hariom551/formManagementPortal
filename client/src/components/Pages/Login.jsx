@@ -30,23 +30,23 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
-      const result = await fetch("https://formmanagementportal-server.onrender.com/api/v1/users/login", {
-        method: 'post',
+      const result = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/users/login`, {
+        method: 'POST',
         body: JSON.stringify({ userid: userId, password }),
         headers: {
           'Content-Type': 'application/json'
         }
       });
+  
       const data = await result.json();
-
+  
       if (result.status === 200) {
         const { user, token } = data.data;
         localStorage.setItem('user', JSON.stringify(user));
         localStorage.setItem('token', token);
         window.location.href = '/home';
-
       } else {
         setValue(data.message, {
           position: "top-center",
@@ -71,6 +71,7 @@ function Login() {
       });
     }
   };
+  
 
   return (
     <>

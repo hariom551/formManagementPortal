@@ -124,7 +124,7 @@ const UpdateTehsilDetail = asyncHandler(async (req, res) => {
 
     try {
         await queryDatabase(
-            'UPDATE Tehsillist SET EName= ?, HName= ? WHERE Id= ?',
+            'UPDATE tehsillist SET EName= ?, HName= ? WHERE Id= ?',
             [EName, HName, Id]
         );
 
