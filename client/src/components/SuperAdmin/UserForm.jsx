@@ -67,7 +67,7 @@ function UserForm() {
     };
 
     try {
-      let result = await fetch("api/v1/users/submitdetails", {
+      let result = await fetch(`${import.meta.env.VITE_BACKEND_URL}api/v1/users/submitdetails`, {
         method: 'POST',
         body: JSON.stringify(requestBody),
         headers: {
@@ -89,7 +89,7 @@ function UserForm() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/v1/users/hariom', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/users/hariom`, {
           method: 'POST',
           body: JSON.stringify({ role: content, loginUserId }),
           headers: {
