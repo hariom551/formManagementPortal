@@ -8,13 +8,13 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://formmanagementportal-server.onrender.com',
-        // target: 'http://localhost:3000/',
+        // target: 'https://formmanagementportal-server.onrender.com',
+        target: 'http://localhost:3000/',
         changeOrigin: true,
-        rewrite: (path) => {
-          console.log('Rewriting path:', path);
-          return path.replace(/^\/api/, '');
-        },
+        // rewrite: (path) => {
+        //   console.log('Rewriting path:', path);
+        //   return path.replace(/^\/api/, '');
+        // },
       },
     },
   },
