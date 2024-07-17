@@ -58,7 +58,8 @@ const searchAreaVill = asyncHandler(async (req, res) => {
 
     try {
         const results = await queryDatabase(
-            `SELECT DISTINCT EAreaVill, Id AS AreaId FROM areavill WHERE EAreaVill LIKE ?`,
+            `SELECT DISTINCT EAreaVill, HnoRange FROM areavill WHERE EAreaVill LIKE ? 
+            ORDER BY EAreaVill`,
             [`%${query}%`]
         );
         return res.json(results);
@@ -69,7 +70,7 @@ const searchAreaVill = asyncHandler(async (req, res) => {
 });
 
 const allAreaDetails = asyncHandler(async (req, res) => {
-    const { EAreaVill } = req.body;
+    const { EAreaVill, HnoRange } = req.body;
 
     if (!EAreaVill) {
         return res.status(400).json({ error: 'EAreaVill parameter is required' });
@@ -78,9 +79,9 @@ const allAreaDetails = asyncHandler(async (req, res) => {
     try {
         const results = await queryDatabase(`
             SELECT 
-                A.EAreaVill, 
-                C.ECBPanch, C.Id AS ChkBlkId, 
-                C.WBId, W.EWardBlock, 
+                A.EAreaVill, A.Id, 
+                C.ECBPanch, C.Id AS ChkBlkId, C.ChakNo ,
+                C.WBId, W.EWardBlock, W.WardNo, 
                 W.VSId, V.EVidhanSabha, 
                 V.counId, cc.ECouncil, 
                 cc.TehId, T.EName 
@@ -90,8 +91,9 @@ const allAreaDetails = asyncHandler(async (req, res) => {
             LEFT JOIN vidhansabha AS V ON V.ID = W.VSId 
             LEFT JOIN council AS cc ON cc.Id = V.counId 
             LEFT JOIN tehsillist AS T ON T.ID = cc.TehId 
-            WHERE A.EAreaVill = ?`,
-            [EAreaVill]
+            
+            WHERE A.EAreaVill = ? AND A.HnoRange= ?`,
+            [EAreaVill, HnoRange]
         );
 
         // const groupedResults = results.reduce((acc, curr) => {
@@ -241,14 +243,14 @@ const AddVoter = [
             }
 
             const query = `INSERT INTO voterlist (
-                RegNo, PacketNo, IncRefId, EFName, HFName,
+                RegNo, PacketNo, EFName, HFName,
                 ELName, HLName, RType, ERFName, HRFName, 
                 ERLName, HRLName, CasteId, Qualification, Occupation, 
                 Age, DOB, Sex, MNo, MNo2,
                 AadharNo, VIdNo, GCYear, AreaId, TehId, 
                 CounId, VSId, WBId, ChkBlkId, HNo,
                 Landmark, Image, IdProof, Degree)
-                VALUES (?, ?, ?, ?, ?, 
+                VALUES (?, ?, ?, ?, 
                 ?, ?, ?, ?, ?,
                 ?, ?, ?, ?, ?,
                 ?, ?, ?, ?, ?,
@@ -257,7 +259,7 @@ const AddVoter = [
                 ?, ?, ?, ?)`;
 
             const values = [
-                req.regNo, referenceDetails.PacketNo, referenceDetails.IncRefId, voterDetails.EFName, voterDetails.HFName,
+                req.regNo, referenceDetails.PacketNo, voterDetails.EFName, voterDetails.HFName,
                 voterDetails.ELName, voterDetails.HLName, voterDetails.RType, voterDetails.ERFName, voterDetails.HRFName,
                 voterDetails.ERLName, voterDetails.HRLName, voterDetails.CasteId, voterDetails.Qualification, voterDetails.Occupation,
                 voterDetails.Age, voterDetails.DOB, voterDetails.Sex, voterDetails.MNo, voterDetails.MNo2,

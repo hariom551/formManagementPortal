@@ -19,12 +19,21 @@ function queryDatabase(sql, params) {
     });
 }
 
+// const generateToken = (payload) => {
+//     return jwt.sign(
+//         payload,
+//         process.env.ACCESS_TOKEN_SECRET,
+//         {
+//             expiresIn: process.env.ACCESS_TOKEN_EXPIRY 
+//         });
+// };
+
 const generateToken = (payload) => {
     return jwt.sign(
         payload,
         process.env.ACCESS_TOKEN_SECRET,
         {
-            expiresIn: process.env.ACCESS_TOKEN_EXPIRY 
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY   // expiresIn is in seconds
         });
 };
 
@@ -41,13 +50,11 @@ const checkRole = (requiredRole) => {
 };
 
 
-
 const loginUser = asyncHandler(async (req, res) => {
     const { userid, password } = req.body;
 
-    // console.log(req.body);
     if (!userid || !password) {
-        throw new ApiError(400, "UserId or password is required")
+        throw new ApiError(400, "UserId or password is required");
     }
 
     try {
@@ -60,7 +67,6 @@ const loginUser = asyncHandler(async (req, res) => {
                     userid: user.userid,
                     role: user.role,
                     name: user.name
-                    // ipaddress: req.ip,
                 };
 
                 const token = generateToken(tokenPayload); // Generate JWT token
@@ -68,10 +74,15 @@ const loginUser = asyncHandler(async (req, res) => {
                 console.log('JWT token generated');
 
                 const options = {
-                    httpOnly: true,
-                    secure: true
-                }
+                    httpOnly: false, // Make sure this is false if you need to access it in JavaScript
+                    secure: false, // Should be true in production
+                    maxAge: 60*60 * 1000, // 100 seconds in milliseconds
+                    sameSite: 'Lax', // Adjust SameSite attribute if needed
+                    path: '/', // Ensure the cookie is accessible in the entire app
+                };
 
+                // res.cookie('token', token, options).status(200).send({ success: true, message: 'Logged in',token ,results})
+               
                 return res
                     .status(200)
                     .cookie("token", token, options)
@@ -86,16 +97,17 @@ const loginUser = asyncHandler(async (req, res) => {
                     );
 
             } else {
-                throw new ApiError(401, "Invalid user credentials")
+                throw new ApiError(401, "Invalid user credentials");
             }
         } else {
-            throw new ApiError(401, "Invalid user credentials")
+            throw new ApiError(401, "Invalid user credentials");
         }
     } catch (error) {
         console.error('Database query error', error);
         return res.status(500).send('A database error occurred, please try again later.');
     }
 });
+
 
 
 const submitDetails = asyncHandler(async (req, res) => {
@@ -259,8 +271,20 @@ const DeleteDistrictDetail = asyncHandler(async (req, res) => {
     }
 });
 
+const logoutuser = async (req, res) => {
+    try {
+        res.clearCookie('token')
+        res.status(200).send({ success: true, message: 'User logout' })
+    } catch (error) {
+        res.status(500).send({
+            success: false,
+            message: 'Something wrong in logout controller'
+        })
+    }
+}
 
-export { loginUser, submitDetails, hariom, changePassword, AddDistrict, GetDistrictDetails, UpdateDistrictDetail, DeleteDistrictDetail, checkRole, }
+
+export { loginUser, submitDetails, hariom, changePassword, AddDistrict, GetDistrictDetails, logoutuser, UpdateDistrictDetail, DeleteDistrictDetail, checkRole, }
 
 
 

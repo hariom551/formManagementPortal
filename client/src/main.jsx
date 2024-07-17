@@ -1,14 +1,14 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client'; // Import createRoot from react-dom/client
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Layout from './Layout.jsx';
 import Login from './components/Pages/Login.jsx';
 import Home from './components/Pages/Home.jsx';
 import UserForm from './components/SuperAdmin/UserForm.jsx';
-import ChangePassword from './components/SuperAdmin/ChangePassword.jsx';             
+import ChangePassword from './components/SuperAdmin/ChangePassword.jsx';
 import './index.css';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Caste from './components/Admin/Caste.jsx';
 import District from './components/SuperAdmin/District.jsx';
@@ -27,15 +27,14 @@ import UpdateIncomingForm from './components/FormsAdmin/UpdateIncomingForm.jsx';
 import AddVoter from './components/FeedingStaff/AddVoter.jsx';
 import SearchChakBlock from './components/FeedingStaff/SearchChakBlock.jsx';
 import VoterList from './components/SubAdmin/VoterList.jsx';
-
+import Cookies from 'js-cookie';
 
 const getRoutesForRole = (role) => {
   switch (role) {
-
     case 'Super Admin':
       return (
         <>
-          <Route path="/Home" element={<Home />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/district" element={<District />} />
           <Route path="/editDistrictDetails" element={<EditDistrictDetails />} />
           <Route path="/userform" element={<UserForm />} />
@@ -44,80 +43,83 @@ const getRoutesForRole = (role) => {
           <Route path="/outgoingForms" element={<OutgoingForms />} />
         </>
       );
-
-      case 'Forms Admin':
-        return (
-          <>
-            <Route path="/Home" element={<Home />} />
-            <Route path="/incomingForms" element={<IncomingForms />} />
-            <Route path="/outgoingForms" element={<OutgoingForms />} />
-            {/* <Route path="/updatedIncomingForms" element={<UpdateIncomingForm />} /> */}
-          
-          </>
-        );
-    
-
+    case 'Forms Admin':
+      return (
+        <>
+          <Route path="/home" element={<Home />} />
+          <Route path="/incomingForms" element={<IncomingForms />} />
+          <Route path="/outgoingForms" element={<OutgoingForms />} />
+        </>
+      );
     case 'Admin':
       return (
         <>
-          <Route path="/Home" element={<Home />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/userform" element={<UserForm />} />
           <Route path="/changePassword" element={<ChangePassword />} />
           <Route path="/tehsil" element={<Tehsil />} />
           <Route path="/council" element={<Council />} />
           <Route path="/casteManagement" element={<Caste />} />
           <Route path="/vidhanSabha" element={<VidhanSabha />} />
-          <Route path="/WardBlock" element={<WardBlock/>}/>
-          <Route path="/chakBlock" element={<ChakBlock/>}/>
-          <Route path="/areaVill" element={<AreaVill/>}/>
-          <Route path="/pollingStationList" element={<PollongStationList/>}/>
-          <Route path="/pollingStationAllotment" element={<PollingStationAllotment/>}/>
+          <Route path="/wardBlock" element={<WardBlock />} />
+          <Route path="/chakBlock" element={<ChakBlock />} />
+          <Route path="/areaVill" element={<AreaVill />} />
+          <Route path="/pollingStationList" element={<PollongStationList />} />
+          <Route path="/pollingStationAllotment" element={<PollingStationAllotment />} />
         </>
       );
-
-      case 'Sub Admin':
-        return (
-          <>
-            <Route path="/Home" element={<Home />} />
-            <Route path="/userform" element={<UserForm />} />
-            <Route path="/changePassword" element={<ChangePassword />} />
-            <Route path="/VoterList" element={<VoterList />} /> 
-          </>
-        );
-
-        case 'Feeding Staff':
-          return (
-            <>
-              <Route path="/Home" element={<Home />} />
-              {/* <Route path="/AddVoterForm" element={<AddVoterForm />} /> */}
-              <Route path="/addVotersForm" element={<AddVoter />} />
-              <Route path="/SearchChakBlock" element={<SearchChakBlock />} />
-            </>
-          );
-      
-      
-      
-  
-      // default:
-    //   // Default to login page if role is not recognized
-    //   return <Navigate to="/" />;
+    case 'Sub Admin':
+      return (
+        <>
+          <Route path="/home" element={<Home />} />
+          <Route path="/userform" element={<UserForm />} />
+          <Route path="/changePassword" element={<ChangePassword />} />
+          <Route path="/voterList" element={<VoterList />} />
+        </>
+      );
+    case 'Feeding Staff':
+      return (
+        <>
+          <Route path="/home" element={<Home />} />
+          <Route path="/addVotersForm" element={<AddVoter />} />
+          <Route path="/searchChakBlock" element={<SearchChakBlock />} />
+        </>
+      );
+    default:
+      return <Route path="*" element={<Navigate to="/" />} />;
   }
 };
 
-const user = JSON.parse(localStorage.getItem("user"));
-    const userRole = user ? user.role : "";
+// Get user role from localStorage
 
-ReactDOM.render(
+const token = Cookies.get('token');
+if(!token)
+  {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+  }
+const user = JSON.parse(localStorage.getItem('user'));
+const userRole = token && user ? user.role : '';
+
+// Create the root and render the app
+const rootElement = document.getElementById('root');
+const root = createRoot(rootElement);
+
+root.render(
   <React.StrictMode>
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route element={<Layout />}>
-          {getRoutesForRole(userRole)}
-        </Route>
+        
+          <>
+    
+            <Route element={<Layout />}>
+              {getRoutesForRole(userRole)}
+            </Route>
+          </>
+        
       </Routes>
     </Router>
     <ToastContainer />
-  </React.StrictMode>,
-  document.getElementById('root')
+  </React.StrictMode>
 );

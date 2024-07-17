@@ -5,7 +5,7 @@ import { FaUserGroup } from "react-icons/fa6"
 import { FaBuildingColumns } from "react-icons/fa6";;
 import { IoLogOutSharp } from "react-icons/io5";
 import { FaLocationDot } from "react-icons/fa6";
-
+import axios from 'axios'
 function SideNavBar({ show }) {
     const [dropdownStates, setDropdownStates] = useState({
         users: false,
@@ -31,10 +31,18 @@ function SideNavBar({ show }) {
         }));
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.href = '/';
+    const handleLogout = async () => {
+        try {
+            const response = await axios.delete('/api/v1/users/logoutuser')
+            if (response.data.success) {
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                window.location.href = '/';
+            }
+        } catch (error) {
+            console.log(error.message)
+        }
+
     };
 
     const user = JSON.parse(localStorage.getItem("user"));
@@ -50,15 +58,15 @@ function SideNavBar({ show }) {
                 {role === 'Super Admin' && (
                     <div className="superadmin-link">
                         <ul>
-                            <li ><Link to="/Home" className='flex items-center gap-2'><IoMdHome className='text-2xl'/>Home</Link></li>
+                            <li ><Link to="/Home" className='flex items-center gap-2'><IoMdHome className='text-2xl' />Home</Link></li>
                         </ul>
                         <ul>
-                            <li><Link to="/district" className='flex items-center gap-2'><FaBuildingColumns/>District</Link></li>
+                            <li><Link to="/district" className='flex items-center gap-2'><FaBuildingColumns />District</Link></li>
                         </ul>
 
                         <div className="dropdown">
                             <button className="dropbtn flex items-center gap-2" onClick={() => toggleDropdown('users')}>
-                            <FaUserGroup className='text-xl'/> Users <span className="dropdown-symbol">{dropdownStates.users ? '-' : '+'}</span>
+                                <FaUserGroup className='text-xl' /> Users <span className="dropdown-symbol">{dropdownStates.users ? '-' : '+'}</span>
                             </button>
                             <div className={`dropdown-content ${dropdownStates.users ? 'show' : ''}`} id="users-dropdown-content">
                                 <ul><li><Link to={{ pathname: "/userForm", search: "?content=Forms Admin" }}>Forms Admin</Link></li></ul>
@@ -69,7 +77,7 @@ function SideNavBar({ show }) {
 
                         <div className="dropdown">
                             <button className="dropbtn flex items-center gap-2" onClick={() => toggleDropdown('outgoing')}>
-                            <FaUserGroup className='text-xl'/>Out./Inc.List <span className="dropdown-symbol">{dropdownStates.outgoing ? '-' : '+'}</span>
+                                <FaUserGroup className='text-xl' />Out./Inc.List <span className="dropdown-symbol">{dropdownStates.outgoing ? '-' : '+'}</span>
                             </button>
                             <div className={`dropdown-content ${dropdownStates.outgoing ? 'show' : ''}`} id="outgoing-dropdown-content">
                                 <ul><li><Link to="/outgoingForms">Outgoing List</Link></li></ul>
@@ -87,21 +95,21 @@ function SideNavBar({ show }) {
                             </div>
                         </div> */}
 
-                  
+
 
                         <ul><li><Link onClick={handleLogout} className='flex gap-2'><IoLogOutSharp className='text-2xl' />Logout</Link></li></ul>
-                     
+
                     </div>
                 )}
 
                 {role === 'Forms Admin' && (
                     <div className="formadmin-link">
-                        <ul><li><Link to="/Home" className='flex items-center gap-2'><IoMdHome className='text-2xl'/>Home</Link></li></ul>
+                        <ul><li><Link to="/Home" className='flex items-center gap-2'><IoMdHome className='text-2xl' />Home</Link></li></ul>
 
 
                         <div className="dropdown">
                             <button className="dropbtn flex items-center gap-2" onClick={() => toggleDropdown('Forms')}>
-                            <FaUserGroup className='text-xl'/>Forms <span className="dropdown-symbol">{dropdownStates.Forms ? '-' : '+'}</span>
+                                <FaUserGroup className='text-xl' />Forms <span className="dropdown-symbol">{dropdownStates.Forms ? '-' : '+'}</span>
                             </button>
                             <div className={`dropdown-content ${dropdownStates.VoterL ? 'show' : ''}`} id="caste-dropdown-content">
                                 <ul><li><a href="/outgoingForms">Outgoing Forms</a></li></ul>
@@ -111,28 +119,28 @@ function SideNavBar({ show }) {
                         </div>
 
                         <ul><li><Link onClick={handleLogout} className='flex gap-2'><IoLogOutSharp className='text-2xl' />Logout</Link></li></ul>
-                     
+
                     </div>
                 )}
 
                 {role === 'Admin' && (
                     <div className="admin-link">
-                        <ul><li><Link to="/Home" className='flex items-center gap-2'><IoMdHome className='text-2xl'/>Home</Link></li></ul>
+                        <ul><li><Link to="/Home" className='flex items-center gap-2'><IoMdHome className='text-2xl' />Home</Link></li></ul>
 
                         <div className="dropdown">
                             <button className="dropbtn flex items-center gap-2" onClick={() => toggleDropdown('SubAdmin')}>
-                                <FaUserGroup className='text-xl'/>Sub Admin<span className="dropdown-symbol">{dropdownStates.SubAdmin ? '-' : '+'}</span>
+                                <FaUserGroup className='text-xl' />Sub Admin<span className="dropdown-symbol">{dropdownStates.SubAdmin ? '-' : '+'}</span>
                             </button>
                             <div className={`dropdown-content ${dropdownStates.SubAdmin ? 'show' : ''}`} id="SubAdmin-dropdown-content">
                                 {/* <ul><li><Link to="/userForm">Sub Admin</Link></li></ul> */}
-                                <ul><li><Link to={{ pathname: "/userForm", search: "?content=Sub Admin" }}>  <FaUserGroup className='text-xl'/>Sub Admin</Link></li></ul>
+                                <ul><li><Link to={{ pathname: "/userForm", search: "?content=Sub Admin" }}>  <FaUserGroup className='text-xl' />Sub Admin</Link></li></ul>
                             </div>
                         </div>
 
 
                         <div className="dropdown">
                             <button className="dropbtn flex items-center gap-2" onClick={() => toggleDropdown('pariseeman')}>
-                            <FaLocationDot className='text-xl'/>Pariseeman<span className="dropdown-symbol">{dropdownStates.pariseeman ? '-' : '+'}</span>
+                                <FaLocationDot className='text-xl' />Pariseeman<span className="dropdown-symbol">{dropdownStates.pariseeman ? '-' : '+'}</span>
                             </button>
                             <div className={`dropdown-content ${dropdownStates.pariseeman ? 'show' : ''}`} id="pariseeman-dropdown-content">
                                 <ul><li><Link to="/Tehsil">Tehsil</Link></li></ul>
@@ -146,15 +154,15 @@ function SideNavBar({ show }) {
 
                         <div className="dropdown">
                             <button className="dropbtn flex items-center gap-2" onClick={() => toggleDropdown('Caste')}>
-                            <FaUserGroup className='text-xl'/> Caste <span className="dropdown-symbol">{dropdownStates.Caste ? '-' : '+'}</span>
+                                <FaUserGroup className='text-xl' /> Caste <span className="dropdown-symbol">{dropdownStates.Caste ? '-' : '+'}</span>
                             </button>
                             <div className={`dropdown-content ${dropdownStates.Caste ? 'show' : ''}`} id="caste-dropdown-content">
-                                <ul><li><a href="/CasteManagement" >Caste Management</a></li></ul>
+                                <ul><li><Link to="/CasteManagement" >Caste Management</Link></li></ul>
                             </div>
                         </div>
 
                         <div className="dropdown">
-                            <button className="dropbtn flex items-center gap-2" onClick={() => toggleDropdown('PollingStation')}><FaUserGroup className='text-xl'/> Polling Station <span className="dropdown-symbol">{dropdownStates.PollingStation ? '-' : '+'}</span></button>
+                            <button className="dropbtn flex items-center gap-2" onClick={() => toggleDropdown('PollingStation')}><FaUserGroup className='text-xl' /> Polling Station <span className="dropdown-symbol">{dropdownStates.PollingStation ? '-' : '+'}</span></button>
                             <div className={`dropdown-content ${dropdownStates.PollingStation ? 'show' : ''}`} id="pollingstation-dropdown-content">
                                 <ul><li><Link to="/PollingStationList">Polling Station List</Link></li></ul>
                                 <ul><li><Link to="/PollingStationAllotment">Polling Station Allotment</Link></li></ul>
@@ -162,7 +170,7 @@ function SideNavBar({ show }) {
                         </div>
 
                         <div className="dropdown">
-                            <button className="dropbtn flex items-center gap-2" onClick={() => toggleDropdown('Reporters')}><FaUserGroup className='text-xl'/>Reporters <span className="dropdown-symbol">{dropdownStates.Reporters ? '-' : '+'}</span></button>
+                            <button className="dropbtn flex items-center gap-2" onClick={() => toggleDropdown('Reporters')}><FaUserGroup className='text-xl' />Reporters <span className="dropdown-symbol">{dropdownStates.Reporters ? '-' : '+'}</span></button>
                             <div className={`dropdown-content ${dropdownStates.Reporters ? 'show' : ''}`} id="reporters-dropdown-content">
                                 <ul><li><Link to="/MISDISTRICT">MIS DISTRICT</Link></li></ul>
                                 <ul><li><Link to="/MISWardWise">MIS Ward wise</Link></li></ul>
@@ -173,7 +181,7 @@ function SideNavBar({ show }) {
                         </div>
 
                         <div className="dropdown">
-                            <button className="dropbtn flex items-center gap-2" onClick={() => toggleDropdown('voterList')}><FaUserGroup className='text-xl'/> Voter Reports <span className="dropdown-symbol">{dropdownStates.voterList ? '-' : '+'}</span></button>
+                            <button className="dropbtn flex items-center gap-2" onClick={() => toggleDropdown('voterList')}><FaUserGroup className='text-xl' /> Voter Reports <span className="dropdown-symbol">{dropdownStates.voterList ? '-' : '+'}</span></button>
                             <div className={`dropdown-content ${dropdownStates.voterList ? 'show' : ''}`} id="voterlist-dropdown-content">
                                 <ul><li><Link to="/VoterList">Voter List</Link></li></ul>
                                 <ul><li><Link to="/MotherRoleVoterList">Mother Role Voter List</Link></li></ul>
@@ -182,17 +190,17 @@ function SideNavBar({ show }) {
                         </div>
 
                         <ul><li><Link onClick={handleLogout} className='flex gap-2'><IoLogOutSharp className='text-2xl' />Logout</Link></li></ul>
-                     
+
                     </div>
                 )}
 
                 {role === 'Sub Admin' && (
                     <div className="subadmin-link">
-                        <ul><li><Link to="/Home" className='flex items-center gap-2'><IoMdHome className='text-2xl'/>Home</Link></li></ul>
+                        <ul><li><Link to="/Home" className='flex items-center gap-2'><IoMdHome className='text-2xl' />Home</Link></li></ul>
 
                         <div className="dropdown">
                             <button className="dropbtn flex items-center gap-2" onClick={() => toggleDropdown('Staff')}>
-                            <FaUserGroup className='text-xl'/> Staff<span className="dropdown-symbol">{dropdownStates.Staff ? '-' : '+'}</span>
+                                <FaUserGroup className='text-xl' /> Staff<span className="dropdown-symbol">{dropdownStates.Staff ? '-' : '+'}</span>
                             </button>
 
                             <div className={`dropdown-content ${dropdownStates.Staff ? 'show' : ''}`} id="Staff-dropdown-content">
@@ -205,7 +213,7 @@ function SideNavBar({ show }) {
                         <div className="dropdown">
                             <button className="dropbtn flex items-center gap-2
                             " onClick={() => toggleDropdown('Form')}>
-                            <FaUserGroup className='text-xl'/> Form<span className="dropdown-symbol">{dropdownStates.Form ? '-' : '+'}</span>
+                                <FaUserGroup className='text-xl' /> Form<span className="dropdown-symbol">{dropdownStates.Form ? '-' : '+'}</span>
                             </button>
                             <div className={`dropdown-content ${dropdownStates.Form ? 'show' : ''}`} id="form-dropdown-content">
                                 <ul><li><Link to="/staffEntry">Staff Entry</Link></li></ul>
@@ -215,7 +223,7 @@ function SideNavBar({ show }) {
 
                         <div className="dropdown">
                             <button className="dropbtn flex items-center gap-2" onClick={() => toggleDropdown('VoterL')}>
-                            <FaUserGroup className='text-xl'/> Voter List <span className="dropdown-symbol">{dropdownStates.VoterL ? '-' : '+'}</span>
+                                <FaUserGroup className='text-xl' /> Voter List <span className="dropdown-symbol">{dropdownStates.VoterL ? '-' : '+'}</span>
                             </button>
                             <div className={`dropdown-content ${dropdownStates.VoterL ? 'show' : ''}`} id="caste-dropdown-content">
                                 <ul><li><a href="/VoterList">Voter List</a></li></ul>
@@ -225,17 +233,17 @@ function SideNavBar({ show }) {
                         </div>
 
                         <ul><li><Link onClick={handleLogout} className='flex gap-2'><IoLogOutSharp className='text-2xl' />Logout</Link></li></ul>
-                     
+
                     </div>
                 )}
 
                 {role === 'Feeding Staff' && (
                     <div className="feedingStaff-link">
-                        <ul><li><Link to="/Home" className='flex items-center gap-2'><IoMdHome className='text-2xl'/>Home</Link></li></ul>
+                        <ul><li><Link to="/Home" className='flex items-center gap-2'><IoMdHome className='text-2xl' />Home</Link></li></ul>
 
                         <div className="dropdown">
                             <button className="dropbtn flex items-center gap-2" onClick={() => toggleDropdown('Form')}>
-                            <FaUserGroup className='text-xl'/>Form<span className="dropdown-symbol">{dropdownStates.Form ? '-' : '+'}</span>
+                                <FaUserGroup className='text-xl' />Form<span className="dropdown-symbol">{dropdownStates.Form ? '-' : '+'}</span>
                             </button>
                             <div className={`dropdown-content ${dropdownStates.Form ? 'show' : ''}`} id="form-dropdown-content">
                                 <ul><li><Link to="/addVotersForm">Add Voter's Form</Link></li></ul>
@@ -243,8 +251,8 @@ function SideNavBar({ show }) {
                             </div>
                         </div>
 
-                    <ul><li><Link onClick={handleLogout} className='flex gap-2'><IoLogOutSharp className='text-2xl' />Logout</Link></li></ul>
-                     
+                        <ul><li><Link onClick={handleLogout} className='flex gap-2'><IoLogOutSharp className='text-2xl' />Logout</Link></li></ul>
+
                     </div>
                 )}
 

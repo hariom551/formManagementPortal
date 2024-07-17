@@ -34,6 +34,8 @@ function UserForm() {
   const user = JSON.parse(localStorage.getItem("user"));
   const loginUserId = user.userid;
 
+  const token = localStorage.getItem('token');
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
@@ -67,11 +69,14 @@ function UserForm() {
     };
 
     try {
+      
+
       let result = await fetch("http://localhost:3000/api/v1/users/submitdetails", {
         method: 'POST',
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify(requestBody),     
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
         }
       });
 
@@ -93,7 +98,8 @@ function UserForm() {
           method: 'POST',
           body: JSON.stringify({ role: content, loginUserId }),
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
           }
         });
         if (!response.ok) {
