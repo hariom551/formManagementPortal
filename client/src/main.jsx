@@ -85,6 +85,15 @@ const getRoutesForRole = (role) => {
           <Route path="/searchChakBlock" element={<SearchChakBlock />} />
         </>
       );
+      case 'QC Staff':
+      return (
+        <>
+          <Route path="/home" element={<Home />} />
+          <Route path="/addVotersForm" element={<AddVoter />} />
+          <Route path="/searchChakBlock" element={<SearchChakBlock />} />
+        </>
+      );
+
     default:
       return <Route path="*" element={<Navigate to="/" />} />;
   }
@@ -112,7 +121,6 @@ root.render(
         <Route path="/" element={<Login />} />
         
           <>
-    
             <Route element={<Layout />}>
               {getRoutesForRole(userRole)}
             </Route>

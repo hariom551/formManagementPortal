@@ -206,7 +206,7 @@ function SideNavBar({ show }) {
                             <div className={`dropdown-content ${dropdownStates.Staff ? 'show' : ''}`} id="Staff-dropdown-content">
                                 <ul><li><Link to={{ pathname: "/userForm", search: "?content=Feeding Staff" }}>Feeding Staff</Link></li></ul>
                                 <ul><li><Link to={{ pathname: "/userForm", search: "?content=Quality Staff" }}>Quality Staff</Link></li></ul>
-                                <ul><li><Link to={{ pathname: "/userForm", search: "?content=App Feeding Staff" }}>App Feeding Staff</Link></li></ul>
+                                {/* <ul><li><Link to={{ pathname: "/userForm", search: "?content=App Feeding Staff" }}>App Feeding Staff</Link></li></ul> */}
                             </div>
                         </div>
                         <br />
@@ -256,6 +256,24 @@ function SideNavBar({ show }) {
                     </div>
                 )}
 
+                {role === 'QC Staff' && (
+                    <div className="feedingStaff-link">
+                        <ul><li><Link to="/Home" className='flex items-center gap-2'><IoMdHome className='text-2xl' />Home</Link></li></ul>
+
+                        <div className="dropdown">
+                            <button className="dropbtn flex items-center gap-2" onClick={() => toggleDropdown('Form')}>
+                                <FaUserGroup className='text-xl' />Form<span className="dropdown-symbol">{dropdownStates.Form ? '-' : '+'}</span>
+                            </button>
+                            <div className={`dropdown-content ${dropdownStates.Form ? 'show' : ''}`} id="form-dropdown-content">
+                                <ul><li><Link to="/addVotersForm">Add Voter's Form</Link></li></ul>
+                                <ul><li><Link to="/SearchChakBlock">Search Chak Block</Link></li></ul>
+                            </div>
+                        </div>
+
+                        <ul><li><Link onClick={handleLogout} className='flex gap-2'><IoLogOutSharp className='text-2xl' />Logout</Link></li></ul>
+
+                    </div>
+                )}
 
 
             </div>
