@@ -259,16 +259,24 @@ function SideNavBar({ show }) {
                 {role === 'QC Staff' && (
                     <div className="feedingStaff-link">
                         <ul><li><Link to="/Home" className='flex items-center gap-2'><IoMdHome className='text-2xl' />Home</Link></li></ul>
-
-                        <div className="dropdown">
+                        <ul><li><Link to="/VoterList" className='flex items-center gap-2'><FaUserGroup className='text-2xl' />Voter List</Link></li></ul>
+                        <ul><li><Link to="/DispatchLetter" className='flex items-center gap-2'><FaUserGroup className='text-2xl' />Dispatch Letter</Link></li></ul>
+                        <ul><li><Link to="/Telecaller" className='flex items-center gap-2'><FaUserGroup className='text-2xl' />Tellecaller</Link></li></ul>
+                        <ul><li><Link to="/QcForm" className='flex items-center gap-2'><FaUserGroup className='text-2xl' />Form qc</Link></li></ul>
+                        <ul><li><Link to="/SearchChakBlock" className='flex items-center gap-2'><FaUserGroup className='text-2xl' />Search Chak Block</Link></li></ul>
+                      
+                       
+                        {/* <div className="dropdown">
                             <button className="dropbtn flex items-center gap-2" onClick={() => toggleDropdown('Form')}>
                                 <FaUserGroup className='text-xl' />Form<span className="dropdown-symbol">{dropdownStates.Form ? '-' : '+'}</span>
                             </button>
                             <div className={`dropdown-content ${dropdownStates.Form ? 'show' : ''}`} id="form-dropdown-content">
-                                <ul><li><Link to="/addVotersForm">Add Voter's Form</Link></li></ul>
+                                <ul><li><Link to="/Dispatch Letter">Dispatch Letter</Link></li></ul>
+                                <ul><li><Link to="/Dispatch Letter">Tellecaller</Link></li></ul>
+                                <ul><li><Link to="/Dispatch Letter">Form qc</Link></li></ul>
                                 <ul><li><Link to="/SearchChakBlock">Search Chak Block</Link></li></ul>
                             </div>
-                        </div>
+                        </div> */}
 
                         <ul><li><Link onClick={handleLogout} className='flex gap-2'><IoLogOutSharp className='text-2xl' />Logout</Link></li></ul>
 

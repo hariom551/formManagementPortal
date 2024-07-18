@@ -28,6 +28,8 @@ import AddVoter from './components/FeedingStaff/AddVoter.jsx';
 import SearchChakBlock from './components/FeedingStaff/SearchChakBlock.jsx';
 import VoterList from './components/SubAdmin/VoterList.jsx';
 import Cookies from 'js-cookie';
+import Voters from './components/QCStaff/Voters.jsx';
+import DispatchLetter from './components/QCStaff/DispatchLetter.jsx';
 
 const getRoutesForRole = (role) => {
   switch (role) {
@@ -89,8 +91,12 @@ const getRoutesForRole = (role) => {
       return (
         <>
           <Route path="/home" element={<Home />} />
-          <Route path="/addVotersForm" element={<AddVoter />} />
+          {/* <Route path="/VoterList" element={<Voters />} /> */}
+          <Route path="/VoterList" element={<VoterList />} />
           <Route path="/searchChakBlock" element={<SearchChakBlock />} />
+          <Route path="/DispatchLetter" element={<DispatchLetter />} />
+          <Route path="/Telecaller" element={<SearchChakBlock />} />
+          <Route path="/QcForm" element={<SearchChakBlock />} />
         </>
       );
 
@@ -107,6 +113,7 @@ if(!token)
     localStorage.removeItem("token");
     localStorage.removeItem("user");
   }
+
 const user = JSON.parse(localStorage.getItem('user'));
 const userRole = token && user ? user.role : '';
 

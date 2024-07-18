@@ -8,7 +8,7 @@ import Select from 'react-select';
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { Link } from 'react-router-dom';
 
-function VoterList() {
+function DispatchLetter() {
     const [votersDetails, setVotersDetails] = useState([]);
     const [formData, setFormData] = useState({ WBId: undefined });
     const [WBOptions, setWBOptions] = useState([]);
@@ -132,33 +132,7 @@ function VoterList() {
             },
         ];
 
-        if (userRole === 'QC Staff') {
-            baseColumns.unshift(
-                {
-                    header: 'Edit',
-                    size: 10,
-                    Cell: ({ row }) => (
-                        <Button variant="primary" className="Edit">
-                            <Link to={{ pathname: "/edit", search: `?content=${row.original.id}` }}>
-                                Edit
-                            </Link>
-                        </Button>
-                    ),
-                },
-                {
-                    header: 'Delete',
-                    size: 10,
-                    Cell: ({ row }) => (
-                        <Button variant="danger" className="Edit">
-                            <Link to={{ pathname: "/delete", search: `?content=${row.original.userid}` }}>
-                                delete
-                            </Link>
-                        </Button>
-                    ),
-                }          
-            
-            );
-        }
+    
 
         return baseColumns;
     }, [userRole]);
@@ -198,4 +172,4 @@ function VoterList() {
     );
 }
 
-export default VoterList;
+export default DispatchLetter;
