@@ -38,7 +38,7 @@ const voterList = asyncHandler(async (req, res) => {
             `SELECT RegNo, PacketNo, EFName, HFName, ELName, HLName, RType, ERFName, HRFName, 
             ERLName, HRLName, CasteId, caste.ECaste, Qualification, Occupation, Age, 
             DATE_FORMAT(DOB, '%d/%m/%Y') as DOB, Sex, MNo, MNo2, AadharNo, VIdNo, GCYear, 
-            AreaVill.EAreaVill, AreaId, TehId, CounId, VSId, WBId, ChkBlkId, HNo, Landmark, Image, IdProof, Degree 
+             AreaVill.EAreaVill ,AreaVill.HAreaVill, AreaId, TehId, CounId, VSId, WBId, ChkBlkId, HNo, Landmark, Image, IdProof, Degree 
             FROM voterlist 
             LEFT JOIN caste ON CasteId = caste.ID 
             LEFT JOIN AreaVill ON AreaId= AreaVill.Id

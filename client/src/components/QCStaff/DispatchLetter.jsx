@@ -6,7 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Select from 'react-select';
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
-import { Link } from 'react-router-dom';
+
 
 function DispatchLetter() {
     const [votersDetails, setVotersDetails] = useState([]);
@@ -61,8 +61,6 @@ function DispatchLetter() {
         }
     };
 
-    const user = JSON.parse(localStorage.getItem('user'));
-    const userRole = user ? user.role : '';
 
     const columns = useMemo(() => {
         const baseColumns = [
@@ -132,12 +130,71 @@ function DispatchLetter() {
             },
         ];
 
-    
-
         return baseColumns;
-    }, [userRole]);
+    }, []);
 
     const table = useMaterialReactTable({ columns, data: votersDetails });
+
+    const handleDispatchLetter = () => {
+        const letterContent = votersDetails.map((voter, index) => (
+            `<div class="letter">
+                <p>सेवा में ,</p>
+                <p>${voter.HFName + " " + voter.HLName}</p>
+                <p>${voter.HNo + " " + voter.HAreaVill},</p>
+                <p>प्रिय ${voter.HFName + " " + voter.HLName},</p>
+                <p>नमस्कार!</p>
+                <p>आशा है कि आप सकुशल और स्वस्थ होंगे। रक्षा बंधन के पावन अवसर पर आपको और आपके परिवार को मेरी ओर से ढेर सारी शुभकामनाएं।</p>
+                <p>रक्षा बंधन का यह पर्व हमारे भाई-बहन के प्यार और समर्पण का प्रतीक है। यह वह दिन है जब बहनें अपने भाइयों की कलाई पर राखी बांधकर उनकी लंबी उम्र और सुख-समृद्धि की कामना करती हैं, और भाई भी अपनी बहनों की रक्षा का संकल्प लेते हैं। इस पवित्र बंधन का यह त्योहार हमारे परिवार और समाज को एकजुट करता है और आपसी प्रेम और विश्वास को मजबूत करता है।</p>
+                <p>इस विशेष दिन पर, मैं आपको याद करते हुए अपने दिल की गहराइयों से यह संदेश भेज रहा हूँ। आप हमेशा खुश रहें, स्वस्थ रहें, और जीवन में सफलता की ऊंचाइयों को छुएं। हमारी बचपन की यादें, हंसी-मजाक और साथ बिताए वो पल हमेशा मेरे दिल में संजोए रहेंगे।</p>
+                <p>भगवान से प्रार्थना है कि आपकी सभी इच्छाएं पूरी हों और आप हमेशा जीवन में आगे बढ़ते रहें। राखी के इस त्योहार पर आपकी खुशियों की कामना करते हुए, मैं आपके लिए ढेर सारा प्यार और शुभकामनाएं भेज रहा हूँ।</p>
+                <p>आपका स्नेही,</p>
+                <p>अरुण पाठक</p>
+                <p>स्नातक चैत्र, कानपूर</p>
+            </div>`
+        )).join('<div class="page-break"></div>');
+
+
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Letters</title>
+                    <style>
+                      @page {
+                            size: A4;
+                            margin: 0;
+                        }
+                         body {
+                            font-family: Arial, sans-serif;
+                            line-height: 1.6;
+                            color: #333;
+                            margin-top: 0.3rem;
+                            padding: 20mm;
+                            box-sizing: border-box;
+                            min-height: 100vh;
+                        }
+                        .letter {
+                            margin-bottom: 0.3rem;
+                            page-break-after: always;
+                        }
+                       
+                        @media print {
+                            body {
+                                width: 21cm;
+                                height: 29.7cm;
+                      
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${letterContent}
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+    };
 
     return (
         <main className="bg-gray-100">
@@ -167,6 +224,8 @@ function DispatchLetter() {
                 <div className="overflow-x-auto" style={{ zIndex: -1 }}>
                     <MaterialReactTable table={table} />
                 </div>
+                <Button variant="primary" onClick={handleDispatchLetter}className="mt-8 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    Dispatch Letter</Button>
             </div>
         </main>
     );
