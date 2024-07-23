@@ -35,6 +35,34 @@ const voterList = asyncHandler(async (req, res) => {
 
     try {
         const results = await queryDatabase(
+            `SELECT voterlist.Id, PacketNo, EFName, HFName, ELName, HLName, RType, ERFName, HRFName, 
+            ERLName, HRLName, CasteId, caste.ECaste, Qualification, Occupation, Age, 
+            DATE_FORMAT(DOB, '%d/%m/%Y') as DOB, Sex, MNo, MNo2, AadharNo, VIdNo, GCYear, 
+             AreaVill.EAreaVill ,AreaVill.HAreaVill, AreaId, TehId, CounId, VSId, WBId, ChkBlkId, HNo, Landmark, Image, IdProof, Degree 
+            FROM voterlist 
+            LEFT JOIN caste ON CasteId = caste.ID 
+            LEFT JOIN AreaVill ON AreaId= AreaVill.Id
+            WHERE WBId = ?`, 
+            [WBId]
+        );
+
+        return res.json(results);
+    } catch (error) {
+        console.error('Database query error', error);
+        return res.status(500).json({ error: 'A database error occurred.' });
+    }
+});
+
+const NullMobVoterList = asyncHandler(async (req, res) => {
+
+    const { WBId } = req.body;
+
+    if (!WBId) {
+        return res.status(400).json({ error: 'WBId parameter is required' });
+    }
+
+    try {
+        const results = await queryDatabase(
             `SELECT RegNo, PacketNo, EFName, HFName, ELName, HLName, RType, ERFName, HRFName, 
             ERLName, HRLName, CasteId, caste.ECaste, Qualification, Occupation, Age, 
             DATE_FORMAT(DOB, '%d/%m/%Y') as DOB, Sex, MNo, MNo2, AadharNo, VIdNo, GCYear, 
@@ -52,7 +80,6 @@ const voterList = asyncHandler(async (req, res) => {
         return res.status(500).json({ error: 'A database error occurred.' });
     }
 });
-
 const NoMobvoterList = asyncHandler(async (req, res) => {
 
     const { WBId } = req.body;

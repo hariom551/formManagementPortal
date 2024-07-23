@@ -72,12 +72,32 @@ function VoterList() {
                 size: 50,
                 Cell: ({ row }) => row.index + 1,
             },
-            { accessorKey: 'RegNo', header: 'Id', size: 10 },
-            { accessorKey: 'EFName', header: 'Name (English)', size: 20 },
-            { accessorKey: 'HFName', header: 'Name (Hindi)', size: 20 },
+            { accessorKey: 'Id', header: 'Id', size: 10 },
+            { accessorKey: 'EFName', header: 'Name (English)', size: 20,
+                Cell : ({cell}) =>{
+                    const {EFName, ELName }= cell.row.original;
+                    return `${EFName} ${ELName}`
+                },
+             },
+            { accessorKey: 'HFName', header: 'Name (Hindi)', size: 20,
+                Cell : ({cell}) =>{
+                    const {HFName, HLName }= cell.row.original;
+                    return `${HFName} ${HLName}`
+                },
+             },
             { accessorKey: 'RType', header: 'Relation', size: 10 },
-            { accessorKey: 'ERFName', header: 'Relative Name (English)', size: 20 },
-            { accessorKey: 'HRFName', header: 'Relative Name (Hindi)', size: 20 },
+            { accessorKey: 'ERFName', header: 'Relative Name (English)', size: 20,
+                Cell : ({cell}) =>{
+                    const {ERFName, ERLName }= cell.row.original;
+                    return `${ERFName} ${ERLName}`
+                },
+             },
+            { accessorKey: 'HRFName', header: 'Relative Name (Hindi)', size: 20,
+                Cell : ({cell}) =>{
+                    const {HRFName, HRLName }= cell.row.original;
+                    return `${HRFName} ${HRLName}`
+                },
+             },
             {
                 accessorKey: 'EAreaVillHNo',
                 header: 'Address',
@@ -139,7 +159,7 @@ function VoterList() {
                     size: 10,
                     Cell: ({ row }) => (
                         <Button variant="primary" className="Edit">
-                            <Link to={{ pathname: "/edit", search: `?content=${row.original.id}` }}>
+                            <Link to={{ pathname: "/edit", search: `?content=${row.original.Id}` }}>
                                 Edit
                             </Link>
                         </Button>
@@ -150,7 +170,7 @@ function VoterList() {
                     size: 10,
                     Cell: ({ row }) => (
                         <Button variant="danger" className="Edit">
-                            <Link to={{ pathname: "/delete", search: `?content=${row.original.userid}` }}>
+                            <Link to={{ pathname: "/delete", search: `?content=${row.original.Id}` }}>
                                 delete
                             </Link>
                         </Button>

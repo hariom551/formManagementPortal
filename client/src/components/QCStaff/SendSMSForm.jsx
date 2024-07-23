@@ -6,14 +6,15 @@ import Select from 'react-select';
 import Button from 'react-bootstrap/Button';
 import Papa from 'papaparse';
 
+
 const SendSMSForm = () => {
     const [WBOptions, setWBOptions] = useState([]);
     const [formData, setFormData] = useState({
         WBId: '',
         source: 'Database',
-        csvFile: null,
         Total_mobile_numbers: '',
         total_records: '',
+        csvFile: null,
         exMobile: '',
         exPerson: ''
     });
@@ -62,8 +63,7 @@ const SendSMSForm = () => {
             }
             
             const data = await response.json();
-            console.log("Received data:", data); // Log the received data
-            
+    
             setFormData(prev => ({
                 ...prev,
                 Total_mobile_numbers: data[0].Total_mobile_numbers,
@@ -72,7 +72,7 @@ const SendSMSForm = () => {
             
             toast.success(data.message || 'Voters details fetched successfully');
         } catch (error) {
-            console.error("Error in handleApply:", error);
+         
             toast.error(`Error in fetching voters details: ${error.message}`);
         }
     };
@@ -89,6 +89,7 @@ const SendSMSForm = () => {
                 header: true,
             });
         }
+        console.log(csvData);
     };
 
     const handleSubmit = async (e) => {
@@ -136,7 +137,7 @@ const SendSMSForm = () => {
                             id="Externalfile"
                             name="source"
                             value="Externalfile"
-                            label="External file"
+                            label="External file (CSV)."
                             checked={formData.source === 'Externalfile'}
                             onChange={handleInputChange}
                         />

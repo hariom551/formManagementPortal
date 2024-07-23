@@ -28,8 +28,11 @@ app.use(session({
 
 
 app.post('/send-sms', async (req, res) => {
-    const { name, railwaynum, pwds, mob } = req.body;
-
+    // const { name, railwaynum, pwds, mob } = req.body;
+    const name="Hariom";
+    const railwaynum = "123";
+    const pwds = "123";
+    const mob="8115644226";
     const smss = `Dear ${name} your registration is successful in RRC NER for Apprenticeship your registration no. is ${railwaynum} and password is ${pwds}. SISTEK`;
     
     const mainsms2 = encodeURIComponent(smss);
