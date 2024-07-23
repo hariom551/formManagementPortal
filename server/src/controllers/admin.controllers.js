@@ -2,24 +2,11 @@ import jwt from 'jsonwebtoken';
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { pool } from '../db/database.js';
+import { queryDatabase } from '../utils/queryDatabase.js';
 
-
-function queryDatabase(sql, params) {
-    return new Promise((resolve, reject) => {
-        pool.query(sql, params, (error, results) => {
-            if (error) {
-                reject(error);
-            } else {
-                resolve(results);
-            }
-        });
-    });
-}
 
 const AddCaste = asyncHandler(async (req, res) => {
     const { ESurname, HSurname, ECaste, HCaste } = req.body;
-
     if (!ESurname || !HSurname || !ECaste || !HCaste) {
         throw new ApiError(400, "Please enter all details!")
     }
@@ -44,7 +31,6 @@ const AddCaste = asyncHandler(async (req, res) => {
 });
 
 const casteDetails = asyncHandler(async (req, res) => {
-
     try {
         const results = await queryDatabase('SELECT * FROM caste');
         return res.json(results); // Should correctly return the results array
@@ -59,7 +45,6 @@ const UpdateCasteDetail = asyncHandler(async (req, res) => {
     if (!ID || !ESurname || !HSurname || !ECaste || !HCaste) {
         throw new ApiError(400, "Please enter all details!")
     }
-
     try {
         await queryDatabase(
             'UPDATE caste SET ESurname= ?, HSurname= ?, ECaste= ?, HCaste= ? WHERE ID= ?',
@@ -81,11 +66,9 @@ const UpdateCasteDetail = asyncHandler(async (req, res) => {
 
 const AddTehsil = asyncHandler(async (req, res) => {
     const { EName, HName } = req.body;
-
     if (!EName || !HName) {
         throw new ApiError(400, "Please enter all details!")
     }
-
     try {
         await queryDatabase(
             'INSERT INTO tehsillist (EName, HName) VALUES (?, ?)',
@@ -106,7 +89,6 @@ const AddTehsil = asyncHandler(async (req, res) => {
 });
 
 const TehsilDetails = asyncHandler(async (req, res) => {
-
     try {
         const results = await queryDatabase('SELECT * FROM tehsillist');
         return res.json(results); // Should correctly return the results array
@@ -121,7 +103,6 @@ const UpdateTehsilDetail = asyncHandler(async (req, res) => {
     if (!Id || !EName || !HName) {
         throw new ApiError(400, "Please enter all details!")
     }
-
     try {
         await queryDatabase(
             'UPDATE Tehsillist SET EName= ?, HName= ? WHERE Id= ?',
@@ -144,8 +125,9 @@ const UpdateTehsilDetail = asyncHandler(async (req, res) => {
 
 const DeleteTehsilDetail = asyncHandler(async (req, res) => {
     const { Id } = req.body;
-
-
+    if (!Id) {
+        return res.status(400).json({ error: "Id is required" });
+    }
     try {
         await queryDatabase(
             'DELETE FROM tehsillist WHERE Id= ?',
@@ -157,7 +139,7 @@ const DeleteTehsilDetail = asyncHandler(async (req, res) => {
             new ApiResponse(200, "Tehsil details Deleted successfully")
         );
     } catch (error) {
-        console.error('Database query error', error);
+        
         return res.status(error.statusCode || 500).json(new ApiResponse(error.statusCode || 500, null, error.message || "Internal Server Error"));
     }
 });

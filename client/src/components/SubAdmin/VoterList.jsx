@@ -61,6 +61,30 @@ function VoterList() {
         }
     };
 
+    const handleDelete = async (Id) =>{
+        try {
+          let result = await fetch("/api/v1/qualityStaff/DeleteVoter", {
+            method: 'POST',
+            body: JSON.stringify({Id}),
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+    
+          if (result.ok) {
+            setVotersDetails(prevVoters => prevVoters.filter(voter => voter.Id !== Id));
+            toast.success("Voter delete successfully.");
+            // setTimeout(() => {
+            //   window.location.reload();
+            // }, 100);
+          } else {
+            toast.error("Error in deleting voter:", result.statusText);
+          }
+        } catch (error) {
+          toast.error("Error in  deleting voter:", error.message);
+        }
+    };
+
     const user = JSON.parse(localStorage.getItem('user'));
     const userRole = user ? user.role : '';
 
@@ -169,11 +193,16 @@ function VoterList() {
                     header: 'Delete',
                     size: 10,
                     Cell: ({ row }) => (
-                        <Button variant="danger" className="Edit">
-                            <Link to={{ pathname: "/delete", search: `?content=${row.original.Id}` }}>
-                                delete
-                            </Link>
-                        </Button>
+                        <Button variant="danger"  onClick={() => handleDelete(row.original.Id)} className="delete" type='button'>
+      
+                        Delete
+                      
+                    </Button>
+                        // <Button variant="danger" className="Edit">
+                        //     <Link to={{ pathname: "/delete", search: `?content=${row.original.Id}` }}>
+                        //         delete
+                        //     </Link>
+                        // </Button>
                     ),
                 }          
             

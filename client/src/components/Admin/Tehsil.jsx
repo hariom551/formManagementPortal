@@ -128,8 +128,6 @@ function Tehsil() {
   };
 
   const handleDelete = async (Id) =>{
-  
-
     try {
       let result = await fetch("/api/v1/Admin/deleteTehsilDetail", {
         method: 'POST',
@@ -141,18 +139,17 @@ function Tehsil() {
 
       if (result.ok) {
 
-        toast.success("Tehsil Added Successfully successfully.");
+        toast.success("Tehsil Deleted Successfully successfully.");
         setTimeout(() => {
           window.location.reload();
         }, 500);
       } else {
-        toast.error("Error in Adding Tehsil:", result.statusText);
+        toast.error("Error in Deleting Tehsil:", result.statusText);
       }
     } catch (error) {
-      toast.error("Error in Adding Tehsil:", error.message);
+      toast.error("Error in Deleting Tehsil:", error.message);
     }
   };
-
 
   const columns = useMemo(() => [
     {
@@ -184,12 +181,12 @@ function Tehsil() {
     {
       accessorKey: 'EName',
       header: 'Tehsil Name (English)',
-      size: 20,
+      size: 15,
     },
     {
         accessorKey: 'HName',
         header: 'Tehsil Name (Hindi)',
-        size: 20,
+        size: 15,
       },
    
   ], []);

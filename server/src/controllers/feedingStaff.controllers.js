@@ -1,20 +1,9 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { pool } from '../db/database.js';
 import { uploadFiles } from "../middleware/multer.middleware.js";
+import { queryDatabase } from "../utils/queryDatabase.js";
 
-function queryDatabase(sql, params) {
-    return new Promise((resolve, reject) => {
-        pool.query(sql, params, (error, results) => {
-            if (error) {
-                reject(error);
-            } else {
-                resolve(results);
-            }
-        });
-    });
-}
 
 const searchSurname = asyncHandler(async (req, res) => {
     const { query } = req.body;
@@ -47,7 +36,6 @@ const searchCaste = asyncHandler(async (req, res) => {
         return res.status(500).send('A database error occurred.');
     }
 });
-
 
 const searchAreaVill = asyncHandler(async (req, res) => {
     const { query } = req.body;
