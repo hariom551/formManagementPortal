@@ -102,30 +102,31 @@ function AddVoter() {
     const user = JSON.parse(localStorage.getItem('user'));
     const userRole = user ? user.role : '';
 
-    useEffect(()=>{
-        const fetchData= async()=>{
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!content) return;
             try {
-                const response= await fetch ('/api/v1/qualitystaff/voterDetailById',{
+                const response = await fetch('/api/v1/qualitystaff/voterDetailById', {
                     method: 'POST',
-                    body: JSON.stringify({ content: content }),
-                    headers:{
+                    body: JSON.stringify({ content }),
+                    headers: {
                         'Content-Type': 'application/json'
                     }
                 });
-                if(!response.ok){
-                    throw new Error("failed to fetch the voter data");
+                if (!response.ok) {
+                    throw new Error("Failed to fetch the voter data");
                 }
-                const data = await response.json();
-                if(!data || !Array.isArray(data) || data.length ===0){
-                    throw new Error ("Empty or invalid deta");
+                const result = await response.json();
+                if (!result.success || result.statusCode !== 200 || !Array.isArray(result.data) || result.data.length === 0) {
+                    throw new Error(result.message || "Empty or invalid data");
                 }
-                setVoterDetails(data);
+                setVoterDetails(prevState => ({ ...prevState, ...result.data[0] }));
             } catch (error) {
-                toast.error('Error in fetching voter data', error);
+                toast.error('Error in fetching voter data: ' + error.message);
             }
         };
         fetchData();
-    },[content]);
+    }, [content]);
 
 
 
