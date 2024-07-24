@@ -15,10 +15,11 @@ const wardwiseVoterContact = asyncHandler(async (req, res) => {
             `SELECT COUNT(Id) AS total_records, COUNT( MNo) AS Total_mobile_numbers FROM voterlist WHERE WBId = ?`, [WBId]
         );
 
-        return res.status(200).send(result);
-
+         return res.status(201).json(
+            new ApiResponse(200, result, " details fetched successfully")
+        )
     } catch (error) {
-        return res.status(500).json({ error: 'A database error occurred.' })
+        return res.status(error.statusCode || 500).json(new ApiResponse(error.statusCode || 500, null, error.message || "Internal Server Error"));
     }
 })
 
@@ -121,4 +122,25 @@ const DeleteVoter = asyncHandler(async (req, res) => {
 
 });
 
-export { wardwiseVoterContact, sendSMS, DeleteVoter }; 
+const voterDetailById = asyncHandler(async (req, res)=>{
+    const {content}= req.body;
+    console.log("hariom",content);
+    if(!content){
+        return res.status(400).json({ error: "Id is required" });
+    }
+    try {
+        const results = await queryDatabase('SELECT * FROM voterlist WHERE Id = ?',[content]);
+
+        return res.status(201).json(
+            new ApiResponse(200, results, " details fetched successfully")
+        )
+    } catch (error) {
+        return res.status(error.statusCode || 500).json(new ApiResponse(error.statusCode || 500, null, error.message || "Internal Server Error"));
+    }
+
+
+
+
+});
+
+export { wardwiseVoterContact, sendSMS, DeleteVoter, voterDetailById }; 

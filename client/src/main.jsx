@@ -98,6 +98,7 @@ const getRoutesForRole = (role) => {
           <Route path="/DispatchLetter" element={<DispatchLetter />} />
           <Route path="/Telecaller" element={<SearchChakBlock />} />
           <Route path="/QcForm" element={<SendSMSForm />} />
+          <Route path="/editVoter" element={<AddVoter />} />
         </>
       );
 

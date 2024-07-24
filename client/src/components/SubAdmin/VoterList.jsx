@@ -39,28 +39,31 @@ function VoterList() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         try {
-            const result = await fetch("/api/v1/subAdmin/voterList", {
+            const response = await fetch("/api/v1/subAdmin/voterList", {
                 method: 'POST',
                 body: JSON.stringify(formData),
                 headers: { 'Content-Type': 'application/json' }
             });
-
-            if (result.ok) {
-                const data = await result.json();
+    
+            if (response.ok) {
+                const result = await response.json();
+                const data = result.data;
                 if (!data || !Array.isArray(data) || data.length === 0) throw new Error('Empty or invalid voter list data');
-
+    
                 setVotersDetails(data);
                 toast.success("Voter list fetched successfully.");
             } else {
-                toast.error(`Error in fetching details: ${result.statusText}`);
+                setVotersDetails([]);
+                toast.error(`Error in fetching details: ${response.statusText}`);
             }
         } catch (error) {
+            setVotersDetails([]);
             toast.error(`Error in fetching: ${error.message}`);
         }
     };
-
+    
     const handleDelete = async (Id) =>{
         try {
           let result = await fetch("/api/v1/qualityStaff/DeleteVoter", {
@@ -74,9 +77,7 @@ function VoterList() {
           if (result.ok) {
             setVotersDetails(prevVoters => prevVoters.filter(voter => voter.Id !== Id));
             toast.success("Voter delete successfully.");
-            // setTimeout(() => {
-            //   window.location.reload();
-            // }, 100);
+          
           } else {
             toast.error("Error in deleting voter:", result.statusText);
           }
@@ -183,7 +184,7 @@ function VoterList() {
                     size: 10,
                     Cell: ({ row }) => (
                         <Button variant="primary" className="Edit">
-                            <Link to={{ pathname: "/edit", search: `?content=${row.original.Id}` }}>
+                            <Link to={{ pathname: "/editVoter", search: `?content=${row.original.Id}` }}>
                                 Edit
                             </Link>
                         </Button>
@@ -198,11 +199,7 @@ function VoterList() {
                         Delete
                       
                     </Button>
-                        // <Button variant="danger" className="Edit">
-                        //     <Link to={{ pathname: "/delete", search: `?content=${row.original.Id}` }}>
-                        //         delete
-                        //     </Link>
-                        // </Button>
+                       
                     ),
                 }          
             

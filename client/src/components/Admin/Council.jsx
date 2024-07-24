@@ -45,10 +45,10 @@ function Council() {
         if (!data || !Array.isArray(data) || data.length === 0) {
           throw new Error('Empty or invalid Tehsil options data');
         }
-        // Map data to an array of { value, label } objects
+     
         const options = data.map(tehsil => ({ value: tehsil.Id, label: tehsil.EName }));
         setTehsilOptions(options);
-        // console.log(options);
+     
       } catch (error) {
         toast.error('Error fetching Tehsil options:', error);
       }
@@ -78,9 +78,7 @@ function Council() {
           const Council = data.find(item => { return item.Id == content });
           if (Council) {
             setFormData(Council);
-
             window.scrollTo({ top: 0, behavior: 'smooth' });
-
           } else {
             toast.error(`Council with ID ${content} not found`);
           }
@@ -89,7 +87,6 @@ function Council() {
         toast.error('Error fetching Council data:', error);
       }
     };
-
     fetchData();
   }, [content]);
 
@@ -138,7 +135,7 @@ function Council() {
         toast.success("Council Updated successfully.");
         setTimeout(() => {
           window.location.href = '/Council';
-        }, 2000);
+        }, 1000);
       } else {
         toast.error("Error in Updating Council:", result.statusText);
       }
@@ -160,8 +157,6 @@ function Council() {
 
 
   const handleDelete = async (Id) => {
-
-
     try {
       let result = await fetch("/api/v1/Admin/deleteCouncilDetail", {
         method: 'POST',

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Button, Form } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -8,9 +9,16 @@ import AddressInformationForm from './AddressInformationForm.jsx';
 import VoterDocs from './VoterDocs.jsx';
 import { Occupation } from '../Pages/Constaint.jsx';
 import { validateVoterDetails } from '../../Validation/voterDetailsValidation.js';
+import { ExtraVoterForm } from '../QCStaff/ExtraVoterForm.jsx';
 
 
 function AddVoter() {
+
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const content = searchParams.get('content');
+
+
     const [referenceDetails, setReferenceDetails] = useState({
         PacketNo: '',
         IncRefId: '',
@@ -70,8 +78,19 @@ function AddVoter() {
         Image: '',
         IdProof: '',
         Degree: '',
-   
+
     });
+
+    const [extraDetails, setExtraDetails] = useState({
+        MobileNoRemark: '',
+        AddressRemark: '',
+        NameRemark: '',
+        FatherNameRemark: '',
+        RequiredForms: '',
+        DeathRemark: '',
+        ExtraRemark: '',
+        SpeacialRemark: '',
+    })
 
     const [errors, setErrors] = useState({
         referenceDetails: {},
@@ -79,6 +98,36 @@ function AddVoter() {
         addressDetail: {},
         voterDocs: {},
     });
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userRole = user ? user.role : '';
+
+    useEffect(()=>{
+        const fetchData= async()=>{
+            try {
+                const response= await fetch ('/api/v1/qualitystaff/voterDetailById',{
+                    method: 'POST',
+                    body: JSON.stringify({ content: content }),
+                    headers:{
+                        'Content-Type': 'application/json'
+                    }
+                });
+                if(!response.ok){
+                    throw new Error("failed to fetch the voter data");
+                }
+                const data = await response.json();
+                if(!data || !Array.isArray(data) || data.length ===0){
+                    throw new Error ("Empty or invalid deta");
+                }
+                setVoterDetails(data);
+            } catch (error) {
+                toast.error('Error in fetching voter data', error);
+            }
+        };
+        fetchData();
+    },[content]);
+
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -102,10 +151,10 @@ function AddVoter() {
         });
 
         const addressDetailError = {};
-        Object.keys(addressDetail).forEach((field)=>{
+        Object.keys(addressDetail).forEach((field) => {
             const error = validateVoterDetails(field, addressDetail[field]);
-            if (error){
-                addressDetailError[field]= error;
+            if (error) {
+                addressDetailError[field] = error;
             }
         });
 
@@ -129,6 +178,7 @@ function AddVoter() {
             }));
             formData.append('voterDetails', JSON.stringify(voterDetails));
             formData.append('addressDetail', JSON.stringify(addressDetail));
+
 
             Object.keys(voterDocs).forEach(key => {
                 if (voterDocs[key].file) {
@@ -204,7 +254,7 @@ function AddVoter() {
                 Image: '',
                 IdProof: '',
                 Degree: '',
-                
+
             });
             setErrors({
                 referenceDetails: {},
@@ -218,11 +268,35 @@ function AddVoter() {
         }
     };
 
+    const handleUpdate = async (e)=>{
+        e.preventDefault();
+        try {
+            const result = await fetch("/api/v1/qcstaff/UpdateVoterDetails",{
+                method: 'POST',
+                body: JSON.stringify(),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+        });
+        if (result.ok){
+            toast.success("voter details updated successfully");
+            setTimeout(()=>{
+                window.location.href='/VoterList';
+            },1000);
+        }else{
+            toast.error("Error in updating voter data", result.statusText);
+        }
+            
+        } catch (error) {
+            toast.error("Error in updating :", error.message);
+        }
+    }
+
     return (
         <main className="bg-gray-100">
             <ToastContainer />
             <div className="container py-4 text-black">
-                <Form onSubmit={handleSubmit} className="Council-form">
+                <Form onSubmit={content ? handleUpdate : handleSubmit} className="Council-form">
                     <ReferenceDetailsForm
                         referenceDetails={referenceDetails}
                         setReferenceDetails={setReferenceDetails}
@@ -251,7 +325,16 @@ function AddVoter() {
                         setErrors={setErrors}
                     />
 
-                    <Button type="submit" className="mt-4">Submit</Button>
+                    {userRole === 'QC Staff' &&
+                        <ExtraVoterForm
+                            extraDetails={extraDetails}
+                            setExtraDetails={setExtraDetails}
+                        />
+                    }
+
+                    <Button variant="primary" type="submit">
+                        {content ? 'Update' : 'Submit'}
+                    </Button>
                 </Form>
             </div>
         </main>
