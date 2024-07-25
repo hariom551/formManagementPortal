@@ -11,13 +11,10 @@ import { Occupation } from '../Pages/Constaint.jsx';
 import { validateVoterDetails } from '../../Validation/voterDetailsValidation.js';
 import { ExtraVoterForm } from '../QCStaff/ExtraVoterForm.jsx';
 
-
 function AddVoter() {
-
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const content = searchParams.get('content');
-
 
     const [referenceDetails, setReferenceDetails] = useState({
         PacketNo: '',
@@ -120,6 +117,8 @@ function AddVoter() {
                 if (!result.success || result.statusCode !== 200 || !Array.isArray(result.data) || result.data.length === 0) {
                     throw new Error(result.message || "Empty or invalid data");
                 }
+                setReferenceDetails(prevState=>({...prevState, PacketNo: result.data[0].PacketNo}))
+                console.log(result.data[0].PacketNo);
                 setVoterDetails(prevState => ({ ...prevState, ...result.data[0] }));
             } catch (error) {
                 toast.error('Error in fetching voter data: ' + error.message);
@@ -127,9 +126,7 @@ function AddVoter() {
         };
         fetchData();
     }, [content]);
-
-
-
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -336,6 +333,7 @@ function AddVoter() {
                     <Button variant="primary" type="submit">
                         {content ? 'Update' : 'Submit'}
                     </Button>
+
                 </Form>
             </div>
         </main>

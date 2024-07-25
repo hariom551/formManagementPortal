@@ -7,6 +7,7 @@ import { Typeahead } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 
 function ReferenceDetailsForm({ referenceDetails, setReferenceDetails, errors, setErrors }) {
+ 
     const [packetOptions, setPacketOptions] = useState([]);
     const fetchPacketOptions = async (inputValue) => {
         try {
